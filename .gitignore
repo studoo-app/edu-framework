@@ -1,8 +1,14 @@
 # Managed by Composer
-/vendor/
+vendor/
 
-# Composer PHAR
-/composer.phar
+# Composer
+composer.phar
+composer.lock
 
 # IDE configuration
-/.idea/**
+.idea/**
+
+# Testing @ QA
+.php-cs-fixer.cache
+.php-cs-fixer.php
+.phpunit.result.cache
