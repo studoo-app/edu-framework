@@ -1,0 +1,33 @@
+{
+  "name": "studoo/edu-framework",
+  "description": "Light Education PHP framework",
+  "keywords": ["education", "framework", "mvc", "php"],
+  "version": "0.0.1",
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Benoit Foujols",
+      "email": "Benoit.Foujols@ac-creteil.fr"
+    },
+    {
+      "name": "Studoo Community",
+      "homepage": "https://github.com/orgs/studoo-app/people"
+    }
+  ],
+  "require": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Studoo\\EduFramework\\Core\\": "src/EduFramework/Core/",
+      "": "app/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/studoo-app/edu-framework"
+    }
+  ]
+}
