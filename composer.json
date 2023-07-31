@@ -16,7 +16,12 @@
     }
   ],
   "require": {
-    "php": ">=8.0"
+    "php": ">=8.0",
+    "vlucas/phpdotenv": "^v5.5"
+  }
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
   },
   "autoload": {
     "psr-4": {
@@ -29,5 +34,14 @@
       "type": "vcs",
       "url": "https://github.com/studoo-app/edu-framework"
     }
-  ]
+  ],
+  "scripts": {
+    "edu-start": [
+      "Composer\\Config::disableProcessTimeout",
+      "php -S localhost:8042 -t public"
+    ],
+    "edu-init": [
+      "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ]
+  }
 }
