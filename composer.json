@@ -36,11 +36,11 @@
     }
   ],
   "scripts": {
-    "edu-start": [
+    "edu:start": [
       "Composer\\Config::disableProcessTimeout",
       "php -S localhost:8042 -t public"
     ],
-    "edu-init": [
+    "edu:init": [
       "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ]
   }
