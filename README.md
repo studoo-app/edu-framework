@@ -1,5 +1,8 @@
 ![separe](https://github.com/studoo-app/.github/blob/main/profile/studoo-banner-logo.png)
 # Edu Framework
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b936ac0094564dfeb00d4b6a736e4823)](https://app.codacy.com/gh/studoo-app/edu-framework?utm_source=github.com&utm_medium=referral&utm_content=studoo-app/edu-framework&utm_campaign=Badge_Grade)
+
 Voici une proposition d'architecture MVC pour l'élaboration d'un projet ou de TP en cours \
 L'objectif pédagogique est :
 - Appréhender un projet par couche via MVC
