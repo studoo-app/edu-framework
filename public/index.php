@@ -20,7 +20,7 @@ $en = TwigCore::getEnvironment();
 // Une route est une association entre une URL et un contrôleur
 // Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $route) {
-    //$route->addRoute('GET', '/', 'Controller\HomeController');
+    $route->addRoute('GET', '/', 'Controller\HomeController');
 });
 
 // Le dispatcher va permettre de faire le lien entre l'URL et le contrôleur.
