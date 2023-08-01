@@ -3,10 +3,12 @@
 namespace Studoo\EduFramework\Core\Controller;
 
 use FastRoute\Dispatcher;
+use Studoo\EduFramework\Core\Controller\Error\HttpController;
 
 class FastRouteCore
 {
-    public static function getDispatcher($dispatcher) {
+    public static function getDispatcher($dispatcher)
+    {
 
         // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
