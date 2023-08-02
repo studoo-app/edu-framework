@@ -1,4 +1,12 @@
 <?php
+/*
+ * Ce fichier fait partie du Studoo
+ *
+ * @author Benoit Foujols
+ *
+ * Pour les informations complètes sur les droits d'auteur et la licence,
+ * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
+ */
 
 namespace Studoo\EduFramework\Core\Controller\Error;
 
@@ -9,16 +17,20 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class HttpController implements ControllerInterface
+/**
+ * Class HttpError404Controller
+ * Classe Controller pour les erreurs HTTP
+ */
+class HttpError404Controller implements ControllerInterface
 {
     /**
+     * Si y a pas de route valide alors j'affiche la page 404
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
      */
     public function execute(Request $request)
     {
-        // Si y a pas de GET alors j'affiche tout
         return TwigCore::getEnvironment()->render(
             'error/http-404.html.twig',
             []);
