@@ -1,0 +1,193 @@
+#   _____         _     __ _ _
+# |_   _|_ _ ___| | __/ _(_) | ___
+#   | |/ _` / __| |/ / |_| | |/ _ \
+#   | | (_| \__ \   <|  _| | |  __/
+#   |_|\__,_|___/_|\_\_| |_|_|\___|
+#
+# https://taskfile.dev
+#
+
+version: '3'
+
+silent: true
+
+##
+## ===   Variables ==================================================
+##
+
+vars:
+  #
+  # TASKFILE
+  CONTRIBUTOR: "Benoit Foujols"
+  ENV: main
+  #
+  # SYSTEM
+  PWD: $PWD
+  #
+  # DOCKER
+  DOCKER: docker
+  DOCKER_FILE: docker-compose.yml
+  DOCKER_RUN: "{{.DOCKER}} run"
+  DOCKER_COMPOSE: "{{.DOCKER}} compose"
+  #
+  # COMPOSER
+  COMPOSER: composer
+  #
+  # PHP UNIT TOOLS
+  PHPUNIT: "php vendor/bin/phpunit"
+  #
+  # PHP QA TOOLS
+  PHPQA: jakzal/phpqa:php8.1-alpine
+  PHPQA_RUN: "{{.DOCKER_RUN}} --init -it --rm -v {{.PWD}}:/project -w /project {{.PHPQA}}"
+
+##
+## ===   TASKS ==================================================
+##
+
+tasks:
+  default:
+    cmds:
+      - task: help
+
+  ## === 🆘  HELP ==================================================
+
+  help:
+    desc: "Description des tâches disponibles"
+    cmds:
+      - echo " ";
+      - echo " 📦 YOUR SYSTEM ---------------------------------------------------------"
+      - echo "Version {{.VERSION}}"
+      - echo 'Your system "{{OS}}" / "{{ARCH}}"'
+      - echo " ";
+      - echo " 📦 ESSENTIAL TASK ---------------------------------------------------------"
+      - echo "* start               Start project exemple"
+      - echo "* stop                Stop project exemple"
+      - echo "* before-commit       Analyse project before commit"
+      - echo " ";
+      - echo " 🎛️ OTHER TASK ----------------------------------------------------------"
+      - task --list
+
+  ## === 🐋  DOCKER ================================================
+
+  docker-up:
+    desc: "Start docker containers"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} up -d"
+
+  docker-stop:
+    desc: "Stop docker containers"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} stop"
+
+  docker-down:
+    desc: "Stop and remove docker containers, networks.."
+    cmds:
+      - "{{.DOCKER_COMPOSE}} down"
+
+  docker-reset:
+    desc: "Stop and reset on your environment"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} down -v"
+
+  ## === 📦  COMPOSER ==============================================
+
+  composer-install:
+    desc: "Install composer dependencies"
+    cmds:
+      - "{{.COMPOSER}} install"
+
+  composer-update:
+    desc: "Update composer dependencies"
+    cmds:
+      -  "{{.COMPOSER}} update"
+
+  composer-validate:
+    desc: Validate composer.json file.
+    cmds:
+      - "{{.COMPOSER}} validate"
+
+  composer-validate-deep:
+    desc: Validate composer.json and composer.lock files in strict mode.
+    cmds:
+      - "{{.COMPOSER}} validate --strict --check-lock"
+
+  ## === 🐛  PHPQA =================================================
+
+  qa-cs-fixer-dry-run:
+    desc: "Run php-cs-fixer dry run"
+    cmds:
+      - "{{.PHPQA_RUN}} php-cs-fixer fix ./src --verbose --dry-run"
+
+  qa-cs-fixer:
+    desc: "Run php-cs-fixer"
+    cmds:
+      - "{{.PHPQA_RUN}} php-cs-fixer fix ./src --verbose"
+
+  qa-phpstan:
+    desc: "Run phpstan"
+    cmds:
+      - "{{.PHPQA_RUN}} phpstan analyse ./src --level=7"
+
+  qa-phpcpd:
+    desc: "Run phpcpd (copy/paste detector)"
+    cmds:
+      - "{{.PHPQA_RUN}} phpcpd ./src"
+
+  qa-php-metrics:
+    desc: "Run php-metrics"
+    cmds:
+      - "{{.PHPQA_RUN}} phpmetrics --report-html=var/phpmetrics ./src"
+
+  ## === 🔎  TESTS =================================================
+
+  tests:
+    desc: "Run tests"
+    cmds:
+      - "{{.PHPUNIT}} --testdox"
+
+  tests-coverage:
+    desc: "Run tests with coverage"
+    cmds:
+      - "{{.PHPUNIT}} --testdox tests --coverage-clover clover.xml"
+
+  ## === ⭐  OTHERS =================================================
+
+  before-commit:
+    desc: "Run before commit"
+    cmds:
+      - task: qa-cs-fixer
+      - task: qa-phpstan
+      - task: qa-phpcpd
+      - task: tests
+      - task: tests-coverage
+
+  testunit:
+    desc: "Run tests"
+    cmds:
+      - task: docker-up
+      - task: tests
+      - task: docker-down
+
+  ex-start:
+    desc: "Start project exemple"
+    cmds:
+      - |
+        Composer start
+
+  start:
+    desc: "Start"
+    cmds:
+      - task: docker-up
+      - task: ex-start
+
+  stop:
+    desc: "Stop"
+    cmds:
+      - |
+        echo "Are you docker stop or down ? [S/d] :"
+        read CONFIRM_DOCKER
+        if [ "$CONFIRM_DOCKER" = "d" ]; then
+          task docker-down
+        else
+          task docker-stop
+        fi
