@@ -21,8 +21,8 @@ interface ControllerInterface
      * La méthode execute() est appelée par le dispatcher
      * Elle permet d'exécuter le controller et de retourner le résultat
      *
-     * @param Request $request
-     * @return mixed
+     * @param Request $request La requête HTTP
+     * @return string
      */
-    public function execute(Request $request);
+    public function execute(Request $request): string;
 }

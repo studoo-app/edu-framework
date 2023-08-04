@@ -38,12 +38,6 @@ class Request
     private string $hander;
 
     /**
-     * Le controller via interface ControllerInterface
-     * @var ControllerInterface $controller
-     */
-    private ControllerInterface $controller;
-
-    /**
      * Les variables de la requête HTTP
      * @var array<mixed> $vars
      */
@@ -52,8 +46,8 @@ class Request
     /**
      * Une requete HTTP a obligatoirement une route et une méthode HTTP (GET, POST ...)
      * Cet objet est présent dans la méthode execute() d'un controller
-     * @param string $route
-     * @param string $httpMethod
+     * @param string $route La route de la requête
+     * @param string $httpMethod La méthode HTTP de la requête
      */
     public function __construct(string $route, string $httpMethod)
     {
@@ -63,7 +57,7 @@ class Request
 
     /**
      * Permet de récupérer une variable de la requête HTTP
-     * @param string $key
+     * @param string $key Le nom de la variable
      * @return string|null
      */
     public function get(string $key): string|null
@@ -82,30 +76,13 @@ class Request
 
     /**
      * Permet de définir le nom et instancier le controller qui est associé à la requête HTTP
-     * @param string $hander
+     * @param string $hander Le nom de la classe du controller
      * @return Request
-     * @throws ErrorHttpStatusException
      */
     public function setHander(string $hander): Request
     {
         $this->hander = $hander;
-        // On vérifie que le controller existe
-        if (!class_exists($hander)) {
-            throw new ErrorHttpStatusException("Le controller $hander n'existe pas");
-        }
-        // On instancie le controller
-        $this->controller = new $hander();
-
         return $this;
-    }
-
-    /**
-     * Renvoi le controller qui est associé à la requête HTTP
-     * @return ControllerInterface
-     */
-    public function getController(): ControllerInterface
-    {
-        return $this->controller;
     }
 
     /**

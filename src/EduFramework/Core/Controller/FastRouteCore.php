@@ -23,6 +23,8 @@ use Twig\Error\SyntaxError;
  */
 class FastRouteCore
 {
+    use BuildControllerTrait;
+
     /**
      * Methode pour récupérer la classe controller à appeler
      * Elle retourne le résultat de la méthode execute() du controller
@@ -33,7 +35,7 @@ class FastRouteCore
      * @throws \Twig\Error\SyntaxError|SyntaxError|RuntimeError|LoaderError
      * @throws \Exception
      */
-    public static function getDispatcher($dispatcher)
+    public function getDispatcher($dispatcher)
     {
         // Recupere les infos de la requete
         // Recupere la methode HTTP (GET, POST, PUT, DELETE, ...)
@@ -63,17 +65,19 @@ class FastRouteCore
             case Dispatcher::NOT_FOUND:
                 $returnView = (new HttpError404Controller())->execute($request);
                 break;
-            // Si la route est trouvée mais que la méthode HTTP n'est pas autorisée
+                // Si la route est trouvée mais que la méthode HTTP n'est pas autorisée
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $returnView = (new HttpError405Controller())->execute($request);
                 break;
-            // Si la route est trouvée alors j'appelle le controller correspondant
+                // Si la route est trouvée alors j'appelle le controller correspondant
             case Dispatcher::FOUND:
                 // J'ajoute le nom de la classe controller à appeler
                 // et les paramètres de la route à l'objet requête HTTP
                 $request->setHander($routeInfo[1])->setVars($routeInfo[2]);
+
                 // J'appelle la méthode execute() du controller
-                $returnView = $request->getController()->execute($request);
+                // et je récupère la vue à afficher
+                $returnView = $this->buildController($request->getHander())->execute($request);
                 break;
             default:
                 // TODO Refactoring des erreurs

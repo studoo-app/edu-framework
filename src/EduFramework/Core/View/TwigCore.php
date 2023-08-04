@@ -17,17 +17,19 @@ class TwigCore
 {
     private static Environment $twig;
 
-    public function __construct($path)
+    /**
+     * @param string $path Chemin vers le dossier templates
+     */
+    public function __construct(string $path)
     {
         // Gestion du moteur de template
-        // TODO Warning : ne pas oublier de mettre le chemin vers le dossier templates
         $loader = new FilesystemLoader($path);
         // création de l'objet $twig
-
         self::$twig = new Environment($loader, []);
     }
 
     /**
+     * Retourne l'objet de l'environnement Twig pour construire les pages HTML ou JSON ...
      * @return Environment
      */
     public static function getEnvironment(): Environment

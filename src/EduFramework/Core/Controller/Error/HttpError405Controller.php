@@ -29,10 +29,11 @@ class HttpError405Controller implements ControllerInterface
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function execute(Request $request)
+    public function execute(Request $request): string
     {
         return TwigCore::getEnvironment()->render(
             'error/http-405.html.twig',
-            []);
+            []
+        );
     }
 }

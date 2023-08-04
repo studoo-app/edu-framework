@@ -10,13 +10,13 @@
 
 namespace Studoo\EduFramework\Core\Exception;
 
-class ErrorHttpStatusException extends \Exception
+class ErrorControllerException extends \Exception
 {
     /**
      * Message de l'exception
      * @var string
      */
-    protected $message = "Erreur HTTP status";
+    protected $message = "Le controller n'existe pas ou n'implémente pas l'interface ControllerInterface";
 
     /**
      * Code de l'excpetion
