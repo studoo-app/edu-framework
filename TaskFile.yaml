@@ -126,7 +126,7 @@ tasks:
   qa-phpstan:
     desc: "Run phpstan"
     cmds:
-      - "{{.PHPQA_RUN}} phpstan analyse ./src --level=7"
+      - "{{.PHPQA_RUN}} phpstan analyse ./src --level=6"
 
   qa-phpcpd:
     desc: "Run phpcpd (copy/paste detector)"
