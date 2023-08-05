@@ -19,6 +19,12 @@ Cible :
 - Première année / 2e semestre
 - Deuxième année / 1re semestre
 
+> [!IMPORTANT]
+> Cet architecture est en cours de développement et n'est pas encore stable.
+
+> [!NOTE]
+> Cette framework ne peut pas être utilisé en production. Elle est destinée à des fins pédagogiques.
+
 ## Prérequis 
 ### Engine PHP
 Pour l'utilisation de ce framework, il est nécessaire d'avoir une version de PHP supérieur à 8.0.0
