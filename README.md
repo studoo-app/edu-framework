@@ -15,10 +15,6 @@ L'objectif pédagogique est :
 - Développement de test unitaire
 - Début d'approche pour l'enseignement d'une framework (symfony, slim, Laravel ...)
 
-Cible :
-- Première année / 2e semestre
-- Deuxième année / 1re semestre
-
 > [!IMPORTANT]
 > Cet architecture est en cours de développement et n'est pas encore stable.
 
