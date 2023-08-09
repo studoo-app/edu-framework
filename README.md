@@ -7,55 +7,15 @@
 [![Latest Unstable Version](https://poser.pugx.org/studoo/edu-framework/v/unstable)](//packagist.org/packages/edu-framework)
 [![License](https://poser.pugx.org/studoo/edu-framework/license)](//packagist.org/packages/studoo/edu-framework)
 
-Voici une proposition d'architecture MVC pour l'élaboration d'un projet ou de TP en cours \
-L'objectif pédagogique est :
+Edu-Framework est une proposition d'architecture MVC pour la création de projets ou de travaux pratiques. L'objectif pédagogique est :
 - Appréhender un projet par couche via MVC
 - Faire un projet "full POO" et dans les "best practices" attendu par les entreprises
 - Orchestrer via un gestionnaire de package (composer)
 - Développement de test unitaire
-- Début d'approche pour l'enseignement d'une framework (symfony, slim, Laravel ...)
-
-> [!IMPORTANT]
-> Cet architecture est en cours de développement et n'est pas encore stable.
+- Début d'approche pour l'enseignement d'un framework (Symfony, Laravel ...)
 
 > [!NOTE]
-> Cette framework ne peut pas être utilisé en production. Elle est destinée à des fins pédagogiques.
+> L'ensemble de la documentation est disponible sur le [https://edu-framework.studoo.app/](https://edu-framework.studoo.app/)
 
-## Prérequis 
-### Engine PHP
-Pour l'utilisation de ce framework, il est nécessaire d'avoir une version de PHP supérieur à 8.0.0
-### Composer
-Composer est un gestionnaire de dépendance en PHP. Il permet de déclarer les bibliothèques dont dépend votre projet et il les installe pour vous.
-Pour l'installation de composer, vous pouvez suivre le tutoriel suivant : [Composer](https://getcomposer.org/download/)
-
-## Installation
-Pour installer le projet, il faut cloner le projet sur votre machine
-````shell
-git clone git@github.com:studoo-app/edu-framework.git
-````
-
-Installer les dépendances du projet via composer
-````shell
-composer install
-````
-
-Initialiser le fichier de configuration
-````shell
-composer edu:init
-````
-
-## Démarrage du projet
-Pour démarrer le projet, il faut lancer la commande suivante
-````shell
-composer edu:start
-````
-
-## Stack Tech
-| Version | Service                                                             | DESCRIPTION                      |
-|:--------|:--------------------------------------------------------------------|:---------------------------------|
-| ^5.5    | [vlucas/phpdotenv](https://packagist.org/packages/vlucas/phpdotenv) | Loads environment variables      |
-| ^3.5    | [twig/twig](https://packagist.org/packages/twig/twig)               | Template Engine (VIEW couch)     |
-| ^1.3    | [nikic/fast-route](https://packagist.org/packages/nikic/fast-route) | Router Engine (CONTROLLER couch) |
-| ^8.0    | [PHP Engine](https://www.php.net/downloads.php)                     | Engine PHP                       |  
-| ^2.0    | [Composer](https://getcomposer.org/download/)                       | Dependency Manager               | 
-| ^9.5    | [PHPUnit](https://phpunit.de/)                                      | Testing Engine                   |
+> [!IMPORTANT]
+> Ce framework n'est pas adapté à une utilisation en production. Il est destiné à des fins pédagogiques.
