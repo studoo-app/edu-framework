@@ -4,7 +4,6 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Utilisation des classes utilisées dans le fichier
-use Controller\HomeController;
 use Dotenv\Dotenv;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Service\DatabaseService;

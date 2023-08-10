@@ -35,7 +35,7 @@ class FastRouteCore
      * @throws \Twig\Error\SyntaxError|SyntaxError|RuntimeError|LoaderError
      * @throws \Exception
      */
-    public function getDispatcher($dispatcher)
+    public function getDispatcher($dispatcher): string
     {
         // Recupere les infos de la requete
         // Recupere la methode HTTP (GET, POST, PUT, DELETE, ...)
@@ -66,6 +66,7 @@ class FastRouteCore
                 $returnView = (new HttpError404Controller())->execute($request);
                 break;
                 // Si la route est trouvée mais que la méthode HTTP n'est pas autorisée
+                // Exemple une route définie en POST est appelée en GET
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $returnView = (new HttpError405Controller())->execute($request);
                 break;
