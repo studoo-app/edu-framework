@@ -24,19 +24,44 @@ use Twig\Error\SyntaxError;
 class FastRouteCore
 {
     use BuildControllerTrait;
+    private \FastRoute\RouteCollector $routeCollector;
+
+    public function __construct()
+    {
+        // Gestion des routes
+        // Une route est une association entre une URL et un contrôleur
+        // Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
+        $this->routeCollector = new \FastRoute\RouteCollector(
+            new \FastRoute\RouteParser\Std(),
+            new \FastRoute\DataGenerator\GroupCountBased()
+        );
+    }
+
+    public function addRoute(string $httpMethod, string $uri, string $controller): self
+    {
+        $this->routeCollector->addRoute($httpMethod, $uri, $controller);
+
+        return $this;
+    }
+
+    public function getDispatcher(): Dispatcher
+    {
+        return new \FastRoute\Dispatcher\GroupCountBased($this->routeCollector->getData());
+    }
 
     /**
      * Methode pour récupérer la classe controller à appeler
      * Elle retourne le résultat de la méthode execute() du controller
-     * @param Dispatcher $dispatcher
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError|SyntaxError|RuntimeError|LoaderError
      * @throws \Exception
      */
-    public function getDispatcher($dispatcher): string
+    public function getRoute(): string
     {
+        $dispatcher = $this->getDispatcher();
+
         // Recupere les infos de la requete
         // Recupere la methode HTTP (GET, POST, PUT, DELETE, ...)
         $httpMethod = $_SERVER['REQUEST_METHOD'];
