@@ -17,19 +17,24 @@ $dotenv->load();
 (new TwigCore(__DIR__ . '/../app/Template'));
 $en = TwigCore::getEnvironment();
 
-// Gestion des routes
-// Une route est une association entre une URL et un contrôleur
-// Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
-$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $route) {
-    $route->addRoute('GET', '/', "Controller\HomeController");
-});
 
 // Gestion de la couche Model et de la connexion à la base de données
 if ($_ENV['DB_HOST_STATUS'] === 'true') {
     (new DatabaseService());
 }
 
+// Gestion des routes
+// Une route est une association entre une URL et un contrôleur
+// Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
+$routeCollector = new FastRoute\RouteCollector(
+    new FastRoute\RouteParser\Std(),
+    new FastRoute\DataGenerator\GroupCountBased()
+);
 
+// Liste des routes
+$routeCollector->addRoute('GET', '/', "Controller\HomeController");
+
+$dispatcher = new FastRoute\Dispatcher\GroupCountBased($routeCollector->getData());
 // Le dispatcher va permettre de faire le lien entre l'URL et le contrôleur.
 // Le client (navigateur) va envoyer une requête HTTP (GET, POST, PUT, DELETE, ...)
 // et le dispatcher va faire le lien entre l'URL et le contrôleur.
