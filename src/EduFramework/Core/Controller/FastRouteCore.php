@@ -29,14 +29,21 @@ class FastRouteCore
     public function __construct()
     {
         // Gestion des routes
-        // Une route est une association entre une URL et un contrôleur
-        // Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
         $this->routeCollector = new \FastRoute\RouteCollector(
             new \FastRoute\RouteParser\Std(),
             new \FastRoute\DataGenerator\GroupCountBased()
         );
     }
 
+    /**
+     * Methode pour ajouter une route
+     * Une route est une association entre une URL et un contrôleur
+     * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
+     * @param string $httpMethod (GET, POST, PUT, DELETE, ...)
+     * @param string $uri La route à appeler
+     * @param string $controller Nom du controller à appeler
+     * @return $this
+     */
     public function addRoute(string $httpMethod, string $uri, string $controller): self
     {
         $this->routeCollector->addRoute($httpMethod, $uri, $controller);
@@ -44,6 +51,10 @@ class FastRouteCore
         return $this;
     }
 
+    /**
+     * Methode pour récupérer le dispatcher
+     * @return Dispatcher
+     */
     public function getDispatcher(): Dispatcher
     {
         return new \FastRoute\Dispatcher\GroupCountBased($this->routeCollector->getData());
