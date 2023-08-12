@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core\Controller;
 use FastRoute\Dispatcher;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -35,6 +36,17 @@ class FastRouteCore
         );
     }
 
+    public function loadRouteConfig(string $pathConfigFile): self
+    {
+
+        $fileData = Yaml::parseFile($pathConfigFile);
+        foreach ($fileData as $routeConfig) {
+            $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
+        }
+
+        return $this;
+    }
+
     /**
      * Methode pour ajouter une route
      * Une route est une association entre une URL et un contrôleur
@@ -44,7 +56,7 @@ class FastRouteCore
      * @param string $controller Nom du controller à appeler
      * @return $this
      */
-    public function addRoute(string $httpMethod, string $uri, string $controller): self
+    public function addRoute(string|array $httpMethod, string $uri, string $controller): self
     {
         $this->routeCollector->addRoute($httpMethod, $uri, $controller);
 

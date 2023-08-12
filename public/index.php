@@ -24,16 +24,11 @@ if ($_ENV['DB_HOST_STATUS'] === 'true') {
 }
 
 // Gestion des routes
-// Une route est une association entre une URL et un contrôleur
-// Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
 $route = new FastRouteCore();
+// Load des routes depuis le fichier de configuration
+$route->loadRouteConfig(__DIR__ . '/../app/config/routes.yaml');
 
-// Liste des routes
-$route->addRoute('GET', '/', "Controller\HomeController");
-
-// Le dispatcher va permettre de faire le lien entre l'URL et le contrôleur.
-// Le client (navigateur) va envoyer une requête HTTP (GET, POST, PUT, DELETE, ...)
-// et le dispatcher va faire le lien entre l'URL et le contrôleur.
+// Récupération de la route à appeler
 try {
     echo $route->getRoute();
 } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError|Exception $e) {
