@@ -2,7 +2,6 @@
   "name": "studoo/edu-framework",
   "description": "Light Education PHP framework",
   "keywords": ["education", "framework", "mvc", "php"],
-  "version": "0.0.1",
   "minimum-stability": "dev",
   "license": "MIT",
   "authors": [
