@@ -56,8 +56,8 @@ class FastRouteCore
      * Une route est une association entre une URL et un contrôleur
      * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
      * @param string|array<mixed> $httpMethod (GET, POST, PUT, DELETE, ...)
-     * @param string $uri La route à appeler
-     * @param string $controller Nom du controller à appeler
+     * @param string              $uri La route à appeler
+     * @param string              $controller Nom du controller à appeler
      * @return $this
      */
     public function addRoute(string|array $httpMethod, string $uri, string $controller): self
