@@ -12,11 +12,13 @@ use Twig\Error\SyntaxError;
 class HomeController implements ControllerInterface
 {
     /**
+     * @param Request $request
+     * @return string|null
+     * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws LoaderError
      */
-    public function execute(Request $request): string
+    public function execute(Request $request): string|null
     {
         return TwigCore::getEnvironment()->render('home/home.html.twig',
             [

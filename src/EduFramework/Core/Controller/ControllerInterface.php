@@ -22,7 +22,7 @@ interface ControllerInterface
      * Elle permet d'exécuter le controller et de retourner le résultat
      *
      * @param Request $request La requête HTTP
-     * @return string
+     * @return string|null
      */
-    public function execute(Request $request): string;
+    public function execute(Request $request): string|null;
 }

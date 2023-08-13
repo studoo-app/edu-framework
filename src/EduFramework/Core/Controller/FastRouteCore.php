@@ -79,13 +79,13 @@ class FastRouteCore
     /**
      * Methode pour récupérer la classe controller à appeler
      * Elle retourne le résultat de la méthode execute() du controller
-     * @return string
+     * @return string|null
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError|SyntaxError|RuntimeError|LoaderError
      * @throws \Exception
      */
-    public function getRoute(): string
+    public function getRoute(): string|null
     {
         $dispatcher = $this->getDispatcher();
 
