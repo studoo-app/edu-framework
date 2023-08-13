@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core\Controller;
 use FastRoute\Dispatcher;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -29,21 +30,47 @@ class FastRouteCore
     public function __construct()
     {
         // Gestion des routes
-        // Une route est une association entre une URL et un contrôleur
-        // Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
         $this->routeCollector = new \FastRoute\RouteCollector(
             new \FastRoute\RouteParser\Std(),
             new \FastRoute\DataGenerator\GroupCountBased()
         );
     }
 
-    public function addRoute(string $httpMethod, string $uri, string $controller): self
+    /**
+     * Methode pour charger les routes depuis un fichier de configuration (Config/route.yaml)
+     * @param string $pathConfigFile Chemin vers le fichier de configuration
+     * @return $this
+     */
+    public function loadRouteConfig(string $pathConfigFile): self
+    {
+        $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
+        foreach ($fileData as $routeConfig) {
+            $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Methode pour ajouter une route
+     * Une route est une association entre une URL et un contrôleur
+     * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
+     * @param string|array<mixed> $httpMethod (GET, POST, PUT, DELETE, ...)
+     * @param string              $uri La route à appeler
+     * @param string              $controller Nom du controller à appeler
+     * @return $this
+     */
+    public function addRoute(string|array $httpMethod, string $uri, string $controller): self
     {
         $this->routeCollector->addRoute($httpMethod, $uri, $controller);
 
         return $this;
     }
 
+    /**
+     * Methode pour récupérer le dispatcher
+     * @return Dispatcher
+     */
     public function getDispatcher(): Dispatcher
     {
         return new \FastRoute\Dispatcher\GroupCountBased($this->routeCollector->getData());

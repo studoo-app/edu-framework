@@ -55,4 +55,34 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/test';
         $this->assertEquals('b9f6849141244d2723a15be3c419c3d47262b8c5', sha1($route->getRoute()));
     }
+
+    public function testLoadRoutesMatchSuccess()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        $this->assertEquals('d83d4bc21c33c6860bae0fe31f3aed41ba0d4038', sha1($route->getRoute()));
+    }
+
+    public function testLoadRoutesMatchSuccessWithExceptionNotFound()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/test';
+        $this->assertEquals('b9f6849141244d2723a15be3c419c3d47262b8c5', sha1($route->getRoute()));
+    }
+
+    public function testLoadRoutesMatchSuccessWithExceptionMethodNotAllowedAndNotFound()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/';
+        $this->assertEquals('73a92167819882a2fc0c64b0a16a0b9f8c28b864', sha1($route->getRoute()));
+    }
 }
