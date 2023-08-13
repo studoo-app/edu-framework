@@ -1,4 +1,6 @@
 <?php
+// Démarrage de la session PHP pour la gestion des variables de session
+session_start();
 
 // Autoloader => chargement automatique des classes depuis le dossier vendor/
 require_once __DIR__ . '/../vendor/autoload.php';
