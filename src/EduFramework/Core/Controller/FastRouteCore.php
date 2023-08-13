@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core\Controller;
 use FastRoute\Dispatcher;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -24,19 +25,70 @@ use Twig\Error\SyntaxError;
 class FastRouteCore
 {
     use BuildControllerTrait;
+    private \FastRoute\RouteCollector $routeCollector;
+
+    public function __construct()
+    {
+        // Gestion des routes
+        $this->routeCollector = new \FastRoute\RouteCollector(
+            new \FastRoute\RouteParser\Std(),
+            new \FastRoute\DataGenerator\GroupCountBased()
+        );
+    }
+
+    /**
+     * Methode pour charger les routes depuis un fichier de configuration (Config/route.yaml)
+     * @param string $pathConfigFile Chemin vers le fichier de configuration
+     * @return $this
+     */
+    public function loadRouteConfig(string $pathConfigFile): self
+    {
+        $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
+        foreach ($fileData as $routeConfig) {
+            $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Methode pour ajouter une route
+     * Une route est une association entre une URL et un contrôleur
+     * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
+     * @param string|array<mixed> $httpMethod (GET, POST, PUT, DELETE, ...)
+     * @param string              $uri La route à appeler
+     * @param string              $controller Nom du controller à appeler
+     * @return $this
+     */
+    public function addRoute(string|array $httpMethod, string $uri, string $controller): self
+    {
+        $this->routeCollector->addRoute($httpMethod, $uri, $controller);
+
+        return $this;
+    }
+
+    /**
+     * Methode pour récupérer le dispatcher
+     * @return Dispatcher
+     */
+    public function getDispatcher(): Dispatcher
+    {
+        return new \FastRoute\Dispatcher\GroupCountBased($this->routeCollector->getData());
+    }
 
     /**
      * Methode pour récupérer la classe controller à appeler
      * Elle retourne le résultat de la méthode execute() du controller
-     * @param Dispatcher $dispatcher
-     * @return string
+     * @return string|null
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError|SyntaxError|RuntimeError|LoaderError
      * @throws \Exception
      */
-    public function getDispatcher($dispatcher)
+    public function getRoute(): string|null
     {
+        $dispatcher = $this->getDispatcher();
+
         // Recupere les infos de la requete
         // Recupere la methode HTTP (GET, POST, PUT, DELETE, ...)
         $httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -66,6 +118,7 @@ class FastRouteCore
                 $returnView = (new HttpError404Controller())->execute($request);
                 break;
                 // Si la route est trouvée mais que la méthode HTTP n'est pas autorisée
+                // Exemple une route définie en POST est appelée en GET
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $returnView = (new HttpError405Controller())->execute($request);
                 break;
