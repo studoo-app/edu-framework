@@ -43,7 +43,7 @@ class FastRouteCore
      */
     public function loadRouteConfig(string $pathConfigFile): self
     {
-        $fileData = Yaml::parseFile($pathConfigFile . 'route.yaml');
+        $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
         foreach ($fileData as $routeConfig) {
             $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
         }
@@ -55,7 +55,7 @@ class FastRouteCore
      * Methode pour ajouter une route
      * Une route est une association entre une URL et un contrôleur
      * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
-     * @param string|array $httpMethod (GET, POST, PUT, DELETE, ...)
+     * @param string|array<mixed> $httpMethod (GET, POST, PUT, DELETE, ...)
      * @param string $uri La route à appeler
      * @param string $controller Nom du controller à appeler
      * @return $this
