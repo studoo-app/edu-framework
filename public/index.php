@@ -26,7 +26,7 @@ if ($_ENV['DB_HOST_STATUS'] === 'true') {
 // Gestion des routes
 $route = new FastRouteCore();
 // Load des routes depuis le fichier de configuration
-$route->loadRouteConfig(__DIR__ . '/../app/config/routes.yaml');
+$route->loadRouteConfig(__DIR__ . '/../app/config/');
 
 // Récupération de la route à appeler
 try {
