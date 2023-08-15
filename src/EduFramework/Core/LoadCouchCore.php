@@ -19,7 +19,7 @@ class LoadCouchCore
 {
     public function __construct()
     {
-        // Gestion des fichiers environnement .env
+        // Gestion du fichier des variables d'environnement (.env)
         $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
         $dotenv->load();
 
