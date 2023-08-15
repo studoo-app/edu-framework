@@ -27,11 +27,11 @@ jobs:
           tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer self-update && composer install && composer dump-autoload
         working-directory: PHP/phpunit
 
       - name: Run tests
-        run: ./vendor/bin/phpunit --coverage-clover ./.qodana/code-coverage/coverage.xml --configuration phpunit.xml --filter FooTest --test-suffix FooTest.php
+        run: ./vendor/bin/phpunit --coverage-clover ./.qodana/code-coverage/coverage.xml
         working-directory: PHP/phpunit
         env:
           XDEBUG_MODE: coverage
@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: php-coverage-data
-          path: PHP/phpunit/.qodana/code-coverage
+          path: ./.qodana/code-coverage
 
       - name: Qodana Scan
         uses: JetBrains/qodana-action@main
