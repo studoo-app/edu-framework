@@ -1,4 +1,4 @@
-name: PHP - PhpUnit Test
+name: Qodana - PhpUnit
 
 on:
   workflow_dispatch:
@@ -22,13 +22,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.1'
           coverage: xdebug
           tools: composer:v2
-
-      - name: Validate composer.json and composer.lock
-        run: composer validate
-        working-directory: PHP/phpunit
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
