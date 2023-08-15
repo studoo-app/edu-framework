@@ -42,7 +42,7 @@ class LoadCouchCore
         // Récupération de la route à appeler
         try {
             echo $route->getRoute();
-        } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError|Exception $e) {
+        } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError $e) {
             echo $e->getMessage();
         }
     }
