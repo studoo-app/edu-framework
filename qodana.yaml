@@ -25,3 +25,7 @@ php:
 linter: jetbrains/qodana-php:latest
 include:
   - name: CheckDependencyLicenses
+  - name: PhpComposerDuplicatedRequirementInspection
+  - name: PhpDisabledQualityToolComposerInspection
+  - name: ComposerJsonFileReferencesInspection
+  - name: PhpComposerExtensionStubsInspection

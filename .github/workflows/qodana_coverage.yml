@@ -22,18 +22,14 @@ jobs:
           php-version: '8.1'
 
       - name: Create PHP/phpunit/
-        run: mkdir -p PHP/phpunit/ || ls -la
-
-      - name: Validate composer.json and composer.lock
-        run: composer validate
-        working-directory: PHP/phpunit
+        run: mkdir -p PHP/phpunit/
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer self-update && composer install && composer dump-autoload
         working-directory: PHP/phpunit
 
       - name: Run tests
-        run: ./vendor/bin/phpunit --coverage-clover ./.qodana/code-coverage/coverage.xml --configuration phpunit.xml --filter FooTest --test-suffix FooTest.php
+        run: ./vendor/bin/phpunit --coverage-clover ./.qodana/code-coverage/coverage.xml
         working-directory: PHP/phpunit
         env:
           XDEBUG_MODE: coverage
