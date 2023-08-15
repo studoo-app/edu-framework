@@ -40,5 +40,5 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          args: "-i,PHP/phpunit,--linter,jetbrains/qodana-php:2023.2-eap"
+          args: "--linter,jetbrains/qodana-php:2023.2-eap"
           pr-mode: false
