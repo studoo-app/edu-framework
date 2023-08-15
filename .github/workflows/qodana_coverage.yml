@@ -1,0 +1,55 @@
+name: PHP - PhpUnit Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+        working-directory: PHP/phpunit
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+        working-directory: PHP/phpunit
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit --coverage-clover ./.qodana/code-coverage/coverage.xml --configuration phpunit.xml --filter FooTest --test-suffix FooTest.php
+        working-directory: PHP/phpunit
+        env:
+          XDEBUG_MODE: coverage
+
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v2
+        with:
+          name: php-coverage-data
+          path: PHP/phpunit/.qodana/code-coverage
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          args: "-i,PHP/phpunit,--linter,jetbrains/qodana-php:2023.2-eap"
+          pr-mode: false
