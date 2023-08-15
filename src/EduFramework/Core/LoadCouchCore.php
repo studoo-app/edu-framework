@@ -1,0 +1,49 @@
+<?php
+/*
+ * Ce fichier fait partie du edu-framework.
+ *
+ * (c) redbull
+ *
+ * Pour les informations complètes sur les droits d'auteur et la licence,
+ * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
+ */
+
+namespace Studoo\EduFramework\Core;
+
+use Dotenv\Dotenv;
+use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Service\DatabaseService;
+use Studoo\EduFramework\Core\View\TwigCore;
+
+class LoadCouchCore
+{
+    public function __construct()
+    {
+        // Gestion des fichiers environnement .env
+        $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
+        $dotenv->load();
+
+        // Gestion de la couche View
+        (new TwigCore(ConfigCore::getConfig('twig_path')));
+
+        // Gestion de la couche Model et de la connexion à la base de données
+        if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
+            (new DatabaseService());
+        }
+    }
+
+    public function run(): void
+    {
+        // Gestion des routes
+        $route = new FastRouteCore();
+        // LoadCouchCore des routes depuis le fichier de configuration
+        $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
+
+        // Récupération de la route à appeler
+        try {
+            echo $route->getRoute();
+        } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError|Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+}
