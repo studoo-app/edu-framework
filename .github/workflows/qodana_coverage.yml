@@ -22,7 +22,7 @@ jobs:
           php-version: '8.1'
 
       - name: Create PHP/phpunit/
-        run: mkdir -p PHP/phpunit/
+        run: mkdir -p PHP/phpunit/ || ls -la
 
       - name: Validate composer.json and composer.lock
         run: composer validate
