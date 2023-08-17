@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+
+  database:
+    container_name: ${APP_NAME}-database
+    image: mysql:5.7
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      #MYSQL_USER: app_db_user
+      #MYSQL_PASSWORD: app_db_password
+    volumes:
+      - ../var/dbdata:/var/lib/mysql
+  #PHP My Admin
+  phpmyadmin:
+    container_name: ${APP_NAME}-pma
+    image: phpmyadmin:latest
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+    networks:
+      - dev
+#Network
+networks:
+  dev:
+#Volumes
+volumes:
+  db-data:
