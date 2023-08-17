@@ -21,17 +21,17 @@ class DockerPilot
      */
     private static function buildCommand(Event $event, string $instruction): ?string
     {
-        $dockerComposeFileName = match ($event->getArguments()[0] ?? null) {
+        $recipe = match ($event->getArguments()[0] ?? null) {
             'mysql' => self::DOCKER_COMPOSE_MYSQL_RECIPE,
             'maria-db' => self::DOCKER_COMPOSE_MARIADB_RECIPE,
             default => null
         };
 
-        if(!isset($dockerComposeFileName)){
+        if (isset($recipe) === false) {
             throw new DockerPilotInvalidArgumentException();
         }
 
-        return "docker compose -f $dockerComposeFileName  --env-file .env $instruction";
+        return "docker compose -f $recipe  --env-file .env $instruction";
     }
 
     /**
