@@ -17,6 +17,7 @@ namespace Studoo\EduFramework\Core;
  */
 class ConfigCore
 {
+
     /**
      * Tableau de configuration
      * @var array<string>
@@ -25,20 +26,22 @@ class ConfigCore
 
     /**
      * ConfigCore constructor.
-     * @param array<string> $config
+     * @param array<string> $config Tableau de configuration
      */
     public function __construct(array $config)
     {
-        self::$config = array_merge([
-            'base_path'         => '/',
-            'twig_path'         => '/app/Template',
-            "route_config_path"  => '/app/config/',
-        ], $config);
+        self::$config = array_merge(
+            [
+                'base_path'         => '/',
+                'twig_path'         => '/app/Template',
+                "route_config_path"  => '/app/config/'
+            ],
+            $config);
     }
 
     /**
      * Permet de récupérer une configuration
-     * @param string $key
+     * @param string $key Clé de la configuration
      * @return mixed
      */
     public static function getConfig(string $key): mixed
@@ -52,6 +55,6 @@ class ConfigCore
      */
     public static function getEnv(string $key): mixed
     {
-        return $_ENV[$key] ?? null;
+        return getenv($key);
     }
 }
