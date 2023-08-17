@@ -30,8 +30,8 @@
   "autoload": {
     "psr-4": {
       "Studoo\\EduFramework\\Core\\": "src/EduFramework/Core/",
-      "": "app/",
-      "Studoo\\EduFramework\\Scripts\\": "src/EduFramework/Scripts/"
+      "Studoo\\EduFramework\\Scripts\\": "src/EduFramework/Scripts/",
+      "": "app/"
     }
   },
   "repositories": [
