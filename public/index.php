@@ -1,5 +1,8 @@
 <?php
 // Démarrage de la session PHP pour la gestion des variables de session
+use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\LoadCouchCore;
+
 session_start();
 
 // Masquer les deprecations de PHP 8.1
@@ -17,24 +20,23 @@ if (version_compare(PHP_VERSION, '8.0', '<') === false) {
     }
 
     // Chargement des configurations de l'application
-    (new Studoo\EduFramework\Core\ConfigCore(
-            [
-                'base_path'         => __DIR__ . '/../',
-                'twig_path'         => __DIR__ . '/../app/Template',
-                "route_config_path"  => __DIR__ . '/../app/config/'
-            ]
-        )
+    (new ConfigCore(
+                    [
+                        'base_path'         => __DIR__ . '/../',
+                        'twig_path'         => __DIR__ . '/../app/Template',
+                        "route_config_path"  => __DIR__ . '/../app/config/'
+                    ]
+                  )
     );
 
     // Chargement des classes utilisées par l'application
-    (new \Studoo\EduFramework\Core\LoadCouchCore())->run();
+    (new LoadCouchCore())->run();
 
 } else {
     echo "Cet app nécessite au moins PHP8.0. "
         . PHP_VERSION .
         " est actuellement installé. Veuillez mettre à jour votre version de PHP.\n";
 }
-
 
 
 
