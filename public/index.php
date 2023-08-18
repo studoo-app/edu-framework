@@ -10,14 +10,7 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 if (version_compare(PHP_VERSION, '8.0', '<') === false) {
     // Autoloader => chargement automatique des classes depuis le dossier vendor/
-    if (file_exists(__DIR__ . '/../vendor/autoload.php') === true) {
-        require_once __DIR__ . '/../vendor/autoload.php';
-    } else {
-        echo 'ERROR: Les dépendances du gestionnaire de package (composer) 
-        ne sont pas correctement configurées! Exécutez "composer install" 
-        ou consultez README.md pour plus de détails';
-        exit(1);
-    }
+    include_once __DIR__ . '/../vendor/autoload.php';
 
     // Chargement des configurations de l'application
     (new ConfigCore(
