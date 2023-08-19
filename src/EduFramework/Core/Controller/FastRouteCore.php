@@ -91,9 +91,11 @@ class FastRouteCore
 
         // Recupere les infos de la requete
         // Recupere la methode HTTP (GET, POST, PUT, DELETE, ...)
-        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        // Si la methode HTTP n'est pas définie alors on met la valeur par défaut GET
+        $httpMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         // Recupere l'URI (Uniform Resource Identifier) Exemple: /, /contact, /contact/1, ...
-        $uri = $_SERVER['REQUEST_URI'];
+        // Si l'URI n'est pas définie alors on met la valeur par défaut /
+        $uri = $_SERVER['REQUEST_URI'] ?? '/';
 
         // Supprime les parametres de type ?param1=valeur1&param2=valeur2
         if (false !== $pos = strpos($uri, '?')) {
