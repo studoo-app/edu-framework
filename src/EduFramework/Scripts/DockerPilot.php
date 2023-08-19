@@ -26,7 +26,7 @@ class DockerPilot
     private const DOCKER_DOWN_INSTRUCTION = "down";
 
     /**
-     * @param Event $event Nom de l'événement
+     * @param Event $event Nom de l événement
      * @param string $instruction (start|down)
      * @return string|null
      * @throws DockerPilotInvalidArgumentException
@@ -47,7 +47,7 @@ class DockerPilot
     }
 
     /**
-     * @param Event $event
+     * @param Event $event Nom de l'événement
      * @return void
      * @throws DockerPilotInvalidArgumentException
      */
