@@ -18,7 +18,7 @@ class NotDataResponseException extends \Exception
     protected $message = "Pas de donnée dans la réponse";
 
     /**
-     * @var int
+     * @var integer
      */
     protected $code = 403;
 }

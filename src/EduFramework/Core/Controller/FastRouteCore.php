@@ -27,6 +27,9 @@ class FastRouteCore
     use BuildControllerTrait;
     private \FastRoute\RouteCollector $routeCollector;
 
+    /**
+     * FastRouteCore constructor.
+     */
     public function __construct()
     {
         // Gestion des routes

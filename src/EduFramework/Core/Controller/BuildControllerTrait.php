@@ -23,8 +23,8 @@ trait BuildControllerTrait
     public function buildController(string $controller): ControllerInterface
     {
         // On vérifie que le controller existe et qu'il implémente l'interface ControllerInterface
-        if (!class_exists($controller)
-            || !in_array(ControllerInterface::class, class_implements($controller), true)) {
+        if (class_exists($controller) === false
+            || in_array(ControllerInterface::class, class_implements($controller), true) === false) {
             throw new ErrorControllerException();
         }
 
