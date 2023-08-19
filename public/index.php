@@ -1,39 +1,31 @@
 <?php
 // Démarrage de la session PHP pour la gestion des variables de session
+use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\LoadCouchCore;
+
 session_start();
 
-// Autoloader => chargement automatique des classes depuis le dossier vendor/
-require_once __DIR__ . '/../vendor/autoload.php';
+// Masquer les deprecations de PHP 8.1
+error_reporting(E_ALL & ~E_DEPRECATED);
 
-// Utilisation des classes utilisées dans le fichier
-use Dotenv\Dotenv;
-use Studoo\EduFramework\Core\Controller\FastRouteCore;
-use Studoo\EduFramework\Core\Service\DatabaseService;
-use Studoo\EduFramework\Core\View\TwigCore;
+if (version_compare(PHP_VERSION, '8.0', '<') === false) {
+    // Autoloader => chargement automatique des classes depuis le dossier vendor/
+    require_once __DIR__ . '/../vendor/autoload.php';
 
-// Gestion des fichiers environnement .env
-$dotenv = Dotenv::createImmutable(__DIR__ . "/../");
-$dotenv->load();
+    // Chargement des configurations de l'application
+    (new ConfigCore(
+                    [
+                        'base_path'         => __DIR__ . '/../',
+                        'twig_path'         => __DIR__ . '/../app/Template',
+                        'route_config_path'  => __DIR__ . '/../app/config/'
+                    ]
+                  )
+    );
 
-// Gestion de la couche View
-(new TwigCore(__DIR__ . '/../app/Template'));
-$en = TwigCore::getEnvironment();
-
-
-// Gestion de la couche Model et de la connexion à la base de données
-if ($_ENV['DB_HOST_STATUS'] === 'true') {
-    (new DatabaseService());
+    // Chargement des classes utilisées par l'application
+    (new LoadCouchCore())->run();
+} else {
+    echo "Cet app nécessite au moins PHP8.0. "
+        . PHP_VERSION .
+        " est actuellement installé. Veuillez mettre à jour votre version de PHP.\n";
 }
-
-// Gestion des routes
-$route = new FastRouteCore();
-// Load des routes depuis le fichier de configuration
-$route->loadRouteConfig(__DIR__ . '/../app/config/');
-
-// Récupération de la route à appeler
-try {
-    echo $route->getRoute();
-} catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError|Exception $e) {
-    echo $e->getMessage();
-}
-

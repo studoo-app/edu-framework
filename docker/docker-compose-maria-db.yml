@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  ##########################
+  # CONTENEURS SERVICES    #
+  ##########################
+
+  #Base de données Mysql
+  database:
+    container_name: ${APP_NAME}-db
+    image: mariadb:10.5.8
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../var/db-data:/var/lib/mysql
+    environment:
+      #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      #MYSQL_USER: app_db_user
+      #MYSQL_PASSWORD: app_db_password
+    networks:
+      - dev
+  #PHP My Admin
+  phpmyadmin:
+    container_name: ${APP_NAME}-pma
+    image: phpmyadmin:latest
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+    networks:
+      - dev
+#Network
+networks:
+  dev:
+#Volumes
+volumes:
+  db-data:

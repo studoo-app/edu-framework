@@ -35,7 +35,7 @@ class DatabaseService
                 $_ENV["DB_PASSWORD"],
                 // Attention au paramètre
                 // PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8 qui ne marche pas sur mariadb
-                array(PDO::ATTR_PERSISTENT => false, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8')
+                [PDO::ATTR_PERSISTENT => false, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
             );
         } catch (Exception $e) {
             die('Erreur : ' . $e->getMessage());
