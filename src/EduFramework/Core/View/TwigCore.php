@@ -13,8 +13,18 @@ namespace Studoo\EduFramework\Core\View;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+/**
+ * Class TwigCore
+ * Elle permet de gérer le moteur de template Twig
+ * @package Studoo\EduFramework\Core\View
+ */
 class TwigCore
 {
+
+    /**
+     * @var Environment
+     * Objet de l'environnement Twig
+     */
     private static Environment $twig;
 
     /**

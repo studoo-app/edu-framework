@@ -25,6 +25,8 @@ class HttpError404Controller implements ControllerInterface
 {
     /**
      * Si y a pas de route valide alors j'affiche la page 404
+     * @param Request $request Objet de la requête
+     * @return string
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
