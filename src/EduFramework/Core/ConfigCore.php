@@ -34,7 +34,7 @@ class ConfigCore
             [
                 'base_path'         => '/',
                 'twig_path'         => '/app/Template',
-                "route_config_path"  => '/app/config/'
+                'route_config_path'  => '/app/config/'
             ],
             $config);
     }
@@ -51,6 +51,7 @@ class ConfigCore
 
     /**
      * Permet de récupérer la configuration du fichier .env à la racine du projet
+     * @param string $key Clé de la configuration
      * @return array<string, mixed>
      */
     public static function getEnv(string $key): mixed

@@ -1,12 +1,13 @@
 <?php
 /*
- * Ce fichier fait partie du edu-framework.
+ * Ce fichier fait partie du Studoo
  *
- * (c) redbull
+ * @author Benoit Foujols
  *
  * Pour les informations complètes sur les droits d'auteur et la licence,
  * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
  */
+
 
 namespace Studoo\EduFramework\Core;
 
@@ -15,6 +16,10 @@ use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
+/**
+ * Class LoadCouchCore
+ * Elle permet de charger les différentes couches de l'application
+ */
 class LoadCouchCore
 {
     public function __construct()
@@ -32,6 +37,10 @@ class LoadCouchCore
         }
     }
 
+    /**
+     * Permet de lancer l'application
+     * @return void
+     */
     public function run(): void
     {
         // Gestion des routes
@@ -39,10 +48,10 @@ class LoadCouchCore
         // LoadCouchCore des routes depuis le fichier de configuration
         $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
 
-        // Récupération de la route à appeler
         try {
+            // Récupération de la route à appeler
             echo $route->getRoute();
-        } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError $e) {
+        } catch (\Twig\Error\LoaderError |\Twig\Error\RuntimeError |\Twig\Error\SyntaxError $e) {
             echo $e->getMessage();
         }
     }
