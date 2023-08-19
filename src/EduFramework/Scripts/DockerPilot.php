@@ -1,4 +1,12 @@
 <?php
+/*
+ * Ce fichier fait partie du Studoo
+ *
+ * @author Julien Pechberty
+ *
+ * Pour les informations complètes sur les droits d'auteur et la licence,
+ * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
+ */
 
 namespace Studoo\EduFramework\Scripts;
 
@@ -6,6 +14,10 @@ use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
 use Studoo\EduFramework\Scripts\Exception\DockerPilotInvalidArgumentException;
 
+/**
+ * Class DockerPilot
+ * @package Studoo\EduFramework\Scripts
+ */
 class DockerPilot
 {
     private const DOCKER_COMPOSE_MYSQL_RECIPE = './docker/docker-compose-mysql-5.yml';
@@ -14,8 +26,8 @@ class DockerPilot
     private const DOCKER_DOWN_INSTRUCTION = "down";
 
     /**
-     * @param Event $event
-     * @param string $instruction
+     * @param Event $event Nom de l'événement
+     * @param string $instruction (start|down)
      * @return string|null
      * @throws DockerPilotInvalidArgumentException
      */
@@ -47,7 +59,7 @@ class DockerPilot
     }
 
     /**
-     * @param Event $event
+     * @param Event $event Nom de l'événement
      * @return void
      * @throws DockerPilotInvalidArgumentException
      */

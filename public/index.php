@@ -29,8 +29,3 @@ if (version_compare(PHP_VERSION, '8.0', '<') === false) {
         . PHP_VERSION .
         " est actuellement installé. Veuillez mettre à jour votre version de PHP.\n";
 }//endif
-
-
-
-
-

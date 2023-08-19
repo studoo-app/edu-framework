@@ -8,7 +8,6 @@
  * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
  */
 
-
 namespace Studoo\EduFramework\Core;
 
 use Dotenv\Dotenv;
@@ -22,7 +21,11 @@ use Studoo\EduFramework\Core\View\TwigCore;
  */
 class LoadCouchCore
 {
-    public function __construct()
+    /**
+     * Permet de lancer l'application
+     * @return void
+     */
+    public function run(): void
     {
         // Gestion du fichier des variables d'environnement (.env)
         $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
@@ -35,14 +38,7 @@ class LoadCouchCore
         if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
             (new DatabaseService());
         }
-    }
 
-    /**
-     * Permet de lancer l'application
-     * @return void
-     */
-    public function run(): void
-    {
         // Gestion des routes
         $route = new FastRouteCore();
         // LoadCouchCore des routes depuis le fichier de configuration
@@ -51,7 +47,7 @@ class LoadCouchCore
         try {
             // Récupération de la route à appeler
             echo $route->getRoute();
-        } catch (\Twig\Error\LoaderError |\Twig\Error\RuntimeError |\Twig\Error\SyntaxError $e) {
+        } catch (\Twig\Error\LoaderError | \Twig\Error\RuntimeError | \Twig\Error\SyntaxError $e) {
             echo $e->getMessage();
         }
     }
