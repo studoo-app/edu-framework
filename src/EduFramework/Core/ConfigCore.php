@@ -17,6 +17,7 @@ namespace Studoo\EduFramework\Core;
  */
 class ConfigCore
 {
+
     /**
      * Tableau de configuration
      * @var array<string>
