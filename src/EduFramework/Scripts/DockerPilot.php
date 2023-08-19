@@ -53,7 +53,7 @@ class DockerPilot
      */
     public static function start(Event $event): void
     {
-        $command = self::buildCommand($event,self::DOCKER_START_INSTRUCTION);
+        $command = self::buildCommand($event, self::DOCKER_START_INSTRUCTION);
         exec($command);
 
     }
@@ -65,7 +65,7 @@ class DockerPilot
      */
     public static function down(Event $event): void
     {
-        $command = self::buildCommand($event,self::DOCKER_DOWN_INSTRUCTION);
+        $command = self::buildCommand($event, self::DOCKER_DOWN_INSTRUCTION);
         exec($command);
     }
 

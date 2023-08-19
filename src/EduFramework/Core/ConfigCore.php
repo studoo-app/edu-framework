@@ -17,7 +17,6 @@ namespace Studoo\EduFramework\Core;
  */
 class ConfigCore
 {
-
     /**
      * Tableau de configuration
      * @var array<string>
@@ -36,7 +35,8 @@ class ConfigCore
                 'twig_path'         => '/app/Template',
                 'route_config_path'  => '/app/config/'
             ],
-            $config);
+            $config
+        );
     }
 
     /**
@@ -52,10 +52,10 @@ class ConfigCore
     /**
      * Permet de récupérer la configuration du fichier .env à la racine du projet
      * @param string $key Clé de la configuration
-     * @return array<string, mixed>
+     * @return mixed
      */
     public static function getEnv(string $key): mixed
     {
-        return getenv($key);
+        return $_ENV[$key] ?? null;
     }
 }
