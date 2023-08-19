@@ -28,8 +28,7 @@ if (version_compare(PHP_VERSION, '8.0', '<') === false) {
     echo "Cet app nécessite au moins PHP8.0. "
         . PHP_VERSION .
         " est actuellement installé. Veuillez mettre à jour votre version de PHP.\n";
-} //endif
-
+}//endif
 
 
 
