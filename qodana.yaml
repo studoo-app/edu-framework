@@ -10,10 +10,10 @@ profile:
 #include:
 #  - name: <SomeEnabledInspectionId>
 #Disable inspections
-#exclude:
-#  - name: <SomeDisabledInspectionId>
-#    paths:
-#      - <path/where/not/run/inspection>
+exclude:
+  - name: Scripts
+    paths:
+      - src/EduFramework/Scripts
 php:
   version: 8.0 #(Applied in CI/CD pipeline)
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
