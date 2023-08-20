@@ -1,6 +1,6 @@
 # Managed by Composer
 vendor/
-
+var/
 # Composer
 composer.phar
 composer.lock

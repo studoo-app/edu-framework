@@ -19,6 +19,7 @@ use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
  */
 class Request
 {
+
     /**
      * La méthode HTTP de la requête
      * @var string $httpMethod
@@ -96,7 +97,7 @@ class Request
 
     /**
      * Permet de définir les variables de la requête HTTP
-     * @param array<mixed> $vars
+     * @param array<mixed> $vars Les variables de la requête HTTP
      * @return Request
      */
     public function setVars(array $vars): Request
@@ -116,7 +117,7 @@ class Request
 
     /**
      * Permet de définir la méthode HTTP de la requête
-     * @param string $httpMethod
+     * @param string $httpMethod La méthode HTTP de la requête
      * @return Request
      */
     public function setHttpMethod(string $httpMethod): Request
@@ -136,7 +137,7 @@ class Request
 
     /**
      * Permet de définir la route de la requête
-     * @param string $route
+     * @param string $route La route de la requête
      * @return Request
      */
     public function setRoute(string $route): Request

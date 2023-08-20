@@ -12,7 +12,7 @@ use Twig\Error\SyntaxError;
 class HomeController implements ControllerInterface
 {
     /**
-     * @param Request $request
+     * @param Request $request Requête HTTP
      * @return string|null
      * @throws LoaderError
      * @throws RuntimeError

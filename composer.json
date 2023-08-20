@@ -30,6 +30,7 @@
   "autoload": {
     "psr-4": {
       "Studoo\\EduFramework\\Core\\": "src/EduFramework/Core/",
+      "Studoo\\EduFramework\\Scripts\\": "src/EduFramework/Scripts/",
       "": "app/"
     }
   },
@@ -46,6 +47,14 @@
     ],
     "edu:init": [
       "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-    ]
+    ],
+    "edu:docker:db-service:start": "Studoo\\EduFramework\\Scripts\\DockerPilot::start",
+    "edu:docker:db-service:down": "Studoo\\EduFramework\\Scripts\\DockerPilot::down"
+  },
+  "scripts-descriptions": {
+    "edu:init": "Create env file",
+    "edu:start": "Start local server",
+    "edu:docker:db-service:start": "Start docker related database service [args : mysql / maria-db]",
+    "edu:docker:db-service:down": "Stop and remove docker related database service [args : mysql / maria-db]"
   }
 }

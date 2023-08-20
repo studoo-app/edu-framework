@@ -20,7 +20,7 @@ class ErrorControllerException extends \Exception
 
     /**
      * Code de l'excpetion
-     * @var int
+     * @var integer
      */
     protected $code = 400;
 }
