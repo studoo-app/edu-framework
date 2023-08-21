@@ -14,6 +14,8 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       #MYSQL_USER: app_db_user
       #MYSQL_PASSWORD: app_db_password
+    networks:
+      - dev
     volumes:
       - ../var/dbdata:/var/lib/mysql
   #PHP My Admin
@@ -26,7 +28,7 @@ services:
     ports:
       - "8081:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: database
     networks:
       - dev
 #Network
