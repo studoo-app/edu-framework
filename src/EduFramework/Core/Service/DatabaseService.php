@@ -17,6 +17,7 @@ use Studoo\EduFramework\Core\Exception\ErrorDatabaseNotExistException;
 
 class DatabaseService
 {
+
     /**
      * Objet PDO pour la connexion à la base de données
      * @var PDO
@@ -40,6 +41,8 @@ class DatabaseService
             }
 
             self::$dbConnect = (new $nameClass())->getManager();
+        } else {
+            throw new ErrorDatabaseNotExistException();
         }
     }
 
