@@ -48,11 +48,11 @@ class CreateControllerCommand extends Command
         //Format controller-name arg
         $namesCollection = self::getNamesCollection($input->getFirstArgument());
         //Generate route params in app/Config/routes.yaml
-        self::generateRoute($namesCollection["uri"],$namesCollection["uri"],$namesCollection["className"]);
+        self::generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
         //Generate Controller Class
-        self::generateController($namesCollection["className"],$namesCollection["twigPath"]);
+        self::generateController($namesCollection["className"], $namesCollection["twigPath"]);
         //Generation TWIG
-        self::generateView($namesCollection["twigDir"],$namesCollection["twigPath"]);
+        self::generateView($namesCollection["twigDir"], $namesCollection["twigPath"]);
         //Close command message
         $io->success("Controller successfully generated");
         return Command::SUCCESS;
@@ -67,16 +67,16 @@ class CreateControllerCommand extends Command
     private function getNamesCollection(string $arg): array
     {
 
-        $pieces = preg_split('/(?=[A-Z])/',$arg);
+        $pieces = preg_split('/(?=[A-Z])/', $arg);
         array_shift($pieces);
 
         $className = ucfirst($arg)."Controller";
         $uri = "/".strtolower($arg);
         $twig = strtolower($arg);
 
-        if(count($pieces)>1){
-            $twig = implode("_",array_map(function($item){return strtolower($item);},$pieces));
-            $uri = str_replace("_","-",$twig);
+        if(count($pieces)>1) {
+            $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $pieces));
+            $uri = str_replace("_", "-", $twig);
         }
 
         return [
@@ -94,15 +94,15 @@ class CreateControllerCommand extends Command
      * @return void
      * @throws ControllerAlreadyExistsException
      */
-    private function generateController(string $className, string $twigPath):void
+    private function generateController(string $className, string $twigPath): void
     {
         $filename = "./app/Controller/$className.php";
 
-        if(file_exists($filename)){
+        if(file_exists($filename)) {
             throw new ControllerAlreadyExistsException();
         }
 
-        $file = new PhpFile;
+        $file = new PhpFile();
         //Add namespace Controller
         $namespace= $file->addNamespace("Controller");
         //Add Imports
@@ -127,10 +127,10 @@ class CreateControllerCommand extends Command
                 "request" => $request
             ]
         );
-        CODE,[$twigPath,$className]);
+        CODE, [$twigPath,$className]);
 
         //Create file
-        file_put_contents($filename,$file);
+        file_put_contents($filename, $file);
     }
 
     /**
@@ -146,7 +146,7 @@ class CreateControllerCommand extends Command
     {
         $router = Yaml::parseFile(self::ROUTES_FILE_PATH);
 
-        if(array_key_exists($name,$router)){
+        if(array_key_exists($name, $router)) {
             throw new RouteAlreadyExistsException();
         }
 
@@ -156,7 +156,7 @@ class CreateControllerCommand extends Command
             "httpMethod"=>["GET"]
         ];
 
-        file_put_contents(self::ROUTES_FILE_PATH,Yaml::dump($router));
+        file_put_contents(self::ROUTES_FILE_PATH, Yaml::dump($router));
     }
 
     /**
@@ -168,15 +168,16 @@ class CreateControllerCommand extends Command
      */
     private function generateView(string $dir, string $path): void
     {
-        if(file_exists(self::TEMPLATES_DIR.$path)){
+        if(file_exists(self::TEMPLATES_DIR.$path)) {
             throw new ViewAlreadyExistsException();
         }
 
-        if(is_dir(self::TEMPLATES_DIR.$dir) === false){
+        if(is_dir(self::TEMPLATES_DIR.$dir) === false) {
             mkdir(self::TEMPLATES_DIR.$dir);
         }
 
-        file_put_contents(self::TEMPLATES_DIR.$path,
+        file_put_contents(
+            self::TEMPLATES_DIR.$path,
             <<<'TWIG'
         {% extends "base.html.twig" %}
 
