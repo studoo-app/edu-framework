@@ -5,3 +5,4 @@ parameters:
 	excludePaths:
 	    analyse:
 	        - src/EduFramework/Scripts
+	        - src/EduFramework/Commands
