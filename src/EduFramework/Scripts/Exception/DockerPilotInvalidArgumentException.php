@@ -4,7 +4,6 @@ namespace Studoo\EduFramework\Scripts\Exception;
 
 class DockerPilotInvalidArgumentException extends \Exception
 {
-
     /**
      * Message de l'exception
      * @var string
