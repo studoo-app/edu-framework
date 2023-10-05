@@ -14,6 +14,7 @@ exclude:
   - name: Scripts
     paths:
       - src/EduFramework/Scripts
+      - src/EduFramework/Scripts/DockerPilot.php
 php:
   version: 8.0 #(Applied in CI/CD pipeline)
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
