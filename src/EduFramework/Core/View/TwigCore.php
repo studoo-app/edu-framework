@@ -20,7 +20,6 @@ use Twig\Loader\FilesystemLoader;
  */
 class TwigCore
 {
-
     /**
      * @var Environment
      * Objet de l'environnement Twig

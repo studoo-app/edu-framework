@@ -15,7 +15,6 @@ use Studoo\EduFramework\Core\ConfigCore;
 
 class DatabaseMysql implements DatabaseInterface
 {
-
     /**
      * @return PDO
      */

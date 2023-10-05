@@ -19,7 +19,6 @@ use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
  */
 class Request
 {
-
     /**
      * La méthode HTTP de la requête
      * @var string $httpMethod

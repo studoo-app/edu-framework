@@ -6,7 +6,6 @@ use PDO;
 
 interface DatabaseInterface
 {
-
     /**
      * Permets de récupérer la connexion à la base de données
      * @return PDO
