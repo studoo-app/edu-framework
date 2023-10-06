@@ -117,26 +117,6 @@ class FastRouteCore
         // Exemple: [0] => 1 [1] => App\Controller\HomeController [2] => Array ( [id] => 1 )
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
-        // Pour récupérer des données de type text/plain
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'
-            && isset($_SERVER['CONTENT_TYPE'])
-            && $_SERVER['CONTENT_TYPE'] === 'text/plain') {
-            // Lire les données brutes de la requête
-            $routeInfo[2] = array_merge(
-                $routeInfo[2],
-                json_decode(
-                    str_replace(
-                        "data=",
-                        "",
-                        file_get_contents('php://input')
-                    ),
-                    true,
-                    512,
-                    JSON_THROW_ON_ERROR
-                )
-            );
-        }
-
         switch ($routeInfo[0]) {
             // Si la route n'est pas trouvée alors j'affiche la page 404
             case Dispatcher::NOT_FOUND:
