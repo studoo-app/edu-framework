@@ -128,7 +128,8 @@ class FastRouteCore
                     str_replace(
                         "data=",
                         "",
-                        file_get_contents('php://input')),
+                        file_get_contents('php://input')
+                    ),
                     true,
                     512,
                     JSON_THROW_ON_ERROR

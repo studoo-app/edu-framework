@@ -57,17 +57,19 @@ class Request
 
     /**
      * Permet de récupérer les headers de la requête HTTP
-     * @return bool|array
+     * @return bool|array<mixed>
      */
     public function getHearder(): bool|array
     {
         if (!function_exists('getallheaders')) {
             $headers = [];
             foreach ($_SERVER as $name => $value) {
-                if (substr($name, 0,5) === 'HTTP_') {
+                if (substr($name, 0, 5) === 'HTTP_') {
                     $headers[str_replace(
                         ' ',
-                        '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+                        '-',
+                        ucwords(strtolower(str_replace('_', ' ', substr($name, 5))))
+                    )] = $value;
                 }
             }
             return $headers;
