@@ -53,7 +53,7 @@ class RequestTest extends TestCase
         $this->assertEquals(["test" => "test"], $request->getVars());
     }
 
-    public function testGet()
+    public function testGetValide()
     {
         $request = new Request("/test", "GET");
         $request->setVars(["testVars" => "test"]);

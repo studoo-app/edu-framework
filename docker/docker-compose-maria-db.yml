@@ -6,7 +6,7 @@ services:
 
   #Base de données Mysql
   database:
-    container_name: ${APP_NAME}-db
+    container_name: ${APP_NAME}-database
     image: mariadb:10.5.8
     restart: always
     ports:
@@ -31,7 +31,7 @@ services:
     ports:
       - "8081:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: database
     networks:
       - dev
 #Network

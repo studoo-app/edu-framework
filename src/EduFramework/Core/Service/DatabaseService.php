@@ -12,6 +12,8 @@ namespace Studoo\EduFramework\Core\Service;
 
 use Exception;
 use PDO;
+use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Exception\ErrorDatabaseNotExistException;
 
 class DatabaseService
 {
@@ -22,23 +24,24 @@ class DatabaseService
     private static PDO $dbConnect;
 
     /**
-     * TODO faire un exemple
+     * @throws ErrorDatabaseNotExistException
      */
     public function __construct()
     {
-        try {
-            self::$dbConnect = new PDO(
-                'mysql:host=' . $_ENV["DB_HOST"] .
-                ';port=' . $_ENV["DB_SOCKET"] .
-                ';dbname=' . $_ENV["DB_NAME"],
-                $_ENV["DB_USER"],
-                $_ENV["DB_PASSWORD"],
-                // Attention au paramètre
-                // PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8 qui ne marche pas sur mariadb
-                [PDO::ATTR_PERSISTENT => false, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
-            );
-        } catch (Exception $e) {
-            die('Erreur : ' . $e->getMessage());
+        $dbValideType = ['mysql', 'mariadb'];
+
+        if (ConfigCore::getEnv("DB_TYPE") !== null &&
+            in_array(ConfigCore::getEnv("DB_TYPE"), $dbValideType, true)) {
+
+            $nameClass = "Studoo\\EduFramework\\Core\\Service\\Database" . ucfirst(ConfigCore::getEnv("DB_TYPE"));
+            if (class_exists($nameClass) === false
+                || in_array(DatabaseInterface::class, class_implements($nameClass), true) === false) {
+                throw new ErrorDatabaseNotExistException();
+            }
+
+            self::$dbConnect = (new $nameClass())->getManager();
+        } else {
+            throw new ErrorDatabaseNotExistException();
         }
     }
 
