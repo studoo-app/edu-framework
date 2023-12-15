@@ -1,0 +1,36 @@
+version: "3"
+services:
+  database:
+    container_name: edu-web-database
+    image: mysql:8.0
+    command: mysqld --sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: app_db
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./var/dbdata:/var/lib/mysql
+  phpmyadmin:
+    container_name: edu-web-pma
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 1G
+      MEMORY_LIMIT: 512M
+      MAX_EXECUTION_TIME: 0
+    restart: always
+    links:
+      - database
+  mailer:
+    container_name: edu-web-mailer
+    image: schickling/mailcatcher
+    ports: [ "1025", "1080" ]
+volumes:
+  dbdata:
