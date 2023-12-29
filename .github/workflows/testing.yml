@@ -14,7 +14,6 @@ on:
       - dev
   pull_request:
     branches:
-      - dev
       - main
 
 jobs:
@@ -46,6 +45,9 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo, curl
+        env:
+          update: true
+
       - name: Check PHP Version
         run: php -v
 
@@ -59,6 +61,7 @@ jobs:
             sleep 1
             echo "Waiting for MySQL..."
           done
+          nc -z 127.0.0.1 3306
 
       - name: Generate SQL
         run: mysql -h 127.0.0.1 -u root < tests/Config/EtudiantApp.sql
