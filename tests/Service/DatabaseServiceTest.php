@@ -30,4 +30,18 @@ class DatabaseServiceTest extends TestCase
         $this->expectException(ErrorDatabaseNotExistException::class);
         new DatabaseService();
     }
+
+    public function testInstanceOfClassPdo()
+    {
+        $_ENV["DB_TYPE"] = "mysql";
+        new DatabaseService();
+        $this->assertInstanceOf(PDO::class, DatabaseService::getConnect());
+    }
+
+    public function testNoExistDriverPgsql()
+    {
+        $_ENV["DB_TYPE"] = "pgsql";
+        $this->expectException(ErrorDatabaseNotExistException::class);
+        new DatabaseService();
+    }
 }

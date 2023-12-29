@@ -28,7 +28,7 @@ class DatabaseService
      */
     public function __construct()
     {
-        $dbValideType = ['mysql', 'mariadb'];
+        $dbValideType = ['mysql', 'mariadb', 'pgsql', 'sqlite'];
 
         if (ConfigCore::getEnv("DB_TYPE") !== null &&
             in_array(ConfigCore::getEnv("DB_TYPE"), $dbValideType, true)) {
