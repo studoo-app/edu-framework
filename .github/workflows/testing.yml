@@ -9,9 +9,6 @@
 name: Code Quality Analysis
 
 on:
-  push:
-    branches:
-      - dev
   pull_request:
     branches:
       - main
@@ -64,7 +61,7 @@ jobs:
           nc -z 127.0.0.1 3306
 
       - name: Generate SQL
-        run: mysql -h 127.0.0.1 -u root < tests/Config/EtudiantApp.sql
+        run: mysql -h 127.0.0.1 -u root app_db < tests/Config/EtudiantApp.sql
 
       - name: Install dependencies
         run: composer self-update && composer install && composer dump-autoload
