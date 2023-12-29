@@ -26,7 +26,12 @@ class StudooDebugExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new \Twig\TwigFunction('dd', [$this, 'dd']),
+            new \Twig\TwigFunction('dd',
+                [
+                 $this,
+                 'dd',
+                ]
+            ),
         ];
     }
 
