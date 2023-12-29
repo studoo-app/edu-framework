@@ -26,7 +26,8 @@ class StudooDebugExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new \Twig\TwigFunction('dd',
+            new \Twig\TwigFunction(
+                'dd',
                 [
                  $this,
                  'dd',
@@ -37,11 +38,11 @@ class StudooDebugExtension extends AbstractExtension
 
     /**
      * Permet d'afficher le contenu d'une variable
-     * @param string $var
-     * @return string
+     * @param mixed $var
+     * @return void
      * TODO Changer le style de l'affichage
      */
-    public function dd($var): void
+    public function dd(mixed $var): void
     {
         ob_start();
         var_dump($var);
