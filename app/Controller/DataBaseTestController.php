@@ -29,12 +29,11 @@ class DataBaseTestController implements ControllerInterface
         // Récupération des données
         $etudiants = $etudiantStmt->fetchAll();
 
-        return TwigCore::getEnvironment()->render
-        (
+        return TwigCore::getEnvironment()->render(
             'home/db.html.twig',
             [
-                'titre'     => 'Exemple avec connextion à la base de données',
-                'etudiants' => $etudiants
+             'titre'     => 'Exemple avec connextion à la base de données',
+             'etudiants' => $etudiants,
             ]
         );
     }
