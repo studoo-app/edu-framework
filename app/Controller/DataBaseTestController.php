@@ -25,15 +25,15 @@ class DataBaseTestController implements ControllerInterface
         // Connexion à la base de données
         $getConnectDb = DatabaseService::getConnect();
         // Requête SQL
-        $etudiantStmt = $getConnectDb->prepare("SELECT * FROM `etudiant`");
-        // Exécution de la requête
-        $etudiantStmt->execute();
+        $etudiantStmt = $getConnectDb->query("SELECT * FROM `etudiant`");
         // Récupération des données
         $etudiants = $etudiantStmt->fetchAll();
 
-        return TwigCore::getEnvironment()->render('home/db.html.twig',
+        return TwigCore::getEnvironment()->render
+        (
+            'home/db.html.twig',
             [
-                'titre'   => 'Exemple avec connextion à la base de données',
+                'titre'     => 'Exemple avec connextion à la base de données',
                 'etudiants' => $etudiants
             ]
         );

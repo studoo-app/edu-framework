@@ -26,7 +26,9 @@ class DatabaseMariadb implements DatabaseInterface
             ';dbname=' . ConfigCore::getEnv("DB_NAME"),
             ConfigCore::getEnv("DB_USER"),
             ConfigCore::getEnv("DB_PASSWORD"),
-            [PDO::ATTR_PERSISTENT => false]
+            [
+                PDO::ATTR_PERSISTENT => false
+            ]
         );
     }
 }

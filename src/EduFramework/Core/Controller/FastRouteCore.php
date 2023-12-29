@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core\Controller;
 use FastRoute\Dispatcher;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
+use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -25,6 +26,11 @@ use Twig\Error\SyntaxError;
 class FastRouteCore
 {
     use BuildControllerTrait;
+
+    /**
+     * Objet pour la gestion des routes
+     * @var \FastRoute\RouteCollector
+     */
     private \FastRoute\RouteCollector $routeCollector;
 
     /**
@@ -138,8 +144,7 @@ class FastRouteCore
                 $returnView = $this->buildController($request->getHander())->execute($request);
                 break;
             default:
-                // TODO Refactoring des erreurs
-                $returnView = (new HttpError404Controller())->execute($request);
+                $returnView = (new HttpErrorDefaultController())->execute($request);
                 break;
         }
         return $returnView;

@@ -61,7 +61,7 @@ class Request
      */
     public function getHearder(): bool|array
     {
-        if (!function_exists('getallheaders')) {
+        if (function_exists('getallheaders') === false) {
             $headers = [];
             foreach ($_SERVER as $name => $value) {
                 if (substr($name, 0, 5) === 'HTTP_') {

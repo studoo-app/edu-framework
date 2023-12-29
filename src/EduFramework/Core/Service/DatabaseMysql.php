@@ -26,7 +26,10 @@ class DatabaseMysql implements DatabaseInterface
             ';dbname=' . ConfigCore::getEnv("DB_NAME"),
             ConfigCore::getEnv("DB_USER"),
             ConfigCore::getEnv("DB_PASSWORD"),
-            [PDO::ATTR_PERSISTENT => false, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+            [
+                PDO::ATTR_PERSISTENT => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+            ]
         );
     }
 }
