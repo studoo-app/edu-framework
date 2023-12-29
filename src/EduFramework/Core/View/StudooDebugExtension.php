@@ -26,19 +26,18 @@ class StudooDebugExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new \Twig\TwigFunction(
-                'dd',
-                [
-                 $this,
-                 'dd',
-                ]
-            ),
-        ];
+            new \Twig\TwigFunction('dd',
+                    [
+                     $this,
+                     'dd',
+                    ]
+                ),
+               ];
     }
 
     /**
      * Permet d'afficher le contenu d'une variable
-     * @param mixed $var
+     * @param mixed $var La variable à debuger
      * @return void
      * TODO Changer le style de l'affichage
      */
