@@ -1,20 +1,28 @@
 <?php
 /*
- * Ce fichier fait partie du edu-framework.
+ * Ce fichier fait partie du Studoo
  *
- * (c) Studoo
+ * @author Benoit Foujols
  *
  * Pour les informations complètes sur les droits d'auteur et la licence,
  * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
  */
 
-
 namespace Studoo\EduFramework\Core\View;
 
 use Twig\Extension\AbstractExtension;
 
+/**
+ * Class StudooDebugExtension
+ * Elle permet de déclarer les fonctions de l'extension dd()
+ * @package Studoo\EduFramework\Core\View
+ */
 class StudooDebugExtension extends AbstractExtension
 {
+    /**
+     * Permet de déclarer les fonctions de l'extension
+     * @return \Twig\TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [
@@ -22,12 +30,19 @@ class StudooDebugExtension extends AbstractExtension
         ];
     }
 
-    public function dd($var): void
+    /**
+     * Permet d'afficher le contenu d'une variable
+     * @param string $var
+     * @return void
+     */
+    public function dd(string $var): void
     {
         ob_start();
         var_dump($var);
         $result = ob_get_clean();
 
-        echo "<div style=\"background-color: grey; color: white; padding: 10px; margin: 10px 0;\"><pre>{$result}</pre></div>";
+        echo "<div style=\"background-color: grey; color: white; padding: 10px; margin: 10px 0;\">
+                <pre>{$result}</pre>
+              </div>";
     }
 }

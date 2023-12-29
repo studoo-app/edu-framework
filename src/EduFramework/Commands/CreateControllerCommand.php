@@ -74,16 +74,16 @@ class CreateControllerCommand extends Command
         $uri = "/".strtolower($arg);
         $twig = strtolower($arg);
 
-        if(count($pieces)>1) {
+        if(count($pieces) > 1) {
             $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $pieces));
             $uri = str_replace("_", "-", $twig);
         }
 
         return [
-            "uri"=>$uri,
-            "twigDir"=>$twig,
-            "twigPath"=>"$twig/$twig.html.twig",
-            "className"=>$className
+            "uri" => $uri,
+            "twigDir" => $twig,
+            "twigPath" => "$twig/$twig.html.twig",
+            "className" => $className
         ];
     }
 
@@ -104,7 +104,7 @@ class CreateControllerCommand extends Command
 
         $file = new PhpFile();
         //Add namespace Controller
-        $namespace= $file->addNamespace("Controller");
+        $namespace = $file->addNamespace("Controller");
         //Add Imports
         $namespace->addUse('Studoo\EduFramework\Core\Controller\ControllerInterface');
         $namespace->addUse('Studoo\EduFramework\Core\Controller\Request');
@@ -150,10 +150,10 @@ class CreateControllerCommand extends Command
             throw new RouteAlreadyExistsException();
         }
 
-        $router[$name]=[
-            "uri"=>"/".$uri,
-            "controller"=>'Controller\\'.$className,
-            "httpMethod"=>["GET"]
+        $router[$name] = [
+            "uri" => "/".$uri,
+            "controller" => 'Controller\\'.$className,
+            "httpMethod" => ["GET"]
         ];
 
         file_put_contents(self::ROUTES_FILE_PATH, Yaml::dump($router));
