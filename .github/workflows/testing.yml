@@ -58,7 +58,9 @@ jobs:
             sleep 1
             echo "Waiting for MySQL..."
           done
-          nc -z 127.0.0.1 3306
+
+      - name: Pause
+        run: sleep 15
 
       - name: Generate SQL
         run: mysql -h 127.0.0.1 -u root app_db < tests/Config/EtudiantApp.sql
