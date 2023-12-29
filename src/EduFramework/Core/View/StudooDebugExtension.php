@@ -33,16 +33,17 @@ class StudooDebugExtension extends AbstractExtension
     /**
      * Permet d'afficher le contenu d'une variable
      * @param string $var
-     * @return void
+     * @return string
+     * TODO Changer le style de l'affichage
      */
-    public function dd(string $var): void
+    public function dd($var): void
     {
         ob_start();
         var_dump($var);
         $result = ob_get_clean();
 
         echo "<div style=\"background-color: grey; color: white; padding: 10px; margin: 10px 0;\">
-                <pre>{$result}</pre>
-              </div>";
+                    <pre>{$result}</pre>
+                </div>";
     }
 }
