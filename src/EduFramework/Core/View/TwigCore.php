@@ -35,12 +35,7 @@ class TwigCore
         // Gestion du moteur de template
         $loader = new FilesystemLoader($path);
         // création de l'objet $twig
-        self::$twig = new Environment(
-            $loader,
-            [
-            'cache' => false,
-            'debug' => true,
-            ]
+        self::$twig = new Environment($loader, ['cache' => false, 'debug' => true]
         );
         // Ajoutez l'extension Debug
         self::$twig->addExtension(new DebugExtension());
