@@ -38,7 +38,8 @@ class TwigCore
         self::$twig = new Environment($loader, [
             'cache' => false,
             'debug' => true,
-        ]);
+            ]
+        );
         // Ajoutez l'extension Debug
         self::$twig->addExtension(new DebugExtension());
         self::$twig->addExtension(new StudooDebugExtension());
