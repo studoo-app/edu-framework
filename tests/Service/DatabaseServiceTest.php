@@ -30,4 +30,26 @@ class DatabaseServiceTest extends TestCase
         $this->expectException(ErrorDatabaseNotExistException::class);
         new DatabaseService();
     }
+
+    public function testNoExistDriverPgsql()
+    {
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../Config/');
+        $dotenv->load();
+        (new ConfigCore([]));
+        $this->expectException(ErrorDatabaseNotExistException::class);
+        new DatabaseService();
+    }
+
+    public function testInstanceOfPdo()
+    {
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../Config/');
+        $dotenv->load();
+        (new ConfigCore([]));
+
+        $_ENV["DB_TYPE"] = "mysql";
+        $_ENV["DB_PASSWORD"] = "";
+
+        new DatabaseService();
+        $this->assertInstanceOf(PDO::class, DatabaseService::getConnect());
+    }
 }

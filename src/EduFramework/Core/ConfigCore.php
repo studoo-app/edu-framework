@@ -56,6 +56,6 @@ class ConfigCore
      */
     public static function getEnv(string $key): mixed
     {
-        return $_ENV[$key] ?? null;
+        return strip_tags($_ENV[$key]);
     }
 }

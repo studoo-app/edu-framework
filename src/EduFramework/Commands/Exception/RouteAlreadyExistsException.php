@@ -4,6 +4,7 @@ namespace Studoo\EduFramework\Commands\Exception;
 
 class RouteAlreadyExistsException extends \Exception
 {
+
     /**
      * Message de l'exception
      * @var string

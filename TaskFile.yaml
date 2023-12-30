@@ -172,7 +172,7 @@ tasks:
     desc: "Start project exemple"
     cmds:
       - |
-        Composer start
+        composer edu:start
 
   start:
     desc: "Start"

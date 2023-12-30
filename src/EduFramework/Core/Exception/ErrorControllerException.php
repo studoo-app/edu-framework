@@ -12,6 +12,7 @@ namespace Studoo\EduFramework\Core\Exception;
 
 class ErrorControllerException extends \Exception
 {
+
     /**
      * Message de l'exception
      * @var string

@@ -1,0 +1,80 @@
+#   ____  _             _
+#  / ___|| |_ _   _  __| | ___   ___
+#  \___ \| __| | | |/ _` |/ _ \ / _ \
+#   ___) | |_| |_| | (_| | (_) | (_) |
+#  |____/ \__|\__,_|\__,_|\___/ \___/
+#
+# Fichier de test de la qualité du code avec Codacy
+#
+name: Code Quality Analysis
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  eduframe:
+    name: EduFrame -> Test PHP (PHP ${{ matrix.php-versions }})
+    # https://hub.docker.com/_/ubuntu/
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        # https://hub.docker.com/_/mysql
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: app_db
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+    strategy:
+        fail-fast: true
+        matrix:
+            php-versions: [ '8.1' ]
+    steps:
+      # https://github.com/actions/checkout (official)
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # https://github.com/shivammathur/setup-php (community)
+      - name: Setup PHP, extensions and composer with shivammathur/setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo, curl
+        env:
+          update: true
+
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Install .env
+        run: mv .env.example .env
+
+      - name: Wait for MySQL
+        run: |
+          sudo apt-get install -y netcat
+          while ! nc -z 127.0.0.1 3306; do   
+            sleep 1
+            echo "Waiting for MySQL..."
+          done
+
+      - name: Pause
+        run: sleep 15
+
+      - name: Generate SQL
+        run: mysql -h 127.0.0.1 -u root app_db < tests/Config/EtudiantApp.sql
+
+      - name: Install dependencies
+        run: composer self-update && composer install && composer dump-autoload
+
+      - name: Run tests and collect coverage
+        run: vendor/bin/phpunit --coverage-clover clover.xml
+
+      - name: Upload coverage to Codacy
+        run: |
+          export CODACY_API_TOKEN=${{ secrets.CODACY_API_TOKEN }}
+          export CODACY_ORGANIZATION_PROVIDER=gh
+          export CODACY_USERNAME=studoo-app
+          export CODACY_PROJECT_NAME=edu-framework
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r clover.xml

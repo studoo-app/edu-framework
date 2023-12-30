@@ -11,6 +11,7 @@
 namespace Studoo\EduFramework\Core\View;
 
 use Twig\Environment;
+use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
 /**
@@ -34,7 +35,13 @@ class TwigCore
         // Gestion du moteur de template
         $loader = new FilesystemLoader($path);
         // création de l'objet $twig
-        self::$twig = new Environment($loader, []);
+        self::$twig = new Environment(
+            $loader,
+            ['cache' => false, 'debug' => true]
+        );
+        // Ajoutez l'extension Debug
+        self::$twig->addExtension(new DebugExtension());
+        self::$twig->addExtension(new StudooDebugExtension());
     }
 
     /**

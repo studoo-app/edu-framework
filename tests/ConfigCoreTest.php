@@ -52,4 +52,29 @@ class ConfigCoreTest extends TestCase
     {
         $this->assertEquals('app_db', ConfigCore::getEnv('DB_NAME'));
     }
+
+    public function testGetEnvDbHost()
+    {
+        $this->assertEquals('127.0.0.1', ConfigCore::getEnv('DB_HOST'));
+    }
+
+    public function testGetEnvDbSocket()
+    {
+        $this->assertEquals('3306', ConfigCore::getEnv('DB_SOCKET'));
+    }
+
+    public function testGetEnvDbType()
+    {
+        $this->assertEquals('postgres', ConfigCore::getEnv('DB_TYPE'));
+    }
+
+    public function testGetEnvDbUser()
+    {
+        $this->assertEquals('root', ConfigCore::getEnv('DB_USER'));
+    }
+
+    public function testGetEnvDbPwd()
+    {
+        $this->assertEquals('root', ConfigCore::getEnv('DB_PASSWORD'));
+    }
 }

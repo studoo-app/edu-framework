@@ -12,6 +12,7 @@ namespace Studoo\EduFramework\Core\Exception;
 
 class ErrorDatabaseNotExistException extends \Exception
 {
+
     /**
      * Message de l'exception
      * @var string
