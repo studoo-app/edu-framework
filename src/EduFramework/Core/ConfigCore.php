@@ -31,9 +31,9 @@ class ConfigCore
     {
         self::$config = array_merge(
             [
-                'base_path'         => '/',
-                'twig_path'         => '/app/Template',
-                'route_config_path'  => '/app/config/'
+                'base_path' => '/',
+                'twig_path' => '/app/Template',
+                'route_config_path' => '/app/Config/'
             ],
             $config
         );

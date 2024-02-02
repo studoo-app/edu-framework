@@ -17,7 +17,7 @@ if (version_compare(PHP_VERSION, '8.0', '<') === false) {
                     [
                         'base_path'         => __DIR__ . '/../',
                         'twig_path'         => __DIR__ . '/../app/Template',
-                        'route_config_path'  => __DIR__ . '/../app/config/'
+                        'route_config_path' => __DIR__ . '/../app/Config/'
                     ]
                   )
     );
