@@ -39,7 +39,7 @@ class ConfigCoreTest extends TestCase
 
     public function testGetRouteConfigPathDefault()
     {
-        $this->assertEquals('/app/config/', ConfigCore::getConfig('route_config_path'));
+        $this->assertEquals('/app/Config/', ConfigCore::getConfig('route_config_path'));
     }
 
     public function testGetRouteConfigPathChangeTo()
