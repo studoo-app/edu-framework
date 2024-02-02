@@ -10,6 +10,10 @@
       "email": "Benoit.Foujols@ac-creteil.fr"
     },
     {
+      "name": "Julien Pechberthy",
+      "email": "Julien.Pechberthy@ac-creteil.fr"
+    },
+    {
       "name": "Studoo Community",
       "homepage": "https://github.com/orgs/studoo-app/people"
     }
@@ -57,8 +61,8 @@
     },
     "scripts-descriptions": {
       "edu:init": "Create env file",
-    "edu:start": "Start local server",
-    "edu:docker:db-service:start": "Start docker related database service [args : mysql / maria-db]",
-    "edu:docker:db-service:down": "Stop and remove docker related database service [args : mysql / maria-db]"
+      "edu:start": "Start local server",
+      "edu:docker:db-service:start": "Start docker related database service [args : mysql / maria-db]",
+      "edu:docker:db-service:down": "Stop and remove docker related database service [args : mysql / maria-db]"
   }
 }
