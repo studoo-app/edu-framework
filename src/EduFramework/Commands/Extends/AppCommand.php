@@ -1,6 +1,6 @@
 <?php
 
-namespace Studoo\EduFramework\Commands;
+namespace Studoo\EduFramework\Commands\Extends;
 
 use Symfony\Component\Console\Application;
 
@@ -11,6 +11,7 @@ class AppCommand extends Application
         parent::__construct("EduFramework", "0.1.0@alpha");
 
         $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
+        $this->add(new \Studoo\EduFramework\Commands\CreateControllerCommand());
 
         $this->setDefaultCommand('default');
     }

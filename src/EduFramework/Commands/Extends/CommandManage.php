@@ -1,6 +1,6 @@
 <?php
 
-namespace Studoo\EduFramework\Commands;
+namespace Studoo\EduFramework\Commands\Extends;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
