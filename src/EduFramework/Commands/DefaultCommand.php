@@ -4,6 +4,7 @@ namespace Studoo\EduFramework\Commands;
 
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
+use Studoo\EduFramework\Commands\Extends\listCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,6 +31,9 @@ class DefaultCommand extends CommandManage
             'Bienvenu dans la console EDU-Framwork !',
             ''
         ]);
+
+        $check = new listCommand($output, self::$stdOutput);
+        $check->render();
 
         return Command::SUCCESS;
     }
