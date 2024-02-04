@@ -2,6 +2,7 @@
 
 namespace Studoo\EduFramework\Commands;
 
+use Studoo\EduFramework\Commands\Extends\CkeckStack;
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
 use Studoo\EduFramework\Commands\Extends\listCommand;
@@ -32,8 +33,16 @@ class DefaultCommand extends CommandManage
             ''
         ]);
 
+        $check = new CkeckStack($output, self::$stdOutput);
+        $check->render();
+
         $check = new listCommand($output, self::$stdOutput);
         $check->render();
+
+        self::$stdOutput->writeln([
+            'Si vous avez un problème, https://github.com/studoo-app/edu-framework/discussions',
+            ''
+        ]);
 
         return Command::SUCCESS;
     }
