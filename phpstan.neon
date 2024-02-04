@@ -6,3 +6,5 @@ parameters:
 	    analyse:
 	        - src/EduFramework/Scripts
 	        - src/EduFramework/Commands
+	        - bin
+	        - app

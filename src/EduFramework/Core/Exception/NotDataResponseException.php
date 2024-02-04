@@ -12,7 +12,6 @@ namespace Studoo\EduFramework\Core\Exception;
 
 class NotDataResponseException extends \Exception
 {
-
     /**
      *
      * @var string
