@@ -6,6 +6,7 @@ use Studoo\EduFramework\Commands\Extends\CkeckStack;
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
 use Studoo\EduFramework\Commands\Extends\listCommand;
+use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ class DefaultCommand extends CommandManage
     {
         self::$stdOutput->writeln([
             CommandBanner::getBanner(),
-            'Bienvenu dans la console EDU-Framwork !',
+            'Bienvenu dans la console ' .ConfigCore::getConfig('name'),
             ''
         ]);
 

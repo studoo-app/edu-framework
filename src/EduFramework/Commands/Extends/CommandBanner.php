@@ -4,6 +4,7 @@ namespace Studoo\EduFramework\Commands\Extends;
 
 use DateTime;
 use DateTimeZone;
+use Studoo\EduFramework\Core\ConfigCore;
 
 /**
  * Class CommandBanner
@@ -46,7 +47,7 @@ class CommandBanner
         $banner .= "  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \ / _ \ \n";
         $banner .= " |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/ \n";
         $banner .= "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___| \n";
-        $banner .= "                        </info><comment>" . self::$version . " by studoo collectif</comment>    \n";
+        $banner .= "                        </info><comment>" . self::$version . " " . ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
 
         return $banner;
     }
@@ -61,7 +62,7 @@ class CommandBanner
     {
         $banner = "\n<info>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</info>\n";
         $banner .= "<comment>Command launched : </comment> \n";
-        $banner .= "<comment>Version : </comment> \n";
+        $banner .= "<comment>Version : " . ConfigCore::getConfig('version') . "</comment> \n";
         $banner .= "<comment>Running time : </comment>" . self::execTime() . "\n";
         $banner .= "<info>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</info>\n";
 

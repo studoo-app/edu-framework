@@ -2,6 +2,7 @@
 
 namespace Studoo\EduFramework\Commands\Extends;
 
+use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -52,7 +53,7 @@ class CkeckStack
     {
         $listCheck = [];
 
-        $listCheck[] = (version_compare(PHP_VERSION, '8.1', '>=') === true) ? ["OK", 'PHP', PHP_VERSION] : ["KO", 'PHP', PHP_VERSION];
+        $listCheck[] = (version_compare(PHP_VERSION, ConfigCore::getConfig('php_version'), '>=') === true) ? ["OK", 'PHP', PHP_VERSION] : ["KO", 'PHP', PHP_VERSION];
         $listCheck[] = ["INFO", 'PHP', PHP_BINARY];
 
         return $listCheck;
