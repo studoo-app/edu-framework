@@ -15,8 +15,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class CkeckStack
 {
-    private $output;
-    private $symfonyStyle;
+    /**
+     * @var OutputInterface
+     */
+    private OutputInterface $output;
+
+    /**
+     * @var SymfonyStyle
+     */
+    private SymfonyStyle $symfonyStyle;
 
     public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle)
     {

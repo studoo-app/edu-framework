@@ -34,13 +34,6 @@ class CommandBanner
         self::$timeExecStart = $date;
         self::$timeExecStartMicro = microtime(true);
 
-        /*
-           _          __
-   ___  __| |_   _   / _|_ __ __ _ _ __ ___   ___
-  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \ / _ \
- |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/
-  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___|
-         */
         $banner = "<info>";
         $banner .= "           _          __                           \n";
         $banner .= "   ___  __| |_   _   / _|_ __ __ _ _ __ ___   ___  \n";
