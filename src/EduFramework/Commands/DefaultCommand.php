@@ -16,6 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class DefaultCommand
  * Classe permettant l'utilisation de la commande par défaut
  * @package Studoo\EduFramework\Commands
+ * Example command line:
+ * ```
+ * $ php bin/edu default
+ * ```
  */
 #[AsCommand(
     name: 'default',

@@ -9,6 +9,14 @@ use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * Class DefaultCommandTest
+ * Test de la commande par défaut (\Studoo\EduFramework\Commands\DefaultCommand)
+ * Example command line:
+ * ```
+ * $ php bin/edu default
+ * ```
+ */
 class DefaultCommandTest extends TestCase
 {
     private $commandeTester;
