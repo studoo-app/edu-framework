@@ -25,7 +25,6 @@ if (version_compare(PHP_VERSION, '8.1', '<') === false) {
     // Chargement des classes utilisées par l'application
     (new LoadCouchCore())->run();
 } else {
-    echo "Cet app nécessite au moins PHP8.1"
-        . PHP_VERSION .
-        " est actuellement installé. Veuillez mettre à jour votre version de PHP.\n";
+    printf("Cet app nécessite au moins PHP8.1. %s est actuellement installé.", PHP_VERSION);
+    printf(" Veuillez mettre à jour votre version de PHP.\n");
 }
