@@ -30,7 +30,7 @@ class DefaultCommand extends CommandManage
     {
         self::$stdOutput->writeln([
             CommandBanner::getBanner(),
-            'Bienvenu dans la console ' .ConfigCore::getConfig('name'),
+            'Bienvenue dans la console ' . ConfigCore::getConfig('name'),
             ''
         ]);
 
