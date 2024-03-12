@@ -36,7 +36,7 @@ class CkeckStack
      *
      * @return void
      */
-    public function render()
+    public function render(): void
     {
         $this->symfonyStyle->writeln([
             'Check votre env. : ',
