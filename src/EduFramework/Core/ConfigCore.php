@@ -33,7 +33,7 @@ class ConfigCore
             [
                 'name' => 'EduFramework',
                 'version' => 'v0.6.0@main',
-                'date_version' => '2024-02-04', // Date de la livraison de la version
+                'date_version' => '2024-03-12', // Date de la livraison de la version
                 'php_version' => '8.1', // Warning : bin/edu require PHP 8.1 or higher
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
