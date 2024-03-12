@@ -7,6 +7,7 @@ use Studoo\EduFramework\Commands\Exception\ControllerAlreadyExistsException;
 use Studoo\EduFramework\Commands\Exception\RouteAlreadyExistsException;
 use Studoo\EduFramework\Commands\Exception\ViewAlreadyExistsException;
 use Studoo\EduFramework\Core\Controller\ControllerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,11 +17,15 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class CreateControllerCommand
- * Classe permettant l'utilisation de la commande edu:make:controller
+ * Classe permettant l'utilisation de la commande php bin/edu make:controller <controller-name>
  * Cette commande permet de générer un controller, sa vue associée
  * ainsi que déclarer la route dans le fichier de configuration
  * @package Studoo\EduFramework\Commands
  */
+#[AsCommand(
+    name: 'make:controller',
+    description: 'Génération d un controller',
+)]
 class CreateControllerCommand extends Command
 {
     private const ROUTES_FILE_PATH = './app/Config/routes.yaml';
@@ -28,9 +33,7 @@ class CreateControllerCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDefinition([
-            new InputArgument('controller-name', InputArgument::REQUIRED, 'Controller name'),
-        ]);
+        $this->AddArgument('controller-name', InputArgument::REQUIRED, 'Controller name');
     }
 
     /**
@@ -46,7 +49,7 @@ class CreateControllerCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         //Format controller-name arg
-        $namesCollection = self::getNamesCollection($input->getFirstArgument());
+        $namesCollection = self::getNamesCollection($input->getArgument('controller-name'));
         //Generate route params in app/Config/routes.yaml
         self::generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
         //Generate Controller Class
@@ -71,7 +74,7 @@ class CreateControllerCommand extends Command
         array_shift($pieces);
 
         $className = ucfirst($arg)."Controller";
-        $uri = "/".strtolower($arg);
+        $uri = strtolower($arg);
         $twig = strtolower($arg);
 
         if(count($pieces) > 1) {

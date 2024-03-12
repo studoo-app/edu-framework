@@ -12,7 +12,6 @@ namespace Studoo\EduFramework\Core\Exception;
 
 class ErrorHttpStatusException extends \Exception
 {
-
     /**
      * Message de l'exception
      * @var string

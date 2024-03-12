@@ -4,7 +4,6 @@ namespace Studoo\EduFramework\Commands\Exception;
 
 class ViewAlreadyExistsException extends \Exception
 {
-
     /**
      * Message de l'exception
      * @var string
