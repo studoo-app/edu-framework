@@ -123,7 +123,7 @@ class Request
      */
     public function setVars(array $vars): Request
     {
-        $this->vars = $vars;
+        $this->vars = array_merge($this->vars, $vars);
         return $this;
     }
 
