@@ -17,9 +17,12 @@ class CommandBanner
     /**
      * @var DateTime
      */
-    private static $timeExecStart;
-    private static $timeExecStartMicro;
-    private static string $version;
+    private static DateTime $timeExecStart;
+
+    /**
+     * @var float|string
+     */
+    private static float|string $timeExecStartMicro;
 
     /**
      * Banner of the command
@@ -40,7 +43,8 @@ class CommandBanner
         $banner .= "  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \ / _ \ \n";
         $banner .= " |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/ \n";
         $banner .= "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___| \n";
-        $banner .= "                        </info><comment>" . self::$version . " " . ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+        $banner .= "                        </info><comment>" . ConfigCore::getConfig('version') . " ";
+        $banner .= ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
 
         return $banner;
     }
@@ -82,21 +86,5 @@ class CommandBanner
         }
 
         return round($diffMicro, 2) . " ms.";
-    }
-
-    /**
-     * @return string
-     */
-    public static function getVersion(): string
-    {
-        return self::$version;
-    }
-
-    /**
-     * @param string $version
-     */
-    public static function setVersion(string $version): void
-    {
-        self::$version = $version;
     }
 }

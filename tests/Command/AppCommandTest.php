@@ -18,7 +18,6 @@ class AppCommandTest extends TestCase
     public function testCommandDefault(): void
     {
         $application = new AppCommand();
-        CommandBanner::setVersion($application->getVersion());
         $command = $application->find("default");
         $commandeTester = new CommandTester($command);
 
