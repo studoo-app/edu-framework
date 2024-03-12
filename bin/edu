@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+// Envoie les erreurs à stderr, pas à stdout. ou (0)
+ini_set('display_errors', 'stderr');
+
+// Évitez d'afficher deux fois les erreurs PHP.
+ini_set('log_errors', '0');
+
+// Masquer les deprecations de PHP 8.1
+error_reporting(E_ALL & ~E_DEPRECATED);
+
+if (version_compare(PHP_VERSION, '8.1', '<')) {
+    printf("Cet outil nécessite au moins PHP8.1. %s est actuellement installé. Veuillez mettre à jour votre version de PHP.\n", PHP_VERSION);
+    exit(1);
+}
+
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require __DIR__ . '/../vendor/autoload.php';
+} else {
+    fwrite(STDERR, 'ERROR: Les dépendances du gestionnaire de package (composer) ne sont pas correctement configurées! Exécutez "composer install" ou consultez README.md pour plus de détails' . PHP_EOL);
+    exit(1);
+}
+
+define('ROOT_PATH', realpath('.'));
+
+$application = new \Studoo\EduFramework\Commands\Extends\AppCommand();
+$application->run();
