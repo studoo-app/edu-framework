@@ -11,6 +11,7 @@
 namespace Studoo\EduFramework\Core\Controller;
 
 use FastRoute\Dispatcher;
+use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
@@ -115,6 +116,7 @@ class FastRouteCore
 
         // Création de l'objet requête HTTP
         $request = new Request($uri, $httpMethod);
+        ConfigCore::setRequest($request);
 
         // Dispatche la requete et retourne les infos de la route trouvée dans un tableau
         // [0] => Constante de FastRoute (NOT_FOUND, METHOD_NOT_ALLOWED, FOUND)
