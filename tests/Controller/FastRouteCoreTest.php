@@ -4,6 +4,7 @@ namespace Controller;
 
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
+use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -12,7 +13,10 @@ class FastRouteCoreTest extends TestCase
 
     public function setUp(): void
     {
-        (new TwigCore(__DIR__ . '/../../app/Template'));
+        (new ConfigCore([
+            'twig_path' => __DIR__ . '/../../app/Template'
+        ]));
+        TwigCore::setEnvironment();
         $en = TwigCore::getEnvironment();
     }
 
@@ -23,7 +27,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('d83d4bc21c33c6860bae0fe31f3aed41ba0d4038', sha1($route->getRoute()));
+        $this->assertEquals('ae6360270b7dcefbf34d532945857ce80db09501', sha1($route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionNotFound()
@@ -33,7 +37,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('b9f6849141244d2723a15be3c419c3d47262b8c5', sha1($route->getRoute()));
+        $this->assertEquals('f2bb0fc64c96efcc763fa677baf54f160448f7c0', sha1($route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionMethodNotAllowed()
@@ -43,7 +47,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('73a92167819882a2fc0c64b0a16a0b9f8c28b864', sha1($route->getRoute()));
+        $this->assertEquals('b66101b47494d181b51cf0bf2f6988e40ab2e95f', sha1($route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionMethodNotAllowedAndNotFound()
@@ -53,7 +57,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('b9f6849141244d2723a15be3c419c3d47262b8c5', sha1($route->getRoute()));
+        $this->assertEquals('f2bb0fc64c96efcc763fa677baf54f160448f7c0', sha1($route->getRoute()));
     }
 
     public function testLoadRoutesMatchSuccess()
@@ -63,7 +67,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('d83d4bc21c33c6860bae0fe31f3aed41ba0d4038', sha1($route->getRoute()));
+        $this->assertEquals('ae6360270b7dcefbf34d532945857ce80db09501', sha1($route->getRoute()));
     }
 
     public function testLoadRoutesMatchSuccessWithExceptionNotFound()
@@ -73,7 +77,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('b9f6849141244d2723a15be3c419c3d47262b8c5', sha1($route->getRoute()));
+        $this->assertEquals('f2bb0fc64c96efcc763fa677baf54f160448f7c0', sha1($route->getRoute()));
     }
 
     public function testLoadRoutesMatchSuccessWithExceptionMethodNotAllowedAndNotFound()
@@ -83,6 +87,6 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('73a92167819882a2fc0c64b0a16a0b9f8c28b864', sha1($route->getRoute()));
+        $this->assertEquals('b66101b47494d181b51cf0bf2f6988e40ab2e95f', sha1($route->getRoute()));
     }
 }

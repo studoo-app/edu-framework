@@ -10,6 +10,8 @@
 
 namespace Studoo\EduFramework\Core;
 
+use Studoo\EduFramework\Core\Controller\Request;
+
 /**
  * Class ConfigCore
  * Elle permet de gérer la configuration de l'application
@@ -22,6 +24,8 @@ class ConfigCore
      * @var array<string>
      */
     private static array $config;
+
+    private static Request $resquest;
 
     /**
      * ConfigCore constructor.
@@ -61,5 +65,15 @@ class ConfigCore
     public static function getEnv(string $key): mixed
     {
         return strip_tags($_ENV[$key]);
+    }
+
+    public static function setRequest(Request $request): void
+    {
+        self::$resquest = $request;
+    }
+
+    public static function getRequest(): Request
+    {
+        return self::$resquest;
     }
 }

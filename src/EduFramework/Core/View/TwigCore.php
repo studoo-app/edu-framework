@@ -10,9 +10,14 @@
 
 namespace Studoo\EduFramework\Core\View;
 
+use Studoo\EduFramework\Core\ConfigCore;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
+use Twig\TemplateWrapper;
 
 /**
  * Class TwigCore
@@ -26,6 +31,8 @@ class TwigCore
      * Objet de l'environnement Twig
      */
     private static Environment $twig;
+
+    private static TwigCore $instance;
 
     /**
      * @param string $path Chemin vers le dossier templates
@@ -46,10 +53,32 @@ class TwigCore
 
     /**
      * Retourne l'objet de l'environnement Twig pour construire les pages HTML ou JSON ...
-     * @return Environment
+     * @return TwigCore
      */
-    public static function getEnvironment(): Environment
+    public static function getEnvironment(): TwigCore
     {
-        return self::$twig;
+        return self::$instance;
+    }
+
+    public static function setEnvironment(): void
+    {
+        self::$instance = new self(ConfigCore::getConfig('twig_path'));
+    }
+
+    /**
+     * Permet de générer une page HTML
+     * @param string|TemplateWrapper $name Nom du template
+     * @param array<string> $context Contexte
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render(string|TemplateWrapper $name, array $context = []): string
+    {
+        $response = self::$twig->render($name, $context);
+        if (ConfigCore::getEnv('APP_ENV') === 'dev') {
+            $response .= (new studooBarreDebug())->generateStickyBar();
+        }
+        return $response;
     }
 }

@@ -1,0 +1,27 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    background-color: #e8fff3;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.lead {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.mini-lead {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 0;
+}
