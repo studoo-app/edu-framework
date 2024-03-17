@@ -32,7 +32,7 @@ class LoadCouchCore
         $dotenv->load();
 
         // Gestion de la couche View
-        (new TwigCore(ConfigCore::getConfig('twig_path')));
+        TwigCore::setEnvironment();
 
         // Gestion de la couche Model et de la connexion à la base de données
         if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {

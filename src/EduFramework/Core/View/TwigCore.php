@@ -10,7 +10,11 @@
 
 namespace Studoo\EduFramework\Core\View;
 
+use Studoo\EduFramework\Core\ConfigCore;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
@@ -26,6 +30,8 @@ class TwigCore
      * Objet de l'environnement Twig
      */
     private static Environment $twig;
+
+    private static TwigCore $instance;
 
     /**
      * @param string $path Chemin vers le dossier templates
@@ -46,10 +52,29 @@ class TwigCore
 
     /**
      * Retourne l'objet de l'environnement Twig pour construire les pages HTML ou JSON ...
-     * @return Environment
+     * @return TwigCore
      */
-    public static function getEnvironment(): Environment
+    public static function getEnvironment(): TwigCore
     {
-        return self::$twig;
+        return self::$instance;
+    }
+
+    public static function setEnvironment()
+    {
+        self::$instance = new self(ConfigCore::getConfig('twig_path'));
+    }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function render($name, array $context = []): string
+    {
+        $response = self::$twig->render($name, $context);
+        if (ConfigCore::getEnv('APP_ENV') === 'dev') {
+            $response .= (new studooBarreDebug())->generateStickyBar();
+        }
+        return $response;
     }
 }
