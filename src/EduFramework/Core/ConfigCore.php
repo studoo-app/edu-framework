@@ -36,8 +36,8 @@ class ConfigCore
         self::$config = array_merge(
             [
                 'name' => 'EduFramework',
-                'version' => 'v1.0.0@main',
-                'date_version' => '2024-03-15', // Date de la livraison de la version
+                'version' => 'v1.1.1@main',
+                'date_version' => '2024-03-17', // Date de la livraison de la version
                 'php_version' => '8.1', // Warning : bin/edu require PHP 8.1 or higher
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
