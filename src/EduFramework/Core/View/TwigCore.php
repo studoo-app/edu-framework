@@ -17,6 +17,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
+use Twig\TemplateWrapper;
 
 /**
  * Class TwigCore
@@ -59,17 +60,20 @@ class TwigCore
         return self::$instance;
     }
 
-    public static function setEnvironment()
+    public static function setEnvironment(): void
     {
         self::$instance = new self(ConfigCore::getConfig('twig_path'));
     }
 
     /**
+     * Permet de générer une page HTML
+     * @param string|TemplateWrapper $name Nom du template
+     * @param array<string> $context Contexte
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function render($name, array $context = []): string
+    public function render(string|TemplateWrapper $name, array $context = []): string
     {
         $response = self::$twig->render($name, $context);
         if (ConfigCore::getEnv('APP_ENV') === 'dev') {

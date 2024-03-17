@@ -67,7 +67,7 @@ class ConfigCore
         return strip_tags($_ENV[$key]);
     }
 
-    public static function setRequest(Request $request)
+    public static function setRequest(Request $request): void
     {
         self::$resquest = $request;
     }
