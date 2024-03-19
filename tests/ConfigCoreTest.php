@@ -77,4 +77,14 @@ class ConfigCoreTest extends TestCase
     {
         $this->assertEquals('root', ConfigCore::getEnv('DB_PASSWORD'));
     }
+
+    public function testExistEnvDbName()
+    {
+        $this->assertTrue(ConfigCore::existEnv('DB_NAME'));
+    }
+
+    public function testNotExistEnvDbHost()
+    {
+        $this->assertFalse(ConfigCore::existEnv('DB_HOSTABLE'));
+    }
 }

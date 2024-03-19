@@ -76,8 +76,10 @@ class TwigCore
     public function render(string|TemplateWrapper $name, array $context = []): string
     {
         $response = self::$twig->render($name, $context);
-        if (ConfigCore::getEnv('APP_ENV') === 'dev') {
-            $response .= (new studooBarreDebug())->generateStickyBar();
+        if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev') {
+            $debugBar = new studooBarreDebug();
+            $response .= $debugBar->generateCssGlobal();
+            $response .= $debugBar->generateStickyBar();
         }
         return $response;
     }

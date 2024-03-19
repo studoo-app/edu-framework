@@ -14,6 +14,16 @@ use Studoo\EduFramework\Core\ConfigCore;
 
 class studooBarreDebug
 {
+    public function generateCssGlobal(): string
+    {
+        return "<style>
+                        .container-fluid {
+                            min-height: 100vh!important;
+                        }
+                </style>";
+    }
+
+
     public function generateStickyBar(): string
     {
         return '<div class="stickybar" style="
