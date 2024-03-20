@@ -17,7 +17,8 @@ class listCommand
     private $output;
     private $symfonyStyle;
     private $listCommand = [
-        ["make:controller", "Création d'un controller (classe, config, template)"]
+        ["make:controller", "Création d'un controller (classe, config, template)"],
+        ["check:config", "Check la configuration des prérequis pour le projet"]
     ];
 
     public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle)

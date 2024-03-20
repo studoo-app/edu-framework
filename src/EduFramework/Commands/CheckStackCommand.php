@@ -22,10 +22,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  * ```
  */
 #[AsCommand(
-    name: 'default',
-    description: 'Liste des commandes disponibles',
+    name: 'check:config',
+    description: 'Check les prérequis',
 )]
-class DefaultCommand extends CommandManage
+class CheckStackCommand extends CommandManage
 {
     /**
      * @throws \Exception
@@ -34,14 +34,15 @@ class DefaultCommand extends CommandManage
     {
         self::$stdOutput->writeln([
             CommandBanner::getBanner(),
-            'Bienvenue dans la console ' . ConfigCore::getConfig('name'),
+            'Check des prérequis d ' . ConfigCore::getConfig('name'),
             ''
         ]);
 
-        $check = new listCommand($output, self::$stdOutput);
+        $check = new CkeckStack($output, self::$stdOutput);
         $check->render();
 
         self::$stdOutput->writeln([
+            '',
             'Documentation : https://studoo-app.github.io/edu-framework-doc/',
             ''
         ]);

@@ -14,6 +14,7 @@ class AppCommand extends Application
 
         $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateControllerCommand());
+        $this->add(new \Studoo\EduFramework\Commands\CheckStackCommand());
 
         $this->setDefaultCommand('default');
     }
