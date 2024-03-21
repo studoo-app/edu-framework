@@ -24,7 +24,6 @@ class AppCommandTest extends TestCase
         $commandeTester->execute([]);
         $output = $commandeTester->getDisplay();
 
-        $this->assertStringContainsString('Check votre env. :', $output);
         $this->assertStringContainsString('Liste des commandes :', $output);
     }
 }

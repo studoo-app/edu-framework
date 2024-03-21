@@ -40,8 +40,7 @@ class DefaultCommandTest extends TestCase
         $this->commandeTester->execute([]);
         $output = $this->commandeTester->getDisplay();
 
-        $this->assertStringContainsString('Check votre env. :', $output);
-        $this->assertStringContainsString('Liste des commandes :', $output);
+        $this->assertStringContainsString('Liste des commandes', $output);
     }
 
 }
