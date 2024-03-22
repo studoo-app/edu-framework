@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Studoo\EduFramework\Commands
  * Example command line:
  * ```
- * $ php bin/edu
+ * $ php bin/edu check:config
  * ```
  */
 #[AsCommand(

@@ -55,7 +55,7 @@ class CkeckStack
             '<info>Extension check : </info>',
         ]);
 
-        $this->checkExtension('pdo');
+        $this->checkExtension('pdo_mysql');
         $this->checkExtension('mbstring');
         $this->checkExtension('openssl');
         $this->checkExtension('json');
@@ -90,13 +90,16 @@ class CkeckStack
         ];
         foreach ($extDirs as $dir) {
             $extPath = $dir . DIRECTORY_SEPARATOR . $extFilename;
-            if (!\file_exists($extPath)) {
+            if (\file_exists($extPath) === false) {
                 continue;
             }
             $this->symfonyStyle->writeln(["L'extension existe dans : $extPath"]);
             if (!empty(PHP_CONFIG_FILE_SCAN_DIR) && \is_dir(PHP_CONFIG_FILE_SCAN_DIR)) {
                 $this->symfonyStyle->writeln([
-                    "\nActiver l'extension dans le fichier de configuration : " . PHP_CONFIG_FILE_SCAN_DIR . DIRECTORY_SEPARATOR . "$extension.ini"
+                    "\nActiver l'extension dans le fichier de configuration : "
+                    . PHP_CONFIG_FILE_SCAN_DIR
+                    . DIRECTORY_SEPARATOR
+                    . "$extension.ini"
                     . "\ndécocher la ligne suivante :"
                     . "\nextension=$extPath"
                 ]);
@@ -108,6 +111,5 @@ class CkeckStack
             }
             break;
         }
-        exit(1);
     }
 }
