@@ -9,7 +9,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CommandManage extends Command
 {
-
     /**
      * @var SymfonyStyle $stdOutput Sortie standard
      */

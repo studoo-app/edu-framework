@@ -14,7 +14,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class listCommand
 {
-
     /**
      * @var OutputInterface $output Interface de sortie
      */
