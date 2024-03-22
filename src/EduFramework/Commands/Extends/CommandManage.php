@@ -26,9 +26,9 @@ class CommandManage extends Command
         parent::initialize($input, $output);
 
         // Debug mode
-        if ($output->isVerbose()) {
+        if ($output->isVerbose() === true) {
             error_reporting($output->isDebug() ? E_ALL : E_ALL & ~E_DEPRECATED);
-        } elseif ($output->isQuiet()) {
+        } elseif ($output->isQuiet() === true) {
             error_reporting(false);
         }
 
