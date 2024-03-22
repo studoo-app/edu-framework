@@ -16,15 +16,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CkeckStack
 {
     /**
-     * @var OutputInterface
+     * @var OutputInterface $output Interface de sortie
      */
     private OutputInterface $output;
 
     /**
-     * @var SymfonyStyle
+     * @var SymfonyStyle $symfonyStyle Style de sortie
      */
     private SymfonyStyle $symfonyStyle;
 
+    /**
+     * Constructeur
+     *
+     * @param OutputInterface $output Interface de sortie
+     * @param SymfonyStyle $symfonyStyle Style de sortie
+     */
     public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle)
     {
         $this->output = $output;
@@ -76,9 +82,15 @@ class CkeckStack
         return $listCheck;
     }
 
+    /**
+     * Verification des extensions
+     *
+     * @param string $extension Nom de l'extension
+     * @return void
+     */
     private function checkExtension($extension): void
     {
-        if (\extension_loaded($extension)) {
+        if (\extension_loaded($extension) === true) {
             $this->symfonyStyle->writeln(['  [*] ' . strtoupper($extension) . ' PHP extension est installée.']);
             return;
         }

@@ -9,8 +9,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CommandManage extends Command
 {
+
+    /**
+     * @var SymfonyStyle $stdOutput Sortie standard
+     */
     protected static SymfonyStyle $stdOutput;
 
+    /**
+     * Initialisation
+     *
+     * @param InputInterface $input Interface d'entrée
+     * @param OutputInterface $output Interface de sortie
+     * @return void
+     */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
@@ -25,9 +36,13 @@ class CommandManage extends Command
         self::$stdOutput = new SymfonyStyle($input, $output);
     }
 
+    /**
+     * Récupération de la sortie standard
+     *
+     * @return SymfonyStyle Sortie standard
+     */
     public static function getStdOutPut(): SymfonyStyle
     {
         return self::$stdOutput;
     }
-
 }

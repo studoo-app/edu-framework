@@ -14,13 +14,31 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class listCommand
 {
+
+    /**
+     * @var OutputInterface $output Interface de sortie
+     */
     private $output;
+
+    /**
+     * @var SymfonyStyle $symfonyStyle Style de sortie
+     */
     private $symfonyStyle;
+
+    /**
+     * @var array $listCommand Liste des commandes
+     */
     private $listCommand = [
         ["make:controller", "Création d'un controller (classe, config, template)"],
         ["check:config", "Check la configuration des prérequis pour le projet"]
     ];
 
+    /**
+     * Constructeur
+     *
+     * @param OutputInterface $output Interface de sortie
+     * @param SymfonyStyle $symfonyStyle Style de sortie
+     */
     public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle)
     {
         $this->output = $output;
