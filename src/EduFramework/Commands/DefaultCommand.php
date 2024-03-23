@@ -4,7 +4,7 @@ namespace Studoo\EduFramework\Commands;
 
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
-use Studoo\EduFramework\Commands\Extends\listCommand;
+use Studoo\EduFramework\Commands\Extends\ListCommand;
 use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -37,7 +37,7 @@ class DefaultCommand extends CommandManage
             ''
         ]);
 
-        $check = new listCommand($output, self::$stdOutput);
+        $check = new ListCommand($output, self::$stdOutput);
         $check->render();
 
         self::$stdOutput->writeln([
