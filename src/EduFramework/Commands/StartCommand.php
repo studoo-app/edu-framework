@@ -40,8 +40,11 @@ class StartCommand extends CommandManage
         $check = new CkeckStack($output, self::$stdOutput);
         $check->render();
 
+        //self::$stdOutput->info();
+
         self::$stdOutput->writeln([
             '',
+            CommandBanner::getDoc(),
             'Démarage du serveur de développement...',
             ''
         ]);

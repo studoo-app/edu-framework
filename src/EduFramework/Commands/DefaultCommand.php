@@ -40,10 +40,7 @@ class DefaultCommand extends CommandManage
         $check = new ListCommand($output, self::$stdOutput);
         $check->render();
 
-        self::$stdOutput->writeln([
-            'Documentation : https://studoo-app.github.io/edu-framework-doc/',
-            ''
-        ]);
+        self::$stdOutput->info(CommandBanner::getDoc());
 
         return Command::SUCCESS;
     }

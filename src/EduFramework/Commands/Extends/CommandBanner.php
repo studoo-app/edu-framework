@@ -24,6 +24,11 @@ class CommandBanner
      */
     private static float|string $timeExecStartMicro;
 
+    public static function getDoc(): ?string
+    {
+        return 'Documentation : https://studoo-app.github.io/edu-framework-doc/';
+    }
+
     /**
      * Banner of the command
      *
