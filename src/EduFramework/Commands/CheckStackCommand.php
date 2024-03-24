@@ -12,8 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class DefaultCommand
- * Classe permettant l'utilisation de la commande par défaut
+ * Class CheckStackCommand
+ * Classe permettant de vérifier les prérequis
  * @package Studoo\EduFramework\Commands
  * Example command line:
  * ```

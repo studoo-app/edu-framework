@@ -20,6 +20,10 @@ use Symfony\Component\Yaml\Yaml;
  * Classe permettant l'utilisation de la commande php bin/edu make:controller <controller-name>
  * Cette commande permet de générer un controller, sa vue associée
  * ainsi que déclarer la route dans le fichier de configuration
+ * Example command line:
+ * ```
+ * $ php bin/edu make:controller hello
+ * ```
  * @package Studoo\EduFramework\Commands
  */
 #[AsCommand(
