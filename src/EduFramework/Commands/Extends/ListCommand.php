@@ -29,7 +29,9 @@ class ListCommand
      */
     private array $listCommand = [
         ["make:controller", "Création d'un controller (classe, config, template)"],
-        ["check:config", "Check la configuration des prérequis pour le projet"]
+        ["---------------", ""],
+        ["check:config", "Check la configuration des prérequis pour le projet"],
+        ["start", "Démarrage du serveur execution du projet"]
     ];
 
     /**
