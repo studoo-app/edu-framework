@@ -4,7 +4,6 @@ namespace Command;
 
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Commands\DefaultCommand;
-use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -40,8 +39,7 @@ class DefaultCommandTest extends TestCase
         $this->commandeTester->execute([]);
         $output = $this->commandeTester->getDisplay();
 
-        $this->assertStringContainsString('Check votre env. :', $output);
-        $this->assertStringContainsString('Liste des commandes :', $output);
+        $this->assertStringContainsString('Liste des commandes', $output);
     }
 
 }

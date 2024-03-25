@@ -1,6 +1,16 @@
 #!/usr/bin/env php
 <?php
 
+#   ____  _             _
+#  / ___|| |_ _   _  __| | ___   ___
+#  \___ \| __| | | |/ _` |/ _ \ / _ \
+#   ___) | |_| |_| | (_| | (_) | (_) |
+#  |____/ \__|\__,_|\__,_|\___/ \___/
+#
+# Command bin/edu by Edu-Framework
+# @author Benoit Foujols
+#
+
 // Envoie les erreurs à stderr, pas à stdout. ou (0)
 ini_set('display_errors', 'stderr');
 

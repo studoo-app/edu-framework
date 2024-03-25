@@ -12,14 +12,34 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Benoit Foujols
  */
-class listCommand
+class ListCommand
 {
-    private $output;
-    private $symfonyStyle;
-    private $listCommand = [
-        ["make:controller", "Création d'un controller (classe, config, template)"]
+    /**
+     * @var OutputInterface $output Interface de sortie
+     */
+    private OutputInterface $output;
+
+    /**
+     * @var SymfonyStyle $symfonyStyle Style de sortie
+     */
+    private SymfonyStyle $symfonyStyle;
+
+    /**
+     * @var array $listCommand Liste des commandes
+     */
+    private array $listCommand = [
+        ["make:controller", "Création d'un controller (classe, config, template)"],
+        ["---------------", ""],
+        ["check:config", "Check la configuration des prérequis pour le projet"],
+        ["start", "Démarrage du serveur execution du projet"]
     ];
 
+    /**
+     * Constructeur
+     *
+     * @param OutputInterface $output Interface de sortie
+     * @param SymfonyStyle $symfonyStyle Style de sortie
+     */
     public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle)
     {
         $this->output = $output;
@@ -31,7 +51,7 @@ class listCommand
      *
      * @return void
      */
-    public function render()
+    public function render(): void
     {
         $this->symfonyStyle->writeln([
             'Liste des commandes : ',

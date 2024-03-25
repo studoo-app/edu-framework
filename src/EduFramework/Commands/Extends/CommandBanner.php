@@ -15,14 +15,19 @@ use Studoo\EduFramework\Core\ConfigCore;
 class CommandBanner
 {
     /**
-     * @var DateTime
+     * @var DateTime $timeExecStart
      */
     private static DateTime $timeExecStart;
 
     /**
-     * @var float|string
+     * @var float|string $timeExecStartMicro
      */
     private static float|string $timeExecStartMicro;
+
+    public static function getDoc(): ?string
+    {
+        return 'Documentation : https://studoo-app.github.io/edu-framework-doc/';
+    }
 
     /**
      * Banner of the command
