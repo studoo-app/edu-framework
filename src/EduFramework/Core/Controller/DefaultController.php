@@ -3,6 +3,7 @@
 namespace Studoo\EduFramework\Core\Controller;
 
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\View\studooView;
 use Studoo\EduFramework\Core\View\TwigCore;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -10,6 +11,8 @@ use Twig\Error\SyntaxError;
 
 class DefaultController implements ControllerInterface
 {
+    use studooView;
+
     /**
      * @param Request $request Requête HTTP
      * @return string|null
@@ -25,6 +28,7 @@ class DefaultController implements ControllerInterface
             'default.html.twig',
             [
                 'bonjour'   => "welcome to the home page",
+                'logoEF'      => $this->logo()
             ]
         );
     }

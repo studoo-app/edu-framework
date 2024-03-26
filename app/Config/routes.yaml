@@ -1,4 +1,0 @@
-index:
-    uri: /demo
-    controller: Controller\HomeController
-    httpMethod: [GET]
