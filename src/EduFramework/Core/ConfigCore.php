@@ -41,7 +41,8 @@ class ConfigCore
                 'php_version' => '8.1', // Warning : bin/edu require PHP 8.1 or higher
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
-                'route_config_path' => '/app/Config/'
+                'route_config_path' => '/app/Config/',
+                'command_config_path' => 'app/Config/'
             ],
             $config
         );

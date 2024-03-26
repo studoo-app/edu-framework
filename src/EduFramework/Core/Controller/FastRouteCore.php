@@ -130,8 +130,10 @@ class FastRouteCore
         switch ($routeInfo[0]) {
             // Si la route n'est pas trouvée alors j'affiche la page 404
             case Dispatcher::NOT_FOUND:
+                // Route par defaut sans config route ou sans route / défini
                 if ($uri === '/') {
                     $returnView = (new DefaultController())->execute($request);
+                // Route 404
                 } else {
                     $returnView = (new HttpError404Controller())->execute($request);
                 }
