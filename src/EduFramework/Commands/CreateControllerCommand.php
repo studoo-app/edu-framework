@@ -34,6 +34,7 @@ class CreateControllerCommand extends Command
 {
     private const ROUTES_FILE_PATH = './app/Config/routes.yaml';
     private const TEMPLATES_DIR = './app/Template/';
+    private const CONTROLLER_DIR = './app/Controller/';
 
     protected function configure(): void
     {
@@ -103,6 +104,10 @@ class CreateControllerCommand extends Command
      */
     private function generateController(string $className, string $twigPath): void
     {
+        if(is_dir(self::CONTROLLER_DIR) === false) {
+            mkdir(self::CONTROLLER_DIR);
+        }
+
         $filename = "./app/Controller/$className.php";
 
         if(file_exists($filename)) {
@@ -151,7 +156,15 @@ class CreateControllerCommand extends Command
      */
     private function generateRoute(string $name, string $uri, string $className): void
     {
+        if(is_file(self::ROUTES_FILE_PATH) === false) {
+            file_put_contents(self::ROUTES_FILE_PATH, '');
+        }
+
         $router = Yaml::parseFile(self::ROUTES_FILE_PATH);
+
+        if (!is_array($router)) {
+            $router = [];
+        }
 
         if(array_key_exists($name, $router)) {
             throw new RouteAlreadyExistsException();

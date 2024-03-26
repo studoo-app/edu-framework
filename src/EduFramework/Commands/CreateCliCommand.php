@@ -31,6 +31,8 @@ class CreateCliCommand extends Command
 {
     private const COMMANDS_FILE_PATH = './app/Config/commands.yaml';
 
+    private const COMMAND_DIR = './app/Command';
+
     protected function configure(): void
     {
         $this->AddArgument('command-name', InputArgument::REQUIRED, 'Commande name');
@@ -85,6 +87,10 @@ class CreateCliCommand extends Command
      */
     private function generateCommand(string $className, string $nameCommand): void
     {
+        if(is_dir(self::COMMAND_DIR) === false) {
+            mkdir(self::COMMAND_DIR);
+        }
+
         $filename = "./app/Command/$className.php";
 
         if(file_exists($filename)) {
@@ -136,6 +142,10 @@ class CreateCliCommand extends Command
      */
     private function generateCommandConfig(string $name, string $nameSpace): void
     {
+        if(is_file(self::COMMANDS_FILE_PATH) === false) {
+            file_put_contents(self::COMMANDS_FILE_PATH, '');
+        }
+
         $commands = Yaml::parseFile(self::COMMANDS_FILE_PATH);
 
         if (!is_array($commands)) {
