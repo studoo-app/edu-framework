@@ -1,12 +1,4 @@
 index:
-    uri: /
+    uri: /demo
     controller: Controller\HomeController
     httpMethod: [GET]
-testdb:
-    uri: /testdb
-    controller: Controller\DataBaseTestController
-    httpMethod: [GET]
-post:
-    uri: /post
-    controller: Controller\PostController
-    httpMethod: [GET,POST]

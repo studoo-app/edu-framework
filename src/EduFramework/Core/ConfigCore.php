@@ -58,6 +58,19 @@ class ConfigCore
     }
 
     /**
+     * Permet de modifier une configuration
+     * @param string $key Clé de la configuration
+     * @param mixed $value Valeur de la configuration
+     * @return void
+     */
+    public static function setConfig(string $key, mixed $value): void
+    {
+        if (isset(self::$config[$key]) === true) {
+            self::$config[$key] = $value;
+        }
+    }
+
+    /**
      * Permet de récupérer la configuration du fichier .env à la racine du projet
      * @param string $key Clé de la configuration
      * @return mixed

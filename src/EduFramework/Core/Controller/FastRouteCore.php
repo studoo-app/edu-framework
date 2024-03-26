@@ -128,7 +128,11 @@ class FastRouteCore
         switch ($routeInfo[0]) {
             // Si la route n'est pas trouvée alors j'affiche la page 404
             case Dispatcher::NOT_FOUND:
-                $returnView = (new HttpError404Controller())->execute($request);
+                if ($uri === '/') {
+                    $returnView = (new DefaultController())->execute($request);
+                } else {
+                    $returnView = (new HttpError404Controller())->execute($request);
+                }
                 break;
                 // Si la route est trouvée mais que la méthode HTTP n'est pas autorisée
                 // Exemple une route définie en POST est appelée en GET
