@@ -8,14 +8,16 @@
  * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
  */
 
-
 namespace Studoo\EduFramework\Core\View;
 
+/**
+ * Trait studooView
+ * @package Studoo\EduFramework\Core\View
+ */
 trait studooView
 {
     /**
-     * Logo d'EduFramework
-     * @var string
+     * @return string Retourne le logo de l'application
      */
     public function logo(): string
     {

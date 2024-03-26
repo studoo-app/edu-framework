@@ -9,6 +9,10 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ * Class DefaultController
+ * @package Studoo\EduFramework\Core\Controller
+ */
 class DefaultController implements ControllerInterface
 {
     use studooView;

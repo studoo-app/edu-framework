@@ -133,7 +133,7 @@ class FastRouteCore
                 // Route par defaut sans config route ou sans route / défini
                 if ($uri === '/') {
                     $returnView = (new DefaultController())->execute($request);
-                // Route 404
+                    // Route 404
                 } else {
                     $returnView = (new HttpError404Controller())->execute($request);
                 }

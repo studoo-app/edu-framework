@@ -15,6 +15,10 @@ use Studoo\EduFramework\Core\ConfigCore;
 class studooBarreDebug
 {
     use studooView;
+
+    /**
+     * @return string Retourne CSS global
+     */
     public function generateCssGlobal(): string
     {
         return "<style>
@@ -24,7 +28,9 @@ class studooBarreDebug
                 </style>";
     }
 
-
+    /**
+     * @return string Retourne la barre de débogage
+     */
     public function generateStickyBar(): string
     {
         return '<div class="stickybar" style="

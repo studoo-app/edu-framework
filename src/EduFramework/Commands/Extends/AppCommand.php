@@ -20,7 +20,7 @@ class AppCommand extends Application
         $this->add(new \Studoo\EduFramework\Commands\CreateCliCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {
-            $commandList = Yaml::parseFile( ConfigCore::getConfig('command_config_path') . 'commands.yaml');
+            $commandList = Yaml::parseFile(ConfigCore::getConfig('command_config_path') . 'commands.yaml');
             if (is_array($commandList)) {
                 foreach ($commandList as $command) {
                     if (class_exists($command) === true) {
