@@ -54,8 +54,10 @@ class FastRouteCore
     public function loadRouteConfig(string $pathConfigFile): self
     {
         $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
-        foreach ($fileData as $routeConfig) {
-            $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
+        if (is_array($fileData)) {
+            foreach ($fileData as $routeConfig) {
+                $this->addRoute($routeConfig['httpMethod'], $routeConfig['uri'], $routeConfig['controller']);
+            }
         }
 
         return $this;
