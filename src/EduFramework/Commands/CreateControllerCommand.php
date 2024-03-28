@@ -56,11 +56,11 @@ class CreateControllerCommand extends Command
         //Format controller-name arg
         $namesCollection = self::getNamesCollection($input->getArgument('controller-name'));
         //Generate route params in app/Config/routes.yaml
-        self::generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
+        $this->generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
         //Generate Controller Class
-        self::generateController($namesCollection["className"], $namesCollection["twigPath"]);
+        $this->generateController($namesCollection["className"], $namesCollection["twigPath"]);
         //Generation TWIG
-        self::generateView($namesCollection["twigDir"], $namesCollection["twigPath"]);
+        $this->generateView($namesCollection["twigDir"], $namesCollection["twigPath"]);
         //Close command message
         $io->success("Controller successfully generated");
         return Command::SUCCESS;
@@ -75,15 +75,15 @@ class CreateControllerCommand extends Command
     private function getNamesCollection(string $arg): array
     {
 
-        $pieces = preg_split('/(?=[A-Z])/', $arg);
-        array_shift($pieces);
+        $name = preg_split('/(?=[A-Z])/', $arg);
+        array_shift($name);
 
         $className = ucfirst($arg)."Controller";
         $uri = strtolower($arg);
         $twig = strtolower($arg);
 
-        if(count($pieces) > 1) {
-            $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $pieces));
+        if(count($name) > 1) {
+            $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $name));
             $uri = str_replace("_", "-", $twig);
         }
 
@@ -108,7 +108,7 @@ class CreateControllerCommand extends Command
             mkdir(self::CONTROLLER_DIR);
         }
 
-        $filename = "./app/Controller/$className.php";
+        $filename = self::CONTROLLER_DIR . "$className.php";
 
         if(file_exists($filename)) {
             throw new ControllerAlreadyExistsException();

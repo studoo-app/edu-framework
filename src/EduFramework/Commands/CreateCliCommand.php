@@ -25,7 +25,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 #[AsCommand(
     name: 'make:command',
-    description: 'Génération d une commande',
+    description: 'Génération command CLI',
 )]
 class CreateCliCommand extends Command
 {
@@ -62,8 +62,8 @@ class CreateCliCommand extends Command
 
     /**
      * Fonction permettant le traitement de l'arg command-name passé à la commande
-     * afin de générer les différents noms et chemins nécéssaires
-     * @param string $arg
+     * afin de générer les différents noms et chemins nécessaires
+     * @param string $arg Nom de la commande
      * @return array
      */
     private function getNamesCollection(string $arg): array
@@ -80,8 +80,8 @@ class CreateCliCommand extends Command
 
     /**
      * Fonction permettant de générer la classe PHP
-     * @param string $className
-     * @param string $nameCommand
+     * @param string $className Nom de la classe
+     * @param string $nameCommand Nom de la commande
      * @return void
      * @throws CommandAlreadyExistsException
      */
@@ -123,8 +123,9 @@ class CreateCliCommand extends Command
              self::$stdOutput->writeln([
                 CommandBanner::getBanner(),
                 'Bienvenue dans la console ' . ConfigCore::getConfig('name'),
-                ''
+                '',
             ]);
+            // Ajouter votre code ici
             return Command::SUCCESS;
         CODE);
 

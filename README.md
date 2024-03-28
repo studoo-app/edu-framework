@@ -16,7 +16,7 @@ Edu-Framework est une proposition d'architecture MVC pour la création de projet
 - Début d'approche pour l'enseignement d'un framework (Symfony, Laravel ...)
 
 > [!NOTE]
-> L'ensemble de la documentation est disponible sur le [https://studoo-app.github.io/edu-framework-doc](https://studoo-app.github.io/edu-framework-doc/starter.html)
+> L'ensemble de la documentation est disponible sur le [https://studoo-app.github.io/edu-framework-doc](https://studoo-app.github.io/edu-framework-doc/)
 
 > [!IMPORTANT]
 > Ce framework n'est pas adapté à une utilisation en production. Il est destiné à des fins pédagogiques.
