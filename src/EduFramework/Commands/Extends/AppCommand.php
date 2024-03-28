@@ -18,6 +18,7 @@ class AppCommand extends Application
         $this->add(new \Studoo\EduFramework\Commands\CheckStackCommand());
         $this->add(new \Studoo\EduFramework\Commands\StartCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateCliCommand());
+        $this->add(new \Studoo\EduFramework\Commands\CreateApiCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {
             $commandList = Yaml::parseFile(ConfigCore::getConfig('command_config_path') . 'commands.yaml');
