@@ -164,7 +164,7 @@ class CreateApiCommand extends Command
         }
 
         $indexName = "api_";
-        if(array_key_exists( $indexName . $name, $router)) {
+        if(array_key_exists($indexName . $name, $router)) {
             throw new RouteAlreadyExistsException();
         }
 
