@@ -31,7 +31,7 @@ class DefaultController implements ControllerInterface
         return TwigCore::getEnvironment()->render(
             'default.html.twig',
             [
-                'bonjour'   => "welcome to the home page",
+                'bonjour'   => "Page par défaut, la route est /",
                 'logoEF'      => $this->logo()
             ]
         );
