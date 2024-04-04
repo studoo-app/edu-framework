@@ -78,16 +78,6 @@ class Request
     }
 
     /**
-     * Permet de récupérer une variable de la requête HTTP
-     * @param string $key Le nom de la variable
-     * @return string|null
-     */
-    public function get(string $key): string|null
-    {
-        return $this->vars[$key] ?? null;
-    }
-
-    /**
      * Renvoi le nom du controller qui est associé à la requête HTTP
      * @return string
      */
@@ -108,7 +98,17 @@ class Request
     }
 
     /**
-     * Renoi les variables de la requête HTTP
+     * Permet de récupérer une variable de la requête HTTP
+     * @param string $key Le nom de la variable
+     * @return string|null
+     */
+    public function get(string $key): string|null
+    {
+        return $this->vars[$key] ?? null;
+    }
+
+    /**
+     * Renvoi les variables de la requête HTTP
      * @return array<mixed>
      */
     public function getVars(): array
