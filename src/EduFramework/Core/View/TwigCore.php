@@ -79,7 +79,7 @@ class TwigCore
         if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev') {
             $debugBar = new studooBarreDebug();
             $response .= $debugBar->generateCssGlobal();
-            $response .= $debugBar->generateStickyBar();
+            $response .= $debugBar->generateBarDebug();
         }
         return $response;
     }
