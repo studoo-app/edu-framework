@@ -143,6 +143,7 @@ class FastRouteCore
                 // et les paramètres de la route à l'objet requête HTTP
                 $request->setHander($routeInfo[1])->setVars($_GET);
                 $request->setHander($routeInfo[1])->setVars($_POST);
+                $request->setHander($routeInfo[1])->setVars($routeInfo[2]);
 
                 // J'appelle la méthode execute() du controller
                 // et je récupère la vue à afficher
