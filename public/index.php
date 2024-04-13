@@ -1,8 +1,23 @@
 <?php
-// Démarrage de la session PHP pour la gestion des variables de session
+/*
+ * Edu Framework by studoo
+ *    ____  _             _
+ *   / ___|| |_ _   _  __| | ___   ___
+ *   \___ \| __| | | |/ _` |/ _ \ / _ \
+ *    ___) | |_| |_| | (_| | (_) | (_) |
+ *   |____/ \__|\__,_|\__,_|\___/ \___/
+ *
+ * Starting End Point Edu-Framework
+ * @author Benoit Foujols
+ *
+ * Pour les informations complètes sur les droits d'auteur et la licence,
+ * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
+ */
+
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\LoadCouchCore;
 
+// Démarrage de la session PHP pour la gestion des variables de session
 session_start();
 
 // Masquer les deprecations de PHP 8.1
