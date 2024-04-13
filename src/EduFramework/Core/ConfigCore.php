@@ -1,6 +1,6 @@
 <?php
 /*
- * Ce fichier fait partie du Studoo
+ * Edu Framework by studoo
  *
  * @author Benoit Foujols
  *
@@ -36,8 +36,8 @@ class ConfigCore
         self::$config = array_merge(
             [
                 'name' => 'EduFramework',
-                'version' => 'v2.0.0@alpha',
-                'date_version' => '2024-xx-xx', // Date de la livraison de la version
+                'version' => 'v2.0.0@beta',
+                'date_version' => '2024-04-13', // Date de la livraison de la version
                 'php_version' => '8.1', // Warning : bin/edu require PHP 8.1 or higher
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
@@ -81,16 +81,30 @@ class ConfigCore
         return strip_tags($_ENV[$key]);
     }
 
+    /**
+     * Permet de vérifier si une configuration existe
+     * @param string $key Clé de la configuration
+     * @return bool
+     */
     public static function existEnv(string $key): bool
     {
         return isset($_ENV[$key]);
     }
 
+    /**
+     * Permet de renseigner les informations de la requête HTTP
+     * @param Request $request Récupère les informations de la requête HTTP
+     * @return void
+     */
     public static function setRequest(Request $request): void
     {
         self::$resquest = $request;
     }
 
+    /**
+     * Retourne les informations de la requête HTTP
+     * @return Request
+     */
     public static function getRequest(): Request
     {
         return self::$resquest;

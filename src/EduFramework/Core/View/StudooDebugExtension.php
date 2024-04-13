@@ -32,7 +32,7 @@ class StudooDebugExtension extends AbstractExtension
 
     /**
      * Permet d'afficher le contenu d'une variable
-     * @param mixed $var La variable à debuger
+     * @param mixed $var La variable à debugger
      * @return void
      * TODO Changer le style de l'affichage
      */
@@ -42,8 +42,8 @@ class StudooDebugExtension extends AbstractExtension
         var_dump($var);
         $result = ob_get_clean();
 
-        echo "<div style=\"background-color: grey; color: white; padding: 10px; margin: 10px 0;\">
+        echo "<div style=\"background-color: black; color: white; padding: 10px; margin: 10px 0;\">
                     <pre>{$result}</pre>
-                </div>";
+              </div>";
     }
 }

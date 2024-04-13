@@ -1,6 +1,6 @@
 <?php
 /*
- * Ce fichier fait partie du Studoo
+ * Edu Framework by studoo
  *
  * @author Benoit Foujols
  *
