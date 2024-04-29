@@ -12,7 +12,7 @@ jobs:
       with:
         args: "https://forge.apps.education.fr/foujolsbenoit/edu-framework"
       env:
-        FOLLOW_TAGS: "false"
+        FOLLOW_TAGS: "true"
         FORCE_PUSH: "false"
         GITLAB_HOSTNAME: "forge.apps.education.fr"
         GITLAB_USERNAME: "foujolsbenoit"
