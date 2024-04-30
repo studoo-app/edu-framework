@@ -47,5 +47,10 @@ Notre projet utilise les normes de codage PSR-2. Veuillez vous assurer que votre
 
 De plus, veuillez vous assurer que votre code est bien organisé, facile à lire et bien commenté.
 
-Merci pour vos contributions !
+Code de conduite
+----------------
 
+Notre projet suit le [Code de conduite](CODE\_DE\_CONDUITE.md). Veuillez le lire avant de contribuer à notre projet.
+
+
+Merci pour vos contributions !
