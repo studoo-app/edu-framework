@@ -1,0 +1,21 @@
+name: Mirror and run GitLab CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Mirror + trigger CI
+      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
+      with:
+        args: "https://forge.apps.education.fr/foujolsbenoit/edu-framework"
+      env:
+        FOLLOW_TAGS: "true"
+        FORCE_PUSH: "false"
+        GITLAB_HOSTNAME: "forge.apps.education.fr"
+        GITLAB_USERNAME: "foujolsbenoit"
+        GITLAB_PASSWORD: ${{secrets.GITLAB_PASSWORD}}
+        GITLAB_PROJECT_ID: "966"
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
