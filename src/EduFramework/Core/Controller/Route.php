@@ -17,24 +17,23 @@ use Symfony\Component\Yaml\Yaml;
 
 class Route
 {
-
     /**
      * Chemin du fichier de configuration des routes
      */
     private const ROUTE_FILE_PATH = './app/Config/';
 
     /**
-     * @var array $listRoutes Tableau contenant les informations des routes
+     * @var array<mixed> $listRoutes Tableau contenant les informations des routes
      */
     private array $listRoutes = [];
 
     /**
      * Récupère le nom de la route et les paramètres pour renvoyer le chemin de la route
      * @param string $name Nom de la route à récupérer dans le fichier config/routes.yaml
-     * @param array $param Tableau associatif des paramètres de la route
+     * @param array<mixed> $param Tableau associatif des paramètres de la route
      * @return string URL
-     * @throws ParseException 
-     * @throws BadRouteException 
+     * @throws ParseException
+     * @throws BadRouteException
      */
     public function getNameToPath(string $name, array $param = []): string
     {
@@ -42,7 +41,7 @@ class Route
             $this->getRouteInfo();
         }
         if (array_key_exists($name, $this->listRoutes)) {
-            $url = "";        
+            $url = "";
             foreach ($this->listRoutes[$name]["uri_parse"][0] as $uri) {
                 if (is_string($uri)) {
                     $url .= $uri;
@@ -54,14 +53,14 @@ class Route
                 }
             }
             return $url;
-        } 
+        }
         throw new BadRouteException("La route $name n'existe pas");
     }
 
 
     /**
      * Renseigne et renvoi un tableau contenant les informations des route du fichier config/routes.yaml
-     * @return array Tableau contenant les informations des routes
+     * @return array<mixed> Tableau contenant les informations des routes
      */
     public function getRouteInfo(): array
     {
@@ -76,7 +75,7 @@ class Route
     /**
      * Récupération du fichier config/routes.yaml
      * @param string $pathConfigFile
-     * @return array|bool Tableau des routes ou false si le fichier n'existe pas
+     * @return array<mixed>|bool Tableau des routes ou false si le fichier n'existe pas
      */
     public function loadRoute(string $pathConfigFile): array|bool
     {

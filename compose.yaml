@@ -10,8 +10,8 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: app_db
-      #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      #MYSQL_ROOT_PASSWORD: root
       #MYSQL_USER: app_db_user
       #MYSQL_PASSWORD: app_db_password
     volumes:
