@@ -60,11 +60,12 @@ class Route
 
     /**
      * Renseigne et renvoi un tableau contenant les informations des route du fichier config/routes.yaml
+     * @param string $pathRouteFile Chemin du fichier de configuration des routes
      * @return array<mixed> Tableau contenant les informations des routes
      */
-    public function getRouteInfo(): array
+    public function getRouteInfo(string $pathRouteFile = self::ROUTE_FILE_PATH): array
     {
-        $this->listRoutes = $this->loadRoute(self::ROUTE_FILE_PATH);
+        $this->listRoutes = $this->loadRoute($pathRouteFile);
         $routeParse = new Std();
         foreach ($this->listRoutes as $nameRoute => $route) {
             $this->listRoutes[$nameRoute]["uri_parse"] = $routeParse->parse($route["uri"]);

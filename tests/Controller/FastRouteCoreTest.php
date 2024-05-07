@@ -2,7 +2,6 @@
 
 namespace Controller;
 
-use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
