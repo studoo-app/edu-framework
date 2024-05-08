@@ -42,7 +42,8 @@ class Route
         }
         if (array_key_exists($name, $this->listRoutes)) {
             $url = "";
-            foreach ($this->listRoutes[$name]["uri_parse"][0] as $uri) {
+            $positionParam = (count($param) - 1);
+            foreach ($this->listRoutes[$name]["uri_parse"][$positionParam] as $uri) {
                 if (is_string($uri)) {
                     $url .= $uri;
                 } else {
