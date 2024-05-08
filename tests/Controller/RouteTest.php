@@ -2,7 +2,7 @@
 
 namespace Controller;
 
-use FastRoute\BadRouteException;
+use Studoo\EduFramework\Core\Exception\BadRouteException;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Route;
