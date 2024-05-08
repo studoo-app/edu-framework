@@ -10,8 +10,8 @@
 
 namespace Studoo\EduFramework\Core\Controller;
 
-use FastRoute\BadRouteException;
 use FastRoute\RouteParser\Std;
+use Studoo\EduFramework\Core\Exception\BadRouteException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -48,14 +48,14 @@ class Route
                     $url .= $uri;
                 } else {
                     if (!array_key_exists($uri[0], $param)) {
-                        throw new BadRouteException("Le paramètre $uri[0] n'existe pas");
+                        throw new BadRouteException("Le paramètre " . htmlspecialchars($uri[0]) . " n'existe pas");
                     }
                     $url .= $param[$uri[0]];
                 }
             }
             return $url;
         }
-        throw new BadRouteException("La route $name n'existe pas");
+        throw new BadRouteException("La route " . htmlspecialchars($name) . " n'existe pas");
     }
 
 
