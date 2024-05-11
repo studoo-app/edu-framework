@@ -80,6 +80,6 @@ Chaque membre de l'équipe apporte son expertise et son expérience pour créer 
 Un collectif, appelé [Studoo](https://github.com/studoo-app), est né autour de ces projets pour partager des connaissances et des compétences, et pour contribuer à l'amélioration continue des outils pédagogiques.
 
 - **Founder / Lead tech** : [Benoit Foujols](https://github.com/bfoujols)
-- **Senior dev** : [Julien Pechberty](https://github.com/JPechberty)
+- **Lead dev** : [Julien Pechberty](https://github.com/JPechberty)
 
 
