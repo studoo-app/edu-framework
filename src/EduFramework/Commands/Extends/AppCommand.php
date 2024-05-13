@@ -20,7 +20,11 @@ class AppCommand extends Application
 {
     public function __construct()
     {
-        (new ConfigCore([]));
+        (new ConfigCore(
+            [
+                'base_path'         => __DIR__ . '/../../../../',
+            ]
+        ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
 
         // Gestion du fichier des variables d'environnement (.env)

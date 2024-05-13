@@ -27,7 +27,8 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_DATABASE: app_db
-          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_ROOT_PASSWORD: studoo
+          #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
           - 3306:3306
     strategy:
@@ -66,7 +67,7 @@ jobs:
         run: sleep 15
 
       - name: Generate SQL
-        run: mysql -h 127.0.0.1 -u root app_db < tests/Config/EtudiantApp.sql
+        run: mysql -h 127.0.0.1 -u root -p studoo app_db < tests/Config/EtudiantApp.sql
 
       - name: Install dependencies
         run: composer self-update && composer install && composer dump-autoload
