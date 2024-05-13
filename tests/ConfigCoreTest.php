@@ -75,7 +75,7 @@ class ConfigCoreTest extends TestCase
 
     public function testGetEnvDbPwd()
     {
-        $this->assertEquals('root', ConfigCore::getEnv('DB_PASSWORD'));
+        $this->assertEquals('studoo', ConfigCore::getEnv('DB_PASSWORD'));
     }
 
     public function testExistEnvDbName()
