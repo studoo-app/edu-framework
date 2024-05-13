@@ -65,7 +65,7 @@ class ConfigCoreTest extends TestCase
 
     public function testGetEnvDbType()
     {
-        $this->assertEquals('postgres', ConfigCore::getEnv('DB_TYPE'));
+        $this->assertEquals('mysql', ConfigCore::getEnv('DB_TYPE'));
     }
 
     public function testGetEnvDbUser()
