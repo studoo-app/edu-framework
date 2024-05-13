@@ -33,5 +33,3 @@ Un collectif, appelé [Studoo](https://github.com/studoo-app), est né autour de
 
 - **Founder / Lead tech** : [Benoit Foujols](https://github.com/bfoujols)
 - **Lead dev** : [Julien Pechberty](https://github.com/JPechberty)
-
-
