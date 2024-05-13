@@ -32,6 +32,6 @@ Les comportements inacceptables peuvent entraîner :
 Signaler un comportement inacceptable
 -------------------------------------
 
-Si vous êtes témoin ou victime d'un comportement inacceptable, veuillez contacter les responsables du projet dès que possible. Vous pouvez contacter les responsables du projet par e-mail à Benoit.Foujols@ac-creteil.fr . Tous les rapports seront traités avec sérieux et confidentialité.
+Si vous êtes témoin ou victime d'un comportement inacceptable, veuillez contacter les responsables du projet dès que possible. Vous pouvez contacter les responsables du projet par e-mail à Benoit.Foujols[a]ac-creteil.fr . Tous les rapports seront traités avec sérieux et confidentialité.
 
 Nous sommes engagés à faire respecter ce Code de conduite et à créer un environnement accueillant et inclusif pour tous les contributeurs. Merci de votre aide pour faire de notre projet un espace sûr et respectueux pour tous.
