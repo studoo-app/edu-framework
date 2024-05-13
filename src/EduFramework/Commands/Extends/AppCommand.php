@@ -10,7 +10,9 @@
 
 namespace Studoo\EduFramework\Commands\Extends;
 
+use Dotenv\Dotenv;
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Service\DatabaseService;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Yaml\Yaml;
 
@@ -18,8 +20,21 @@ class AppCommand extends Application
 {
     public function __construct()
     {
-        (new ConfigCore([]));
+        (new ConfigCore(
+            [
+                'base_path'         => __DIR__ . '/../../../../',
+            ]
+        ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
+
+        // Gestion du fichier des variables d'environnement (.env)
+        $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
+        $dotenv->load();
+
+        // Gestion de la couche Model et de la connexion à la base de données
+        if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
+            (new DatabaseService());
+        }
 
         $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateControllerCommand());

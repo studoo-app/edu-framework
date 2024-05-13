@@ -145,6 +145,11 @@ tasks:
     cmds:
       - "{{.PHPUNIT}} --testdox"
 
+  tests-debug:
+    desc: "Run tests"
+    cmds:
+      - "{{.PHPUNIT}} --testdox --debug"
+
   tests-coverage:
     desc: "Run tests with coverage"
     cmds:
@@ -166,6 +171,13 @@ tasks:
     cmds:
       - task: docker-up
       - task: tests
+      - task: docker-down
+
+  testunit-debug:
+    desc: "Run tests"
+    cmds:
+      - task: docker-up
+      - task: tests-debug
       - task: docker-down
 
   ex-start:
