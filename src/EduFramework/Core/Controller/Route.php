@@ -10,8 +10,8 @@
 
 namespace Studoo\EduFramework\Core\Controller;
 
-use FastRoute\BadRouteException;
 use FastRoute\RouteParser\Std;
+use Studoo\EduFramework\Core\Exception\BadRouteException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -42,29 +42,31 @@ class Route
         }
         if (array_key_exists($name, $this->listRoutes)) {
             $url = "";
-            foreach ($this->listRoutes[$name]["uri_parse"][0] as $uri) {
+            $positionParam = (count($param) - 1);
+            foreach ($this->listRoutes[$name]["uri_parse"][$positionParam] as $uri) {
                 if (is_string($uri)) {
                     $url .= $uri;
                 } else {
                     if (!array_key_exists($uri[0], $param)) {
-                        throw new BadRouteException("Le paramètre $uri[0] n'existe pas");
+                        throw new BadRouteException("Le paramètre n'existe pas");
                     }
                     $url .= $param[$uri[0]];
                 }
             }
             return $url;
         }
-        throw new BadRouteException("La route $name n'existe pas");
+        throw new BadRouteException("La route n'existe pas");
     }
 
 
     /**
      * Renseigne et renvoi un tableau contenant les informations des route du fichier config/routes.yaml
+     * @param string $pathRouteFile Chemin du fichier de configuration des routes
      * @return array<mixed> Tableau contenant les informations des routes
      */
-    public function getRouteInfo(): array
+    public function getRouteInfo(string $pathRouteFile = self::ROUTE_FILE_PATH): array
     {
-        $this->listRoutes = $this->loadRoute(self::ROUTE_FILE_PATH);
+        $this->listRoutes = $this->loadRoute($pathRouteFile);
         $routeParse = new Std();
         foreach ($this->listRoutes as $nameRoute => $route) {
             $this->listRoutes[$nameRoute]["uri_parse"] = $routeParse->parse($route["uri"]);
