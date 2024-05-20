@@ -42,7 +42,8 @@ class ConfigCore
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
                 'route_config_path' => '/app/Config/',
-                'command_config_path' => 'app/Config/'
+                'command_config_path' => 'app/Config/',
+                'sqlite_path' => '/var/sqlite/'
             ],
             $config
         );
