@@ -22,7 +22,7 @@ class AppCommand extends Application
     {
         (new ConfigCore(
             [
-                'base_path'         => __DIR__ . '/../../../../',
+                'base_path'         =>  "./",
             ]
         ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
