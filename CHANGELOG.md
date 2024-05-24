@@ -13,8 +13,20 @@
 > [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12) 
 
   <br>
+  
+## v2.0.2 - 24/05/2024
 
-## v2.0.1 (en cours de dev)
+### bug Fixes
+- #94 fix patch root by @bfoujols in https://github.com/studoo-app/edu-framework/pull/95
+
+  <br>
+
+> Release notes for v2.0.2 \
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.2](https://github.com/studoo-app/edu-framework/milestone/15)
+> 
+  <br>
+  
+## v2.0.1 - 15/05/2024
 
 ### bug Fixes
 - [#88](https://github.com/studoo-app/edu-framework/issues/88) Correction sur le probleme avec DatabaseService dans la ligne de command
