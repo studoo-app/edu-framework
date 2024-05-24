@@ -69,14 +69,14 @@
 
   <br>
 
-# v1.2.0 - 25/03/2024
+## v1.2.0 - 25/03/2024
 
-## new features
+### new features
 - [#66](https://github.com/studoo-app/edu-framework/issues/66) ajout de la commande `php bin/edu start` pour démarrer le serveur de développement
 - [#62](https://github.com/studoo-app/edu-framework/issues/62) ajout de la commande `php bin/edu check:config` pour vérifier la configuration du framework
 - [#26](https://github.com/studoo-app/edu-framework/issues/26) Implement PHPDebugBar
 
-## bug fixes
+### bug fixes
 
 - [#81](https://github.com/studoo-app/edu-framework/issues/81) Probleme de récupération des variables dynamiques passées dans la route via {}
 
