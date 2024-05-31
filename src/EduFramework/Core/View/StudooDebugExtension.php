@@ -44,7 +44,7 @@ class StudooDebugExtension extends AbstractExtension
 
         $output = sprintf("<div style=\"background-color: black; color: white; padding: 10px; margin: 10px 0;\">
             <pre>%s</pre>
-        </div>", $result);
+        </div>", htmlspecialchars($result));
 
         echo $output;
     }
