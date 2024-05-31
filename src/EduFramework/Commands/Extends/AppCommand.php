@@ -22,18 +22,20 @@ class AppCommand extends Application
     {
         (new ConfigCore(
             [
-                'base_path'         =>  "./",
+                'base_path' => "./",
             ]
         ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
 
         // Gestion du fichier des variables d'environnement (.env)
-        $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
-        $dotenv->load();
+        if (file_exists(ConfigCore::getConfig('base_path') . '.env') === true) {
+            $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
+            $dotenv->load();
 
-        // Gestion de la couche Model et de la connexion à la base de données
-        if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
-            (new DatabaseService());
+            // Gestion de la couche Model et de la connexion à la base de données
+            if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
+                (new DatabaseService());
+            }
         }
 
         $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
