@@ -42,8 +42,10 @@ class StudooDebugExtension extends AbstractExtension
         var_dump($var);
         $result = ob_get_clean();
 
-        printf("<div style=\"background-color: black; color: white; padding: 10px; margin: 10px 0;\">
+        $output = sprintf("<div style=\"background-color: black; color: white; padding: 10px; margin: 10px 0;\">
             <pre>%s</pre>
         </div>", $result);
+
+        echo $output;
     }
 }
