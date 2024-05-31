@@ -17,6 +17,7 @@
 ## v2.0.2 - 24/05/2024
 
 ### bug Fixes
+
 - [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
 
   <br>
