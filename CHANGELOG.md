@@ -10,11 +10,23 @@
   <br>
 
 > Release notes for v2.1.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12)
 
   <br>
 
-## v2.0.1 (en cours de dev)
+## v2.0.2 - 24/05/2024
+
+### bug Fixes
+
+- [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
+
+  <br>
+
+> Release notes for v2.0.2 \
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.2](https://github.com/studoo-app/edu-framework/milestone/15)
+<br>
+
+## v2.0.1 - 15/05/2024
 
 ### bug Fixes
 - [#88](https://github.com/studoo-app/edu-framework/issues/88) Correction sur le probleme avec DatabaseService dans la ligne de command
@@ -22,7 +34,7 @@
   <br>
 
 > Release notes for v2.0.1 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.0.1](https://github.com/studoo-app/edu-framework/milestone/14) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.1](https://github.com/studoo-app/edu-framework/milestone/14)
 
   <br>
 
@@ -53,25 +65,25 @@
   <br>
 
 > Release notes for v2.0.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.0.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
 
-# v1.2.0 - 25/03/2024
+## v1.2.0 - 25/03/2024
 
-## new features
+### new features
 - [#66](https://github.com/studoo-app/edu-framework/issues/66) ajout de la commande `php bin/edu start` pour démarrer le serveur de développement
 - [#62](https://github.com/studoo-app/edu-framework/issues/62) ajout de la commande `php bin/edu check:config` pour vérifier la configuration du framework
 - [#26](https://github.com/studoo-app/edu-framework/issues/26) Implement PHPDebugBar
 
-## bug fixes
+### bug fixes
 
 - [#81](https://github.com/studoo-app/edu-framework/issues/81) Probleme de récupération des variables dynamiques passées dans la route via {}
 
   <br>
 
 > Release notes for v1.2.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v1.2.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1) 
+> [https://github.com/studoo-app/edu-framework/milestone/v1.2.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
 
