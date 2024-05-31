@@ -5,12 +5,13 @@
 ## v2.1.0 (en cours de dev)
 
 ### new features
+
 - [#87](https://github.com/studoo-app/edu-framework/issues/87) À partir du nom d'une route, reconstruire URL getNameToPath()
 
   <br>
 
 > Release notes for v2.1.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12)
 
   <br>
   
@@ -29,6 +30,7 @@
 ## v2.0.1 - 15/05/2024
 
 ### bug Fixes
+
 - [#88](https://github.com/studoo-app/edu-framework/issues/88) Correction sur le probleme avec DatabaseService dans la ligne de command
 
   <br>
@@ -41,19 +43,23 @@
 ## v2.0.0 - 06/04/2024
 
 ### new features
+
 - [#73](https://github.com/studoo-app/edu-framework/issues/73) ajout de la commande `php bin/edu make:api` pour générer un controller de type API
 - [#70](https://github.com/studoo-app/edu-framework/issues/70) ajout de la commande `php bin/edu make:command` pour générer une commande console
 - [#59](https://github.com/studoo-app/edu-framework/issues/59) ajout d'une page par défaut sur la route
 
 ### deprecations
+
 - [#68](https://github.com/studoo-app/edu-framework/issues/68) Suppression des anciennes configurations Docker
 - [#72](https://github.com/studoo-app/edu-framework/issues/72) Bootstrap 5.3 Clean
 
 ### bug Fixes
+
 - [#83](https://github.com/studoo-app/edu-framework/issues/83) Docker compose.yaml: version is obsolete
 - [#78](https://github.com/studoo-app/edu-framework/issues/78) Barre de debug dans les pages d'erreur
 
 ### Documentation
+
 - Nouvelle interface et organisation par chapitre
 - new [Request : La gestion des requêtes HTTP](https://studoo-app.github.io/edu-framework-doc/fr-resquet.html)
 - update [Comment installer EduFrame](https://studoo-app.github.io/edu-framework-doc/fr-comment-installer-edu.html#cr-ation-du-projet) : Nouvelle installation par version
@@ -72,6 +78,7 @@
 ## v1.2.0 - 25/03/2024
 
 ### new features
+
 - [#66](https://github.com/studoo-app/edu-framework/issues/66) ajout de la commande `php bin/edu start` pour démarrer le serveur de développement
 - [#62](https://github.com/studoo-app/edu-framework/issues/62) ajout de la commande `php bin/edu check:config` pour vérifier la configuration du framework
 - [#26](https://github.com/studoo-app/edu-framework/issues/26) Implement PHPDebugBar
