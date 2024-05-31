@@ -17,13 +17,12 @@
 ## v2.0.2 - 24/05/2024
 
 ### bug Fixes
-- #94 fix patch root by @bfoujols in https://github.com/studoo-app/edu-framework/pull/95
+- [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
 
   <br>
 
 > Release notes for v2.0.2 \
 > [https://github.com/studoo-app/edu-framework/milestone/v2.0.2](https://github.com/studoo-app/edu-framework/milestone/15)
-> 
   <br>
   
 ## v2.0.1 - 15/05/2024
