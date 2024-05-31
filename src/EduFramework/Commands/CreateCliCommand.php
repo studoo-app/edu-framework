@@ -76,13 +76,13 @@ class CreateCliCommand extends Command
      */
     private function getNamesCollection(string $arg): array
     {
-        $className = ucfirst($arg)."Command";
+        $className = ucfirst($arg) . "Command";
         $nameCommand = strtolower($arg);
 
         return [
             "commandName" => $nameCommand,
-            "nameSpace" => "Command\\".$className,
-            "className" => $className
+            "nameSpace"   => "Command\\".$className,
+            "className"   => $className
         ];
     }
 
@@ -95,13 +95,13 @@ class CreateCliCommand extends Command
      */
     private function generateCommand(string $className, string $nameCommand): void
     {
-        if(is_dir(self::COMMAND_DIR) === false) {
+        if (is_dir(self::COMMAND_DIR) === false) {
             mkdir(self::COMMAND_DIR);
         }
 
         $filename = "./app/Command/$className.php";
 
-        if(file_exists($filename)) {
+        if (file_exists($filename) === true) {
             throw new CommandAlreadyExistsException();
         }
 
@@ -117,8 +117,8 @@ class CreateCliCommand extends Command
         //Generate ClassName
         $class = $namespace->addClass($className);
         $class->addAttribute('Symfony\Component\Console\Attribute\AsCommand', [
-            'name' => strtolower($nameCommand),
-            'description' => 'Renseigner la description de la commande ' . $nameCommand,
+            'name'        =>  strtolower($nameCommand),
+            'description' =>  'Renseigner la description de la commande ' . $nameCommand,
         ]);
         //Add extends CommandManage
         $class->setExtends('Studoo\EduFramework\Commands\Extends\CommandManage');
@@ -151,7 +151,7 @@ class CreateCliCommand extends Command
      */
     private function generateCommandConfig(string $name, string $nameSpace): void
     {
-        if(is_file(self::COMMANDS_FILE_PATH) === false) {
+        if (is_file(self::COMMANDS_FILE_PATH) === false) {
             file_put_contents(self::COMMANDS_FILE_PATH, '');
         }
 
