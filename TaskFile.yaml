@@ -163,7 +163,7 @@ tasks:
         cd tests/Config/
         docker compose up -d
         sleep 10
-        docker exec -i edu-testing-database sh -c 'exec mysql -uroot -p"studoo" app_db' < EtudiantApp.sql
+        docker exec -i edu-testing-database sh -c 'exec mysql -uroot -p"studoo" app_db' < EtudiantMysql.sql
 
   destroy-env-testing:
     cmds:
