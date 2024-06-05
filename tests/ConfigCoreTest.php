@@ -15,6 +15,11 @@ class ConfigCoreTest extends TestCase
         (new ConfigCore([]));
     }
 
+    public function testExistEnvFileTest()
+    {
+        $this->assertTrue(ConfigCore::existEnv('ENV_UNIT'));
+    }
+
     public function testGetBasePathDefault()
     {
         $this->assertEquals('/', ConfigCore::getConfig('base_path'));
@@ -50,37 +55,38 @@ class ConfigCoreTest extends TestCase
 
     public function testGetEnvDbName()
     {
+        $_ENV["DB_NAME"] = 'app_db';
         $this->assertEquals('app_db', ConfigCore::getEnv('DB_NAME'));
     }
 
     public function testGetEnvDbHost()
     {
+        $_ENV["DB_HOST"] = '127.0.0.1';
         $this->assertEquals('127.0.0.1', ConfigCore::getEnv('DB_HOST'));
     }
 
     public function testGetEnvDbSocket()
     {
+        $_ENV["DB_SOCKET"] = '3306';
         $this->assertEquals('3306', ConfigCore::getEnv('DB_SOCKET'));
     }
 
     public function testGetEnvDbType()
     {
+        $_ENV["DB_TYPE"] = 'mysql';
         $this->assertEquals('mysql', ConfigCore::getEnv('DB_TYPE'));
     }
 
     public function testGetEnvDbUser()
     {
+        $_ENV["DB_USER"] = 'root';
         $this->assertEquals('root', ConfigCore::getEnv('DB_USER'));
     }
 
     public function testGetEnvDbPwd()
     {
+        $_ENV["DB_PASSWORD"] = 'studoo';
         $this->assertEquals('studoo', ConfigCore::getEnv('DB_PASSWORD'));
-    }
-
-    public function testExistEnvDbName()
-    {
-        $this->assertTrue(ConfigCore::existEnv('DB_NAME'));
     }
 
     public function testNotExistEnvDbHost()

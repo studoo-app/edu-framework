@@ -28,6 +28,7 @@ vars:
   DOCKER: docker
   DOCKER_FILE: docker-compose.yml
   DOCKER_RUN: "{{.DOCKER}} run"
+  DOCKER_STOP: "{{.DOCKER}} stop"
   DOCKER_COMPOSE: "{{.DOCKER}} compose"
   #
   # COMPOSER
@@ -39,6 +40,7 @@ vars:
   # PHP QA TOOLS
   PHPQA: jakzal/phpqa:php8.1-alpine
   PHPQA_RUN: "{{.DOCKER_RUN}} --init -it --rm -v {{.PWD}}:/project -w /project {{.PHPQA}}"
+  MYSQL_TESTING_RUN: "{{.DOCKER_RUN}} --init -it --rm -e MYSQL_ROOT_PASSWORD=studoo -e MYSQL_DATABASE=app_db -p 3309:3306 -d mysql:8.0 --name mysql-testing"
 
 ##
 ## ===   TASKS ==================================================
@@ -113,6 +115,21 @@ tasks:
 
   ## === 🐛  PHPQA =================================================
 
+  qa-start-mysql:
+    desc: "Start container Mysql Testing"
+    cmds:
+      - "{{.MYSQL_TESTING_RUN}}"
+
+  qa-sleep:
+    desc: "Repos avant le test"
+    cmds:
+      - "sleep 5"
+
+  qa-stop-mysql:
+    desc: "Stop container Mysql Testing"
+    cmds:
+      - "{{.DOCKER_STOP}} mysql-testing"
+
   qa-cs-fixer-dry-run:
     desc: "Run php-cs-fixer dry run"
     cmds:
@@ -140,7 +157,22 @@ tasks:
 
   ## === 🔎  TESTS =================================================
 
+  build-env-testing:
+    cmds:
+      - |
+        cd tests/Config/
+        docker compose up -d
+        sleep 10
+        docker exec -i edu-testing-database sh -c 'exec mysql -uroot -p"studoo" app_db' < EtudiantApp.sql
+
+  destroy-env-testing:
+    cmds:
+      - |
+        docker stop edu-testing-database
+        docker remove edu-testing-database
+
   tests:
+    deps: [build-env-testing]
     desc: "Run tests"
     cmds:
       - "{{.PHPUNIT}} --testdox"
@@ -165,6 +197,7 @@ tasks:
       - task: qa-phpcpd
       - task: tests
       - task: tests-coverage
+      - task: destroy-env-testing
 
   testunit:
     desc: "Run tests"

@@ -47,6 +47,7 @@ class DatabaseServiceTest extends TestCase
         (new ConfigCore([]));
 
         $_ENV["DB_TYPE"] = "mysql";
+        $_ENV["DB_SOCKET"] = "3309";
         $_ENV["DB_PASSWORD"] = "studoo";
 
         new DatabaseService();
