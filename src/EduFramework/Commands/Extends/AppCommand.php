@@ -23,6 +23,7 @@ class AppCommand extends Application
         (new ConfigCore(
             [
                 'base_path' => "./",
+                'sqlite_path' => "./var/sqlite/"
             ]
         ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
