@@ -23,11 +23,11 @@ class DatabaseSqlite implements DatabaseInterface
     {
         $pathToSqliteFile = ConfigCore::getConfig('sqlite_path');
 
-        if(is_dir($pathToSqliteFile) === false) {
+        if (is_dir($pathToSqliteFile) === false) {
             mkdir($pathToSqliteFile, 0777, true);
         }
 
-        if (!file_exists($pathToSqliteFile)) {
+        if (file_exists($pathToSqliteFile) === false) {
             throw new Exception("SQLite database file does not exist at the provided path. <" . ConfigCore::getConfig('sqlite_path') . "> ");
         }
 
