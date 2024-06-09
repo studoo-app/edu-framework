@@ -11,17 +11,13 @@
 namespace Studoo\EduFramework\Core\Controller;
 
 use FastRoute\RouteParser\Std;
+use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Exception\BadRouteException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 class Route
 {
-    /**
-     * Chemin du fichier de configuration des routes
-     */
-    private const ROUTE_FILE_PATH = './app/Config/';
-
     /**
      * @var array<mixed> $listRoutes Tableau contenant les informations des routes
      */
@@ -61,12 +57,11 @@ class Route
 
     /**
      * Renseigne et renvoi un tableau contenant les informations des route du fichier config/routes.yaml
-     * @param string $pathRouteFile Chemin du fichier de configuration des routes
      * @return array<mixed> Tableau contenant les informations des routes
      */
-    public function getRouteInfo(string $pathRouteFile = self::ROUTE_FILE_PATH): array
+    public function getRouteInfo(): array
     {
-        $this->listRoutes = $this->loadRoute($pathRouteFile);
+        $this->listRoutes = $this->loadRoute();
         $routeParse = new Std();
         foreach ($this->listRoutes as $nameRoute => $route) {
             $this->listRoutes[$nameRoute]["uri_parse"] = $routeParse->parse($route["uri"]);
@@ -76,12 +71,11 @@ class Route
 
     /**
      * Récupération du fichier config/routes.yaml
-     * @param string $pathConfigFile
      * @return array<mixed>|bool Tableau des routes ou false si le fichier n'existe pas
      */
-    public function loadRoute(string $pathConfigFile): array|bool
+    public function loadRoute(): array|bool
     {
-        $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
+        $fileData = Yaml::parseFile(ConfigCore::getConfig("route_config_path") . 'routes.yaml');
         if (is_array($fileData)) {
             return $fileData;
         }
