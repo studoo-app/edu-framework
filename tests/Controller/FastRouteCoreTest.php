@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
@@ -16,6 +17,7 @@ class FastRouteCoreTest extends TestCase
             'twig_path' => __DIR__ . '/../../app/Template',
             'route_config_path' => __DIR__ . "/../Config/"
         ]));
+
         TwigCore::setEnvironment();
         $en = TwigCore::getEnvironment();
     }

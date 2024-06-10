@@ -21,12 +21,22 @@
 
 - [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
 
-  <br>
+
+=======
+## v2.0.2 - 24/05/2024
+
+### bug Fixes
+
+- [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
+
+<br>
 
 > Release notes for v2.0.2 \
 > [https://github.com/studoo-app/edu-framework/milestone/v2.0.2](https://github.com/studoo-app/edu-framework/milestone/15)
-  <br>
-  
+
+<br>
+
+
 ## v2.0.1 - 15/05/2024
 
 ### bug Fixes
@@ -36,7 +46,7 @@
   <br>
 
 > Release notes for v2.0.1 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.0.1](https://github.com/studoo-app/edu-framework/milestone/14) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.1](https://github.com/studoo-app/edu-framework/milestone/14)
 
   <br>
 
@@ -71,11 +81,16 @@
   <br>
 
 > Release notes for v2.0.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v2.0.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1) 
+> [https://github.com/studoo-app/edu-framework/milestone/v2.0.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
 
 ## v1.2.0 - 25/03/2024
+
+
+### new features
+
+=======
 
 ### new features
 
@@ -90,7 +105,7 @@
   <br>
 
 > Release notes for v1.2.0 \
-> [https://github.com/studoo-app/edu-framework/milestone/v1.2.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1) 
+> [https://github.com/studoo-app/edu-framework/milestone/v1.2.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
 
