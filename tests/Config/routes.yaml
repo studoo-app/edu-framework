@@ -2,6 +2,14 @@ index:
     uri: /
     controller: Controller\HomeController
     httpMethod: [GET]
+home:
+    uri: /home
+    controller: Controller\HomeController
+    httpMethod: [GET]
+link:
+    uri: /link
+    controller: Controller\LinkController
+    httpMethod: [GET]
 user:
     uri: /user/{id}
     controller: Controller\UserController

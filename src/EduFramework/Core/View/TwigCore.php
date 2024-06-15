@@ -49,6 +49,7 @@ class TwigCore
         // Ajoutez l'extension Debug
         self::$twig->addExtension(new DebugExtension());
         self::$twig->addExtension(new StudooDebugExtension());
+        self::$twig->addExtension(new StudooGetPathRouteExtension());
     }
 
     /**

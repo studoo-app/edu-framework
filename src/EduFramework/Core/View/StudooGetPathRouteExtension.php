@@ -10,6 +10,7 @@
 
 namespace Studoo\EduFramework\Core\View;
 
+use Studoo\EduFramework\Core\Controller\Route;
 use Twig\Extension\AbstractExtension;
 
 /**
@@ -17,7 +18,7 @@ use Twig\Extension\AbstractExtension;
  * Elle permet de déclarer les fonctions de l'extension dd()
  * @package Studoo\EduFramework\Core\View
  */
-class StudooDebugExtension extends AbstractExtension
+class StudooGetPathRouteExtension extends AbstractExtension
 {
     /**
      * Permet de déclarer les fonctions de l'extension
@@ -26,24 +27,20 @@ class StudooDebugExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-                new \Twig\TwigFunction('dd', [$this, 'dd']),
+                new \Twig\TwigFunction('getNameToPath', [$this, 'getNameToPath']),
                ];
     }
 
     /**
      * Permet d'afficher le contenu d'une variable
-     * @param mixed $var La variable à debugger
-     * @return void
+     * @param string $name Nom de la route à récupérer dans le fichier config/routes.yaml
+     * @param array<mixed> $param Tableau associatif des paramètres de la route
+     * @return string URL
      * TODO Changer le style de l'affichage
      */
-    public function dd(mixed $var): void
+    public function getNameToPath(string $name, array $param = []): string
     {
-        ob_start();
-        var_dump($var);
-        $result = ob_get_clean();
-
-        printf("<div style=\"background-color: black; color: white; padding: 10px; margin: 10px 0;\">
-            <pre>%s</pre>
-        </div>", htmlspecialchars($result));
+        $route = new Route();
+        return $route->getNameToPath($name, $param);
     }
 }

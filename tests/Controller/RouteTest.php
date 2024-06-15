@@ -14,7 +14,8 @@ class RouteTest extends TestCase
     public function setUp(): void
     {
         (new ConfigCore([
-            'twig_path' => __DIR__ . '/../../app/Template'
+            'twig_path' => __DIR__ . '/../../app/Template',
+            'route_config_path' => __DIR__ . "/../Config/"
         ]));
         TwigCore::setEnvironment();
         $en = TwigCore::getEnvironment();
@@ -26,6 +27,20 @@ class RouteTest extends TestCase
         $this->assertEquals('/', $route->getRouteInfo(__DIR__ . "/../Config/")['index']['uri']);
     }
 
+    public function testGetHomeRoute()
+    {
+        $route = new Route();
+        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $this->assertEquals('/home', $route->getNameToPath('home'));
+    }
+
+    public function testGetIndexRoute()
+    {
+        $route = new Route();
+        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $this->assertEquals('/', $route->getNameToPath('index'));
+    }
+
     public function testGetListRouteParam()
     {
         $route = new Route();
@@ -35,6 +50,7 @@ class RouteTest extends TestCase
     public function testGetListRouteParamForSlash()
     {
         $route = new Route();
+        $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->assertEquals('/user/{id}/update', $route->getRouteInfo(__DIR__ . "/../Config/")['userUpdate']['uri']);
     }
 
@@ -47,21 +63,21 @@ class RouteTest extends TestCase
     public function testGetListRouteParamForConsideredOptionalAndSlash()
     {
         $route = new Route();
-        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->assertEquals('/user/1/benoit', $route->getNameToPath('userName', ['id' => 1, 'name' => 'benoit']));
     }
 
     public function testGetListRouteParamForConsideredOptionalEnd()
     {
         $route = new Route();
-        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->assertEquals('/user/1', $route->getNameToPath('userName', ['id' => 1]));
     }
 
     public function testGetListRouteParamForException()
     {
         $route = new Route();
-        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->expectException(BadRouteException::class);
         $this->assertEquals('/user/1', $route->getNameToPath('userName', ['name' => 'benoit']));
     }
@@ -69,7 +85,7 @@ class RouteTest extends TestCase
     public function testGetListRouteNameForException()
     {
         $route = new Route();
-        $dd = $route->getRouteInfo(__DIR__ . "/../Config/");
+        $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->expectException(BadRouteException::class);
         $this->assertEquals('/user/1', $route->getNameToPath('userNameError', ['id' => 2]));
     }

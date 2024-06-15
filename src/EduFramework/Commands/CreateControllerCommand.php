@@ -90,7 +90,7 @@ class CreateControllerCommand extends Command
         $uri = strtolower($arg);
         $twig = strtolower($arg);
 
-        if(count($name) > 1) {
+        if (count($name) > 1) {
             $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $name));
             $uri = str_replace("_", "-", $twig);
         }
@@ -112,13 +112,13 @@ class CreateControllerCommand extends Command
      */
     private function generateController(string $className, string $twigPath): void
     {
-        if(is_dir(self::CONTROLLER_DIR) === false) {
+        if (is_dir(self::CONTROLLER_DIR) === false) {
             mkdir(self::CONTROLLER_DIR);
         }
 
         $filename = self::CONTROLLER_DIR . "$className.php";
 
-        if(file_exists($filename)) {
+        if (file_exists($filename) === true) {
             throw new ControllerAlreadyExistsException();
         }
 
@@ -170,11 +170,11 @@ class CreateControllerCommand extends Command
 
         $router = Yaml::parseFile(self::ROUTES_FILE_PATH);
 
-        if (!is_array($router)) {
+        if (is_array($router) === false) {
             $router = [];
         }
 
-        if(array_key_exists($name, $router)) {
+        if (array_key_exists($name, $router) === true) {
             throw new RouteAlreadyExistsException();
         }
 
@@ -196,11 +196,11 @@ class CreateControllerCommand extends Command
      */
     private function generateView(string $dir, string $path): void
     {
-        if(file_exists(self::TEMPLATES_DIR.$path)) {
+        if (file_exists(self::TEMPLATES_DIR.$path)) {
             throw new ViewAlreadyExistsException();
         }
 
-        if(is_dir(self::TEMPLATES_DIR.$dir) === false) {
+        if (is_dir(self::TEMPLATES_DIR.$dir) === false) {
             mkdir(self::TEMPLATES_DIR.$dir);
         }
 

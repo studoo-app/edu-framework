@@ -57,10 +57,10 @@ class CreateApiCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         // Creation du dossier Controller/api
-        if(is_dir(self::CONTROLLER_DIR) === false) {
+        if (is_dir(self::CONTROLLER_DIR) === false) {
             mkdir(self::CONTROLLER_DIR);
         }
-        if(is_dir(self::CONTROLLER_DIR . self::API_DIR) === false) {
+        if (is_dir(self::CONTROLLER_DIR . self::API_DIR) === false) {
             mkdir(self::CONTROLLER_DIR . self::API_DIR);
         }
 
@@ -92,13 +92,13 @@ class CreateApiCommand extends Command
         $className = ucfirst($arg)."Controller";
         $uri = strtolower($arg);
 
-        if(count($name) > 1) {
+        if (count($name) > 1) {
             $twig = implode("_", array_map(function ($item) {return strtolower($item);}, $name));
             $uri = str_replace("_", "-", $twig);
         }
 
         return [
-            "uri" => $uri,
+            "uri"       => $uri,
             "className" => $className
         ];
     }
@@ -113,7 +113,7 @@ class CreateApiCommand extends Command
     {
         $filename = self::CONTROLLER_DIR . self::API_DIR .  "$className.php";
 
-        if(file_exists($filename)) {
+        if (file_exists($filename) === true) {
             throw new ControllerAlreadyExistsException();
         }
 
@@ -161,18 +161,18 @@ class CreateApiCommand extends Command
      */
     private function generateRoute(string $name, string $uri, string $className): void
     {
-        if(is_file(self::ROUTES_FILE_PATH) === false) {
+        if (is_file(self::ROUTES_FILE_PATH) === false) {
             file_put_contents(self::ROUTES_FILE_PATH, '');
         }
 
         $router = Yaml::parseFile(self::ROUTES_FILE_PATH);
 
-        if (!is_array($router)) {
+        if (is_array($router) === false) {
             $router = [];
         }
 
         $indexName = "api_";
-        if(array_key_exists($indexName . $name, $router)) {
+        if (array_key_exists($indexName . $name, $router) === true) {
             throw new RouteAlreadyExistsException();
         }
 

@@ -14,7 +14,8 @@ class FastRouteCoreTest extends TestCase
     public function setUp(): void
     {
         (new ConfigCore([
-            'twig_path' => __DIR__ . '/../../app/Template'
+            'twig_path' => __DIR__ . '/../../app/Template',
+            'route_config_path' => __DIR__ . "/../Config/"
         ]));
 
         TwigCore::setEnvironment();
@@ -89,5 +90,27 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/';
         $this->assertEquals('ed2ad24f02864b53319ab611d414ceac5c322751', sha1($route->getRoute()));
+    }
+
+    public function testLinkToGetnametopathInTwig()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/link';
+
+        $this->assertEquals('6aedbea61084214093427be196374b52ed5b775f', sha1($route->getRoute()));
+    }
+
+    public function testLinkToGetnametopathInTwigUserid()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/user/21';
+
+        $this->assertEquals('5b0771c01463fc083f311c71d31e98a2e7ed1e86', sha1($route->getRoute()));
     }
 }
