@@ -36,13 +36,14 @@ class ConfigCore
         self::$config = array_merge(
             [
                 'name' => 'EduFramework',
-                'version' => 'v2.0.3@rc',
-                'date_version' => '2024-05-31', // Date de la livraison de la version
+                'version' => 'v2.1.0@alpha',
+                'date_version' => '2024-05-06', // Date de la livraison de la version
                 'php_version' => '8.1', // Warning : bin/edu require PHP 8.1 or higher
                 'base_path' => '/',
                 'twig_path' => '/app/Template',
                 'route_config_path' => '/app/Config/',
-                'command_config_path' => 'app/Config/'
+                'command_config_path' => 'app/Config/',
+                'sqlite_path' => '/var/sqlite/'
             ],
             $config
         );

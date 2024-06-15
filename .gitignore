@@ -3,7 +3,6 @@ vendor/
 var/
 # Composer
 composer.phar
-composer.lock
 
 # IDE configuration
 .idea/**

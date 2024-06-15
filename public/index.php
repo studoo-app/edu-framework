@@ -32,7 +32,8 @@ if (version_compare(PHP_VERSION, '8.1', '<') === false) {
                     [
                         'base_path'         => __DIR__ . '/../',
                         'twig_path'         => __DIR__ . '/../app/Template',
-                        'route_config_path' => __DIR__ . '/../app/Config/'
+                        'route_config_path' => __DIR__ . '/../app/Config/',
+                        'sqlite_path' => __DIR__ . '/../var/sqlite/'
                     ]
                   )
     );
