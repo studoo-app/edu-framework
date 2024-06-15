@@ -100,6 +100,17 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/link';
 
-        $this->assertEquals('1ab50275de77fa6215e882b0833350c32cfcd7a2', sha1($route->getRoute()));
+        $this->assertEquals('6aedbea61084214093427be196374b52ed5b775f', sha1($route->getRoute()));
+    }
+
+    public function testLinkToGetnametopathInTwigUserid()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/user/21';
+
+        $this->assertEquals('5b0771c01463fc083f311c71d31e98a2e7ed1e86', sha1($route->getRoute()));
     }
 }

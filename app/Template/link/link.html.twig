@@ -4,5 +4,7 @@
 
 {% block content %}
 <h1>{{ titre }}</h1>
-    Lien : <a href="{{ getNameToPath('home') }}">HOME</a>
+    Lien HOME : <a href="{{ getNameToPath('home') }}">HOME</a>
+    <br>
+    Lien USER : <a href="{{ getNameToPath('user', {"id":"21"}) }}">21</a>
 {% endblock %}
