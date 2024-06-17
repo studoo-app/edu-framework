@@ -1,4 +1,4 @@
-# Changelog
+# CHANGELOG
 
 **Présentation des versions du framework Edu Framework**
 
