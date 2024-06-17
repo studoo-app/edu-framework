@@ -1,1 +1,63 @@
-site_name: My Docs
+site_name: EDU Framework
+site_url: https://bfoujols.github.io/poc-mkdoc/
+repo_url: https://github.com/studoo-app/edu-framework
+copyright: 'Copyright © 2022 - 2024 Studoo by Benoit Foujols'
+theme:
+  name: material
+  logo: assets/studoo.svg
+  favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      scheme: default
+      primary: white
+      accent: amber
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - toc.integrate
+  language: fr
+extra:
+  version:
+    default: stable
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/studo-app
+    - icon: fontawesome/brands/gitlab
+      link: https://forge.apps.education.fr/studoo/edu-framework
+    - icon: fontawesome/brands/docker
+      link: https://www.docker.com
+    - icon: fontawesome/brands/php
+      link: https://php.net
+  generator: false
