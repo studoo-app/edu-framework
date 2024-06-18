@@ -52,15 +52,14 @@ theme:
     - content.code.copy
     - content.tabs.link
     - navigation.footer
-    - navigation.indexes
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.tabs
     - navigation.top
     - navigation.path
-    - navigation.tracking
     - search.highlight
-    - toc.integrate
+    - content.code.copy
+    - content.code.select
   language: fr
 
 extra:
@@ -79,6 +78,9 @@ extra:
 
 markdown_extensions:
   - admonition
+  - tables
+  - toc:
+      permalink: true
   - pymdownx.details
   - pymdownx.superfences
   - def_list
@@ -89,11 +91,27 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 plugins:
+  - offline
   - search
   - literate-nav:
       nav_file: _summary.md
+  - git-committers:
+      repository: studoo-app/edu-framework
+      branch: main
+  - git-revision-date-localized:
+      enable_creation_date: true
 
 extra_css:
   - stylesheets/extra.css

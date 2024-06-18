@@ -6,24 +6,15 @@ Avant l'installation du framework vous devez avoir sur votre poste de travail le
 
 Voici la liste des composants nécessaires pour assurer le bon déroulement du projet. Pour chaque composant, nous avons réalisé une page d'aide à l'installation et à l'utilisation :
 
-- [ ] :simple-homebrew: Gestionnaire de paquets
-- [ ] :simple-git: Gestionnaire des versions
-- [ ] :simple-php: Environnement de développement
-- [ ] :simple-composer: Gestionnaire de dépendance
-- [ ] :simple-curl: Commande CURL
-- [ ] :simple-docker: Environnement local
-
-
-Tableau des versions obligatoires et des extensions PHP nécessaires:
-
-| Composants        | Version |
-|-------------------|---------|
-| GIT               | >= ^2.0 |
-| PHP               | >= ^8.1 |
-| COMPOSER          | >= ^2.0 |
-| EXT PHP OPENSSL   |  |
-| EXT PHP MBSTRING  |  |
-| EXT PHP PDO_MYSQL |  |
+- [ ] [:simple-homebrew: Gestionnaire de paquets](prerequis.md#gestionnaire-de-paquets)
+- [ ] [:simple-git: Gestionnaire des versions](prerequis.md#gestionnaire-des-versions)
+- [ ] [:simple-php: Environnement de développement](prerequis.md#environnement-de-developpement) 
+    * [ ] OpenSSL extension
+    * [ ] mbstring extension
+    * [ ] pdo_mysql extension
+- [ ] [:simple-composer: Gestionnaire de dépendance](prerequis.md#gestionnaire-de-dependance)
+- [ ] [:simple-curl: Commande CURL](prerequis.md#commande-curl) 
+- [ ] [:simple-docker: Environnement local](prerequis.md#environnement-local) 
 
 ___
 
@@ -42,7 +33,7 @@ Pour faciliter les installations et la maintenance de votre setup, nous vous rec
 - Trouve et installe automatiquement les dépendances
 - Effectue toutes les étapes de configuration supplémentaires pour obtenir un programme fonctionnel
 
-### Installation
+**Installation**
 
 === ":fontawesome-brands-windows: WINDOWS"
 
@@ -102,7 +93,7 @@ git --version
     git version 2.39.2 (Apple Git-143)
     ````
 
-### Installation
+**Installation**
 
 === ":fontawesome-brands-windows: WINDOWS"
 
@@ -150,7 +141,7 @@ php -v
     with Zend OPcache v8.1.21, Copyright (c), by Zend Technologies
     ````
 
-### Installation
+**Installation**
 
 !!! warning "Version obligatoire"
 
@@ -192,20 +183,20 @@ Vous aurez un résultat similaire à celui-ci :
 ````Bash
 Configuration File (php.ini) Path: /usr/local/etc/php/8.2
 Loaded Configuration File:         /usr/local/etc/php/8.2/php.ini
-Scan for additional .ini files in: /usr/local/etc/php/8.2/conf.d
+Scan for additional .ini files in: /usr/local/etc/php/8.2/conf.d 
 Additional .ini files parsed:      /usr/local/etc/php/8.2/conf.d/ext-opcache.ini
 ````
-Dans cet exemple, le fichier php.ini se trouve dans le dossier "/usr/local/etc/php/8.2". \
+Dans cet exemple, le fichier php.ini se trouve dans le dossier "/usr/local/etc/php/8.2". 
 
-### OpenSSL extension
+#### OpenSSL extension
 Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
 
-````Bash
+````text title="php.ini"
 ;extension=openssl
 ````
 Enlever le point-virgule pour activer l'extension.
 
-### mbstring extension
+#### mbstring extension
 Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
 
 ````Bash
@@ -213,7 +204,7 @@ Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suiv
 ````
 Enlever le point-virgule pour activer l'extension.
 
-### pdo_mysql extension
+#### pdo_mysql extension
 Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
 
 ````Bash
@@ -241,7 +232,7 @@ composer --version
     Composer version 2.5.8 
     ````
 
-### Installation
+**Installation**
 
 === ":fontawesome-brands-windows: WINDOWS"
 
@@ -292,8 +283,7 @@ curl --version
     Features: alt-svc AsynchDNS GSS-API HTTP2 HTTPS-proxy IPv6 Kerberos Largefile libz MultiSSL NTLM NTLM_WB SPNEGO SSL UnixSockets
     ````
 
-### Installation
-
+**Installation**
 
 
 === ":fontawesome-brands-windows: WINDOWS"
