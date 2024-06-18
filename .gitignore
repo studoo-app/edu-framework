@@ -19,3 +19,4 @@ clover.xml
 
 # Documentation
 venv/**
+.cache/**
