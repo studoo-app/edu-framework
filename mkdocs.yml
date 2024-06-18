@@ -1,7 +1,7 @@
 site_name: EDU Framework
 site_url: https://studoo-app.github.io/edu-framework/
 repo_url: https://github.com/studoo-app/edu-framework
-copyright: 'Copyright © 2022 - 2024 Studoo by Benoit Foujols'
+copyright: 'Copyright © 2022 - 2024 Collectif studoo'
 
 theme:
   name: material
