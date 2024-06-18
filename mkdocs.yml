@@ -57,6 +57,7 @@ theme:
     - navigation.instant.prefetch
     - navigation.tabs
     - navigation.top
+    - navigation.path
     - navigation.tracking
     - search.highlight
     - toc.integrate
@@ -80,3 +81,19 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - def_list
+  - pymdownx.tasklist:
+      clickable_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+  - literate-nav:
+      nav_file: _summary.md
+
+extra_css:
+  - stylesheets/extra.css

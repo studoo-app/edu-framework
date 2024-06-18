@@ -1,4 +1,4 @@
-# EDU Framework
+# Light Education PHP framework
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a15f20cbdf2743618efe54e2db39f605)](https://app.codacy.com/gh/studoo-app/edu-framework/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/a15f20cbdf2743618efe54e2db39f605)](https://app.codacy.com/gh/studoo-app/edu-framework/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
@@ -32,12 +32,12 @@ Pour démarrer le serveur de développement, vous pouvez utiliser la commande su
 php bin/edu start
 ```
 
-## CI pipelines
+## Etat des pipelines de développement
 
 L'état des pipelines de développement est disponible :
 
-| Package  | Release | Github actions                                                                                                                                                     |
-| :------- |:--------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Edu Framework | main    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/studoo-app/edu-framework) |
-| Edu Framework | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
-| Edu Framework documentation | main    | [![Deploy](https://github.com/studoo-app/edu-framework-doc/actions/workflows/deploy.yml/badge.svg)](https://github.com/studoo-app/edu-framework-doc)               |
+| Package                     | Release | Github actions                                                                                                                                                     |
+|:----------------------------|:--------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Edu Framework stable        | main    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/studoo-app/edu-framework) |
+| Edu Framework v2            | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
+| Edu Framework documentation | main    | [![Deploy](https://github.com/studoo-app/edu-framework/actions/workflows/documentation.yml/badge.svg)](https://github.com/studoo-app/edu-framework)                |
