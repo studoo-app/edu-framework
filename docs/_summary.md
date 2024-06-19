@@ -3,3 +3,4 @@
 * [Démarrage](installation/index.md)
     * [Avant de démarrer](installation/prerequis.md)
     * [Installation](installation/installation.md)
+    * [Start/Stop l'application](installation/start-application.md)
