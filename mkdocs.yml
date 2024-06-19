@@ -109,9 +109,9 @@ plugins:
   - search
   - literate-nav:
       nav_file: _summary.md
-#  - git-committers:
-#      repository: studoo-app/edu-framework
-#      branch: main
+  - git-committers:
+      repository: studoo-app/edu-framework
+      branch: main
   - git-revision-date-localized:
       enable_creation_date: true
 

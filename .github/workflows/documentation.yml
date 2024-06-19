@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install mkdocs
-        run: pip install mkdocs mkdocs-material markdown-callouts mkdocs-literate-nav
+        run: pip install mkdocs mkdocs-material markdown-callouts mkdocs-literate-nav mkdocs-git-revision-date-localized-plugin pip install mkdocs-git-committers-plugin-2
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -39,8 +39,6 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      - name: Install plugin for localized git revision date
-        run: pip install mkdocs-git-revision-date-localized-plugin
       - name: Build with mkdocs
         run: mkdocs build
       - name: Upload artifact
