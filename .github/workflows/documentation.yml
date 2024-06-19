@@ -39,6 +39,8 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
+      - name: Install plugin for localized git revision date
+        run: pip install mkdocs-git-revision-date-localized-plugin
       - name: Build with mkdocs
         run: mkdocs build
       - name: Upload artifact

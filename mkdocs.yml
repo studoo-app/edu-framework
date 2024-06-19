@@ -1,11 +1,11 @@
-site_name: EDU Framework
+site_name: Light Education PHP framework
 site_url: https://studoo-app.github.io/edu-framework/
 repo_url: https://github.com/studoo-app/edu-framework
 copyright: 'Copyright © 2022 - 2024 Collectif Studoo'
 
 theme:
   name: material
-  logo: assets/studoo.svg
+  logo: assets/studoo-edu.svg
   favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
