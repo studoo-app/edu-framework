@@ -1,5 +1,5 @@
 * [Edu Frame](index.md)
-    * [A propos](about.md)
+    * [Objectifs pédagogiques](about.md)
 * [Démarrage](installation/index.md)
     * [Avant de démarrer](installation/prerequis.md)
     * [Installation](installation/installation.md)
