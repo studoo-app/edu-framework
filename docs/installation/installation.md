@@ -41,31 +41,33 @@ composer create-project studoo/edu-framework-skeleton NOM_DU_PROJET VERSION
     Voir le chapitre ["Erreur d'intallation du projet"](#)
 
 
-Exemple d'affichage suite à la commande :
+!!! note "Exemple d'affichage suite à la commande"
 
-````Bash
-Creating a "studoo/edu-framework-skeleton" project at "./NOM_DU_PROJET"
-Installing studoo/edu-framework-skeleton (X.0.0)
-  - Downloading studoo/edu-framework-skeleton (X.0.0)
-  - Installing studoo/edu-framework-skeleton (X.0.0): Extracting archive
-Created project in /Users/redbull/Projects/studoo/NOM_DU_PROJET
-Loading composer repositories with package information
-Updating dependencies
-Lock file operations: 9 installs, 0 updates, 0 removals
-  - Locking graham-campbell/result-type (X.1.x-dev 60c5f57)
-    [...]
-  - Locking vlucas/phpdotenv (dev-master 1a7ea2a)
-Writing lock file
-Installing dependencies from lock file (including require-dev)
-Package operations: 9 installs, 0 updates, 0 removals
-  - Installing symfony/polyfill-php80 (X.x-dev 6caa573): Extracting archive
-    [...]
-  - Installing studoo/edu-framework (dev-main c5cd9c5): Extracting archive
-Generating autoload files
-7 packages you are using are looking for funding.
-Use the `composer fund` command to find out more!
-No security vulnerability advisories found
-````
+    Ce résultat est un exemple et il ne sera probablement pas le vôtre.
+
+    ````Bash
+    Creating a "studoo/edu-framework-skeleton" project at "./NOM_DU_PROJET"
+    Installing studoo/edu-framework-skeleton (X.0.0)
+      - Downloading studoo/edu-framework-skeleton (X.0.0)
+      - Installing studoo/edu-framework-skeleton (X.0.0): Extracting archive
+    Created project in /Users/redbull/Projects/studoo/NOM_DU_PROJET
+    Loading composer repositories with package information
+    Updating dependencies
+    Lock file operations: 9 installs, 0 updates, 0 removals
+      - Locking graham-campbell/result-type (X.1.x-dev 60c5f57)
+        [...]
+      - Locking vlucas/phpdotenv (dev-master 1a7ea2a)
+    Writing lock file
+    Installing dependencies from lock file (including require-dev)
+    Package operations: 9 installs, 0 updates, 0 removals
+      - Installing symfony/polyfill-php80 (X.x-dev 6caa573): Extracting archive
+        [...]
+      - Installing studoo/edu-framework (dev-main c5cd9c5): Extracting archive
+    Generating autoload files
+    7 packages you are using are looking for funding.
+    Use the `composer fund` command to find out more!
+    No security vulnerability advisories found
+    ````
 
 Il est important de connaitre les étapes d'installation. Cela va vous permettre de comprendre en cas de problème d'installation.
 
@@ -163,12 +165,12 @@ Pour résoudre ce problème, plusieurs solutions s'offrent à vous :
 
 Dans le fichier composer.json, vous devez modifier la ligne suivante :
 
-````
+```diff
 "require": {
 -     "studoo/edu-framework": "dev-main"
 +     "studoo/edu-framework": "2.x-dev"
 }
-````
+```
 
 
 
