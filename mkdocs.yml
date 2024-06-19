@@ -1,7 +1,7 @@
 site_name: EDU Framework
 site_url: https://studoo-app.github.io/edu-framework/
 repo_url: https://github.com/studoo-app/edu-framework
-copyright: 'Copyright © 2022 - 2024 Collectif studoo'
+copyright: 'Copyright © 2022 - 2024 Collectif Studoo'
 
 theme:
   name: material
@@ -101,15 +101,17 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - attr_list
+  - md_in_html
 
 plugins:
   - offline
   - search
   - literate-nav:
       nav_file: _summary.md
-  - git-committers:
-      repository: studoo-app/edu-framework
-      branch: main
+#  - git-committers:
+#      repository: studoo-app/edu-framework
+#      branch: main
   - git-revision-date-localized:
       enable_creation_date: true
 
