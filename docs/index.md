@@ -36,6 +36,8 @@ Pour démarrer le serveur de développement, vous pouvez utiliser la commande su
 php bin/edu start
 ```
 
+Cette commande va démarrer le serveur de développement à l'adresse [http://localhost:8042](http://localhost:8042).
+
 ## Etat des pipelines de développement
 
 L'état des pipelines de développement est disponible :
