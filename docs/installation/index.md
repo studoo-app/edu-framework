@@ -26,7 +26,7 @@ Pour installer le framework, vous devez suivre les instructions suivantes :
       - [ ] [Démarrer l'application](start-application.md#demarrer-lapplication)
       - [ ] [Arrêter l'application](start-application.md#arreter-lapplication)
       - [ ] [Problème de démarrage](start-application.md#probleme-de-demarrage)
-- [ ] [La commande bin/edu](#)
+- [ ] [La commande bin/edu](command-edu.md)
 - [ ] [Comment versionner son projet](#)
 - [ ] [Utiliser Docker pour émuler les services](#)
 

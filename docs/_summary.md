@@ -4,3 +4,4 @@
     * [Avant de démarrer](installation/prerequis.md)
     * [Installation](installation/installation.md)
     * [Start/Stop l'application](installation/start-application.md)
+    * [La commande bin/edu](installation/command-edu.md)

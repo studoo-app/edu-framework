@@ -50,7 +50,6 @@ theme:
         name: Switch to system preference
   features:
     - content.code.copy
-    - content.tabs.link
     - navigation.footer
     - navigation.instant
     - navigation.instant.prefetch

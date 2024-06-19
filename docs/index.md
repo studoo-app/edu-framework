@@ -1,7 +1,7 @@
 # Light Education PHP framework
 
 <figure markdown="span">
-  ![Image title](assets/studoo-framework.svg){ width="500" }
+  ![Logo Edu Framework](assets/studoo-framework.svg){ width="500" }
 </figure>
     
 Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers une framework Symfony ?".
