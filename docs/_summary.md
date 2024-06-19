@@ -1,5 +1,5 @@
 * [Edu Frame](index.md)
-* Installation
+* [Démarrage](installation/index.md)
     * [Avant de démarrer](installation/prerequis.md)
     * [Installation](installation/installation.md)
 * [A propos](about.md)
