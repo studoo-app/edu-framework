@@ -7,7 +7,14 @@
 **new features**
 
 - [#87](https://github.com/studoo-app/edu-framework/issues/87) À partir du nom d'une route, reconstruire URL getNameToPath()
+- [#39](https://github.com/studoo-app/edu-framework/issues/39) Mise en place SQLite
+- [#105](https://github.com/studoo-app/edu-framework/issues/105) Nouvelle documentation [https://studoo-app.github.io/edu-framework](https://studoo-app.github.io/edu-framework)
+- [#86](https://github.com/studoo-app/edu-framework/issues/86) Implement codeSpace by GitHub
 
+**bug Fixes**
+
+- [#96](https://github.com/studoo-app/edu-framework/issues/96) Problème d'installation de phpunit 11 @pbentura @RaphaelBensoussan
+- [#92](https://github.com/studoo-app/edu-framework/issues/92) Problème de TestUnit sur FastRouteCore
 
 > Release notes for v2.1.0
 > 
