@@ -21,7 +21,7 @@
     * [DatabaseService - La gestion des données](boost/dataservice.md)
 * [Migrer](migrate/major.md)
     * [Migrer de la version 1.0 à la version 2.0](migrate/migration-1_2-2_0.md)
-* Plus
+* Annexes
     * [Glossaire](annexes/glossaire.md)
     * [FAQ](annexes/faq.md)
 * [Changelog](changelog.md)
