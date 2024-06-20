@@ -5,3 +5,4 @@
     * [Installation](installation/installation.md)
     * [Start/Stop l'application](installation/start-application.md)
     * [La commande bin/edu](installation/command-edu.md)
+    * [Comment versionner son projet](installation/versionning.md)

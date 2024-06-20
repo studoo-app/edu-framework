@@ -65,8 +65,8 @@ extra:
   version:
     default: stable
   social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/studo-app
+    - icon: fontawesome/brands/github
+      link: https://github.com/studoo-app
     - icon: fontawesome/brands/gitlab
       link: https://forge.apps.education.fr/studoo/edu-framework
     - icon: fontawesome/brands/docker
