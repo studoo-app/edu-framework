@@ -54,7 +54,7 @@ Voici l'arborecence du projet :
 │           └── villeread.html.twig
 ```
 
-Dans le fichier VillereadController.php, vous devez ajouter :
+Dans le fichier VilleReadController.php, vous devez ajouter :
 
 ```diff
 <?php
