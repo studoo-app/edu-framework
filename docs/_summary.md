@@ -7,7 +7,8 @@
     * [La commande bin/edu](installation/command-edu.md)
     * [Démarrer les services](installation/start-services.md)
     * [Comment versionner son projet](installation/versionning.md)
-* Construire
+* [Construire](build/index.md)
+    * [Le concept d'archirtecture MVC](build/concept-mvc.md)
     * [Arborescence](build/arborescence.md)
 * [Consolider](#)
 * Annexes
