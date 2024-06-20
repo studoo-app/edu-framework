@@ -24,3 +24,4 @@
 * Plus
     * [Glossaire](annexes/glossaire.md)
     * [FAQ](annexes/faq.md)
+* [Changelog](changelog.md)

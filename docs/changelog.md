@@ -10,7 +10,7 @@
 
 
 > Release notes for v2.1.0
->
+> 
 > [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12)
 
   <br>
@@ -22,7 +22,7 @@
 - [#94](https://github.com/studoo-app/edu-framework/issues/94) fix patch root by @bfoujols in <https://github.com/studoo-app/edu-framework/pull/95>
 
 > Release notes for v2.0.2
->
+> 
 > [https://github.com/studoo-app/edu-framework/milestone/v2.0.2](https://github.com/studoo-app/edu-framework/milestone/15)
 
 <br>
@@ -34,8 +34,8 @@
 
 - [#88](https://github.com/studoo-app/edu-framework/issues/88) Correction sur le probleme avec DatabaseService dans la ligne de command
 
-> Release notes for v2.0.1
->
+> Release notes for v2.0.1 
+> 
 > [https://github.com/studoo-app/edu-framework/milestone/v2.0.1](https://github.com/studoo-app/edu-framework/milestone/14)
 
   <br>
@@ -69,7 +69,7 @@
 - update [Comment faire un post dans un controller](https://studoo-app.github.io/edu-framework-doc/fr-controller-post-edu.html) : Plus de detail
 
 > Release notes for v2.0.0
->
+> 
 > [https://github.com/studoo-app/edu-framework/milestone/v2.0.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
@@ -86,8 +86,8 @@
 
 - [#81](https://github.com/studoo-app/edu-framework/issues/81) Probleme de récupération des variables dynamiques passées dans la route via {}
 
-> Release notes for v1.2.0
->
+> Release notes for v1.2.0 
+> 
 > [https://github.com/studoo-app/edu-framework/milestone/v1.2.0](https://github.com/studoo-app/edu-framework/milestone/11?closed=1)
 
   <br>
@@ -99,7 +99,7 @@ Version beta de la bar de debug avec les fonctionnalités suivantes :
 - Mise en place de la bar de debug en beta sur environnement de développement
 - Refonte de docker pour l'installation des services
 - Correction de bugs mineurs
-  - Docker : correction sur le reseau des services Mydql et PhpMyAdmin
+    - Docker : correction sur le reseau des services Mydql et PhpMyAdmin
 
 ## v1.0 (2024)
 
