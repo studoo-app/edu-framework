@@ -1,0 +1,118 @@
+site_name: Light Education PHP framework
+site_url: https://studoo-app.github.io/edu-framework/
+repo_url: https://github.com/studoo-app/edu-framework
+copyright: 'Copyright © 2022 - 2024 Collectif Studoo'
+
+theme:
+  name: material
+  logo: assets/studoo-edu.svg
+  favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+    note: fontawesome/solid/note-sticky
+    abstract: fontawesome/solid/book
+    info: fontawesome/solid/circle-info
+    tip: fontawesome/solid/bullhorn
+    success: fontawesome/solid/check
+    question: fontawesome/solid/circle-question
+    warning: fontawesome/solid/triangle-exclamation
+    failure: fontawesome/solid/bomb
+    danger: fontawesome/solid/skull
+    bug: fontawesome/solid/robot
+    example: fontawesome/solid/flask
+    quote: fontawesome/solid/quote-left
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      scheme: default
+      primary: white
+      accent: amber
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - content.code.copy
+    - navigation.footer
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tabs
+    - navigation.top
+    - navigation.path
+    - search.highlight
+    - content.code.copy
+    - content.code.select
+  language: fr
+
+extra:
+  version:
+    default: stable
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/studoo-app
+    - icon: fontawesome/brands/gitlab
+      link: https://forge.apps.education.fr/studoo/edu-framework
+    - icon: fontawesome/brands/docker
+      link: https://www.docker.com
+    - icon: fontawesome/brands/php
+      link: https://php.net
+  generator: false
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - def_list
+  - pymdownx.tasklist:
+      clickable_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+
+plugins:
+  - offline
+  - search
+  - literate-nav:
+      nav_file: _summary.md
+  - git-committers:
+      repository: studoo-app/edu-framework
+      branch: main
+  - git-revision-date-localized:
+      enable_creation_date: true
+
+extra_css:
+  - stylesheets/extra.css

@@ -16,3 +16,7 @@ composer.phar
 # Environment
 .env
 clover.xml
+
+# Documentation
+venv/**
+.cache/**

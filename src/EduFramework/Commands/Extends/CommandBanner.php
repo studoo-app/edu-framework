@@ -34,7 +34,7 @@ class CommandBanner
 
     public static function getDoc(): ?string
     {
-        return 'Documentation : https://studoo-app.github.io/edu-framework-doc/';
+        return 'Documentation : https://studoo-app.github.io/edu-framework';
     }
 
     /**
