@@ -1,9 +1,13 @@
 * [Edu Frame](index.md)
     * [Objectifs pédagogiques](about.md)
-* [Démarrage](installation/index.md)
+* [Démarrer](installation/index.md)
     * [Avant de démarrer](installation/prerequis.md)
     * [Installation](installation/installation.md)
     * [Start/Stop l'application](installation/start-application.md)
     * [La commande bin/edu](installation/command-edu.md)
     * [Démarrer les services](installation/start-services.md)
     * [Comment versionner son projet](installation/versionning.md)
+* Construire
+* Consolider
+* Annexes
+    * [Glossaire](annexes/glossaire.md)
