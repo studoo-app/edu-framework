@@ -28,7 +28,9 @@ Pour démarrer l'application, il suffit ouvrir un terminal :
     php -S localhost:8042 -t public
     ```
 
-Cette commande va démarrer le serveur de développement à l'adresse [http://localhost:8042](http://localhost:8042).
+!!! info "Adresse de l'application"
+
+    Cette commande va démarrer le serveur de développement à l'adresse [http://localhost:8042](http://localhost:8042){:target="_blank"}.
 
 
 ## Arrêtez l'application

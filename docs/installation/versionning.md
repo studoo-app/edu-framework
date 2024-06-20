@@ -59,7 +59,7 @@ git init
 
     Un exemple et il ne sera probablement pas le vôtre. Ici nous avons selectionner le protocole SSH pour faire le lien avec le repository. Vous pouvez aussi utiliser le protocole HTTPS.
     Le SSH est plus sécurisé et plus rapide que le HTTPS. Néanmoins, il nécessite une configuration supplémentaire sur la machine avec l'installation d'une clé SSH.
-    Exemple de configuration SSH : [Github SSH](https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+    Exemple de configuration SSH : [Github SSH](https://docs.github.com/fr/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account){:target="_blank"}
 
     <figure markdown="span">
     ![Screen Start Edu App](../assets/screen-git-url.png){width="500"}

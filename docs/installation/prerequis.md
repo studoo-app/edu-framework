@@ -51,7 +51,7 @@ Pour faciliter les installations et la maintenance de votre setup, nous vous rec
     Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
     ```
 
-    Pour plus informations, visitez le site [https://scoop.sh](https://scoop.sh)
+    Pour plus informations, visitez le site [https://scoop.sh](https://scoop.sh){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -67,7 +67,7 @@ Pour faciliter les installations et la maintenance de votre setup, nous vous rec
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     ```
 
-    Pour plus informations, visitez le site [https://brew.sh](https://brew.sh)
+    Pour plus informations, visitez le site [https://brew.sh](https://brew.sh){:target="_blank"}
 
 ___
 
@@ -106,7 +106,7 @@ git --version
     scoop install main/git
     ```
 
-    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=git](https://scoop.sh/#/apps?q=git&id=95a0a6fa98a17215837dbe3e38b75262d6d4d7ae)
+    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=git](https://scoop.sh/#/apps?q=git&id=95a0a6fa98a17215837dbe3e38b75262d6d4d7ae){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -116,13 +116,13 @@ git --version
     brew install git
     ```
 
-    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/git](https://formulae.brew.sh/formula/git#default)
+    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/git](https://formulae.brew.sh/formula/git#default){:target="_blank"}
 
 ___
 
 ## :simple-php: Environnement de développement
 
-Ce framework utilise le langage PHP, plus information sur [https://www.php.net](https://www.php.net)
+Ce framework utilise le langage PHP, plus information sur [https://www.php.net](https://www.php.net){:target="_blank"}
 
 Pour savoir si PHP est installé sur votre machine, ouvrez un terminal et saisir cette commande :
 
@@ -158,7 +158,7 @@ php -v
     scoop install versions/php82
     ```
 
-    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=php](https://scoop.sh/#/apps?q=php&id=5101819badef2a2c45455bdb63c0036655741250)
+    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=php](https://scoop.sh/#/apps?q=php&id=5101819badef2a2c45455bdb63c0036655741250){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -168,7 +168,7 @@ php -v
     brew install php@8.2
     ```
 
-    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/php](https://formulae.brew.sh/formula/php#default)
+    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/php](https://formulae.brew.sh/formula/php#default){:target="_blank"}
 
 ### Activation des extensions
 
@@ -245,7 +245,7 @@ composer --version
     scoop install main/composer
     ```
 
-    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=composer](https://scoop.sh/#/apps?q=composer&id=9ce50f006acbb8649de41c1a38794e190a8c4453)
+    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=composer](https://scoop.sh/#/apps?q=composer&id=9ce50f006acbb8649de41c1a38794e190a8c4453){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -255,7 +255,7 @@ composer --version
     brew install composer
     ```
 
-    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/composer](https://formulae.brew.sh/formula/composer#default)
+    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/composer](https://formulae.brew.sh/formula/composer#default){:target="_blank"}
 
 ___
 
@@ -265,7 +265,7 @@ Souvent utilisé pour les requêtes HTTP, CURL est un outil en ligne de commande
 
 Il est souvent utilisé pour tester des API, des scripts ou télécharger des fichiers.
 
-Plus d'information sur [https://curl.se](https://curl.se)
+Plus d'information sur [https://curl.se](https://curl.se){:target="_blank"}
 
 
 ```Bash
@@ -297,7 +297,7 @@ curl --version
     scoop install main/curl
     ```
 
-    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=curl](https://scoop.sh/#/apps?q=curl&id=09e3750a1f0a703b6de0f8fa4ca1263ef5d59ad3)
+    Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=curl](https://scoop.sh/#/apps?q=curl&id=09e3750a1f0a703b6de0f8fa4ca1263ef5d59ad3){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -307,7 +307,7 @@ curl --version
     brew install curl
     ```
 
-    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/curl](https://formulae.brew.sh/formula/curl#default)
+    Pour plus informations, visitez le site [https://formulae.brew.sh/formula/curl](https://formulae.brew.sh/formula/curl#default){:target="_blank"}
 
 ___
 
@@ -317,9 +317,13 @@ Pour émuler les services utilisés par le framework, comme MySQL par exemple, n
 
 Docker est une plateforme de virtualisation légère qui permet d'isoler et de gérer facilement des applications dans des conteneurs. En utilisant Docker, vous pouvez créer et exécuter des conteneurs pour les différents services nécessaires à votre framework, tels que MySQL, sans avoir à les installer directement sur votre machine. Cela vous permet de gagner du temps et de simplifier le processus de développement. Alors n'hésitez pas à utiliser Docker pour émuler vos services !
 
-[https://www.docker.com](https://www.docker.com)
-
-L'utilisation de DOCKER est optionnel. Néanmoins, Docker est un outil essentiel pour les développeurs modernes.
+Plus d'information sur l'installation [Docker desktop](https://www.docker.com){:target="_blank"}
 
 La framework est livré avec un fichier `compose.yml` qui vous permet de démarrer rapidement les services nécessaires à votre projet.
 Pour plus d'informations, on en reparle dans la section "Démarrer les services".
+
+!!! info "Information importante"
+
+    L'utilisation de DOCKER n'est pas obligatoire. Néanmoins, Docker est un outil essentiel pour les développeurs modernes.
+
+    Vous pouvez utiliser les services directement sur votre machine (mysql, wamp ...), mais cela peut être plus complexe et plus long. Il fige également les versions des services installés. Ce qui peut poser des problèmes de compatibilité avec les versions utilisées par le framework.
