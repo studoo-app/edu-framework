@@ -11,3 +11,4 @@
 * [Consolider](#)
 * Annexes
     * [Glossaire](annexes/glossaire.md)
+    * [FAQ](annexes/faq.md)
