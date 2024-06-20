@@ -11,7 +11,9 @@
     * [Le concept d'archirtecture MVC](build/concept-mvc.md)
     * [Arborescence](build/arborescence.md)
     * [Comment construire une page ?](build/controller-edu.md)
-* [Consolider](#)
+    * [Comment faire un formulaire en methode POST](build/controller-edu-post.md)
+* [Consolider](boost/index.md)
+    * [Request - La gestion des requêtes HTTP](boost/resquet.md)
 * Annexes
     * [Glossaire](annexes/glossaire.md)
     * [FAQ](annexes/faq.md)

@@ -45,11 +45,11 @@ class HelloController implements ControllerInterface
 
 On peut voir que le controller HelloController implémente l'interface ControllerInterface. 
 
-La méthode execute prend en paramètre un objet de type Request et retourne une chaine de caractère ou null.
+La méthode execute prend en paramètre un objet de type [Request](../boost/resquet.md) et retourne une chaine de caractère ou null.
 
 !!! info
 
-    Pour aller plus loin, vous pouvez lire la documentation de la classe Request pour comprendre comment gérer les requêtes HTTP.
+    Pour aller plus loin, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md) pour comprendre comment gérer les requêtes HTTP.
 
 
 ### Le fichier hello.html.twig
