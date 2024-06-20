@@ -10,6 +10,7 @@
 * [Construire](build/index.md)
     * [Le concept d'archirtecture MVC](build/concept-mvc.md)
     * [Arborescence](build/arborescence.md)
+    * [Comment construire une page ?](build/controller-edu.md)
 * [Consolider](#)
 * Annexes
     * [Glossaire](annexes/glossaire.md)
