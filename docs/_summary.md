@@ -7,7 +7,8 @@
     * [La commande bin/edu](installation/command-edu.md)
     * [Démarrer les services](installation/start-services.md)
     * [Comment versionner son projet](installation/versionning.md)
-* [Construire](#)
+* Construire
+    * [Arborescence](build/arborescence.md)
 * [Consolider](#)
 * Annexes
     * [Glossaire](annexes/glossaire.md)
