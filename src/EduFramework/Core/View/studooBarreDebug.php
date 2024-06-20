@@ -55,7 +55,7 @@ class studooBarreDebug
                         <div style="display: flex; justify-content: flex-start; align-items: center;">
                             <span style="color: black; padding-right: 3px; padding-left: 3px; background: palegoldenrod; padding-left: 1px">' . ConfigCore::getRequest()->getHttpMethod() . '</span>
                             <span style="color: black; padding-right: 3px; padding-left: 3px; background: palegoldenrod; padding-left: 1px">' . ConfigCore::getRequest()->getRoute() . '</span>
-                            <span style="color: white; margin-left: 10px"><a href="https://studoo-app.github.io/edu-framework-doc/" target="_blank" style="color: white;">Documentation</a></span>
+                            <span style="color: white; margin-left: 10px"><a href="https://studoo-app.github.io/edu-framework" target="_blank" style="color: white;">Documentation</a></span>
                          </div>
                     </div>
                     

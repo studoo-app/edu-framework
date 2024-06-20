@@ -92,5 +92,5 @@ Vous pouvez accéder à votre controller en tapant l'url suivante : [http://loca
 ## Schema pour comprendre le fonctionnement pour aller vers controller
 
 <figure markdown="span">
-![Controller Process](../assets/controller.svg)
+![Controller Process](../assets/controller.png)
 </figure>

@@ -61,12 +61,12 @@
 **documentation**
 
 - Nouvelle interface et organisation par chapitre
-- new [Request : La gestion des requêtes HTTP](https://studoo-app.github.io/edu-framework-doc/fr-resquet.html)
-- update [Comment installer EduFrame](https://studoo-app.github.io/edu-framework-doc/fr-comment-installer-edu.html#cr-ation-du-projet) : Nouvelle installation par version
-- update [Comment installer les services](https://studoo-app.github.io/edu-framework-doc/fr-comment-installer-services.html) : Refactoring Docker
-- update [Arborescence](https://studoo-app.github.io/edu-framework-doc/fr-arborescence.html) : Nouvelle arbo v2.0
-- update [Comment faire un controller](https://studoo-app.github.io/edu-framework-doc/fr-controller-edu.html) : Plus de detail
-- update [Comment faire un post dans un controller](https://studoo-app.github.io/edu-framework-doc/fr-controller-post-edu.html) : Plus de detail
+- new [Request : La gestion des requêtes HTTP](https://studoo-app.github.io/edu-framework/boost/resquet.html)
+- update [Comment installer EduFrame](https://studoo-app.github.io/edu-framework/build/index.html) : Nouvelle installation par version
+- update [Comment installer les services](https://studoo-app.github.io/edu-framework/installation/index.html) : Refactoring Docker
+- update [Arborescence](https://studoo-app.github.io/edu-framework/installation/index.html) : Nouvelle arbo v2.0
+- update [Comment faire un controller](https://studoo-app.github.io/edu-framework/build/index.html) : Plus de detail
+- update [Comment faire un post dans un controller](https://studoo-app.github.io/edu-framework/build/index.html) : Plus de detail
 
 > Release notes for v2.0.0
 > 

@@ -32,6 +32,8 @@ Pour démarrer le serveur de développement, vous pouvez utiliser la commande su
 php bin/edu start
 ```
 
+> [Découvrez comment démarrer votre projet](https://studoo-app.github.io/edu-framework/)
+
 ## CI pipelines
 
 L'état des pipelines de développement est disponible :
