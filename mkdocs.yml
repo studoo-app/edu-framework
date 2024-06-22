@@ -2,6 +2,7 @@ site_name: Light Education PHP framework
 site_url: https://studoo-app.github.io/edu-framework/
 repo_url: https://github.com/studoo-app/edu-framework
 copyright: 'Copyright © 2022 - 2024 Collectif Studoo'
+edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -49,6 +50,7 @@ theme:
         icon: material/brightness-4
         name: Switch to system preference
   features:
+    - content.action.edit
     - content.code.copy
     - navigation.footer
     - navigation.instant
