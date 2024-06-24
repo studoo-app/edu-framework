@@ -4,9 +4,9 @@
   ![Logo Edu Framework](assets/studoo-framework.svg){ width="500" }
 </figure>
     
-Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers une framework Symfony ?".
+Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers un framework comme Symfony ? »
 
-L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter la transition vers le framework Symfony. Ce projet visera à couvrir les aspects fondamentaux, en mettant l'accent sur les meilleures pratiques de développement.
+L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter la transition vers un framework comme Symfony. Ce projet visera à couvrir les aspects fondamentaux, en mettant l'accent sur les meilleures pratiques de développement.
 
 !!! warning "Information importante"
 

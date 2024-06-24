@@ -9,7 +9,7 @@
 [![Total Downloads](https://poser.pugx.org/studoo/edu-framework/downloads)](https://packagist.org/packages/studoo/edu-framework)
 [![License](https://poser.pugx.org/studoo/edu-framework/license)](https://packagist.org/packages/studoo/edu-framework)
 
-Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers une framework Symfony ?".
+Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers un framework Symfony ?".
 
 L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter leur transition vers le framework Symfony. Ce projet visera à couvrir les aspects fondamentaux ainsi que les techniques avancées de Symfony, en mettant l'accent sur les meilleures pratiques de développement.
 
