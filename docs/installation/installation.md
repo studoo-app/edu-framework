@@ -15,30 +15,21 @@ pwd // pour savoir ou vous êtes dans votre arboresence
 
 Nous allons créer le projet à l'aide du gestionnaire de paquets "composer". Cette étape vous permettra de construire la base du projet en une seule ligne de commande.
 
-Tableau des versions EDU-Framework :
-
-| Version | Etat                           | Date sortie |
-|---------|--------------------------------|-------------|
-| 2.x-dev | stable | 04/2024     |
-| 1.x-dev | stable | 03/2024     |
-
 Saisir cette commande dans votre terminal :
 
 !!! info "Information importante"
 
     Remplacez **NOM_DU_PROJET** par le nom de votre projet
 
-    Remplacez **VERSION** par la version souhaitée (ex : 2.x-dev)
-
 ````Bash
-composer create-project studoo/edu-framework-skeleton NOM_DU_PROJET VERSION
+composer create-project studoo/edu-framework-skeleton NOM_DU_PROJET
 ````
 
 !!! warning "Erreur d'intallation du projet"
 
     Attention, cette commande peut comporter des erreurs si vous n'avez pas installé PHP.
     
-    Voir le chapitre ["Erreur d'intallation du projet"](#)
+    Voir le chapitre ["Erreur d'intallation du projet"](#erreur-dinstallation-des-dependances)
 
 
 !!! note "Exemple d'affichage suite à la commande"
