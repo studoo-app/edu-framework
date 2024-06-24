@@ -31,6 +31,12 @@ Se rendre dans le dossier du projet :
 cd my_project_name
 ```
 
+Puis, saisir cette commande dans votre terminal :
+
+````Bash 
+composer edu:init
+````
+
 Pour démarrer le serveur de développement, vous pouvez utiliser la commande suivante :
 ```bash
 php bin/edu start
