@@ -3,7 +3,7 @@
 ## Introduction
 La version 2.0 du framework apporte de nombreuses améliorations et corrections de bugs. \
 Je vous invite à lire attentivement les changements apportés pour migrer votre projet de la version 1.2 à la version 2.0.
-Lien sur la release note : [Release note 2.0](fr-release-edu.md)
+Lien sur la release note : [Release note 2.0](../changelog.md#v200-06042024)
 
 ## Comment migrer ?
 Pour migrer de la version 1.2 à la version 2.0, vous devez suivre les étapes suivantes :
@@ -13,12 +13,12 @@ Pour migrer de la version 1.2 à la version 2.0, vous devez suivre les étapes s
 3. Faire les actions suivantes : 
 
 3.1 **Mettre à jour le fichier composer** :
-```
+```diff
   "require": {
     "php": ">=8.1",
     "ext-mbstring": "*",
 --    "studoo/edu-framework": "1.2.x-dev"
-++    "studoo/edu-framework": "2.0.x-dev"
+++    "studoo/edu-framework": "2.x-dev"
   },
 ```
 
@@ -28,10 +28,10 @@ composer update studoo/edu-framework
 ```
 
 Résultat :
-```
+```bash
 [...]
 Package operations: 0 installs, 1 update, 0 removals
-  - Downloading studoo/edu-framework (2.0.x-dev xxxxx)
+  - Downloading studoo/edu-framework (2.x-dev xxxxx)
   - Upgrading studoo/edu-framework (1.2.x-dev ef385b8 => 2.0.x-dev xxxxx): Extracting archive
 [...]
 ```
@@ -42,8 +42,8 @@ Package operations: 0 installs, 1 update, 0 removals
 ```
 
 Résultat :
-```
-EduFramework v2.0.x-xxxx
+```bash
+EduFramework v2.x-xxxx
 ```
 
 ## Les changements
@@ -63,40 +63,42 @@ composer edu:docker:db-service:stop mysql
 
 2. **Téléchargement du nouveau fichier Docker** :
 
-<tabs>
-    <tab title="WINDOWS">
-        <warning>
-            <p>
-                Ouvrir un terminal git bash à la racine de votre projet
-            </p>
-        </warning>
-        Pour télécharger le fichier compose, suivre les instructions :
-        <code-block lang="Bash">
-        curl -o compose.yaml https://raw.githubusercontent.com/studoo-app/edu-framework/2.0/compose.yaml
-        </code-block>
+=== ":fontawesome-brands-windows: WINDOWS"
+
+    Ouvrir un terminal git bash à la racine de votre projet
+
+    Pour télécharger le fichier compose, suivre les instructions :
+    
+    ```bash
+    curl -o compose.yaml https://raw.githubusercontent.com/studoo-app/edu-framework/main/compose.yaml
+    ```
+
+    !!! bug "curl: (35)"
+
         Si vous rencontrez une erreur `curl: (35) schannel: next InitializeSecurityContext failed: Unknown error (0x80092012) - The revocation function was unable to check revocation for the certificate.`
-        <code-block lang="Bash">
-        curl --ssl-no-revoke -o compose.yaml https://raw.githubusercontent.com/studoo-app/edu-framework/2.0/compose.yaml
-        </code-block>
-    </tab>
-    <tab title="MAC OS">
-        <warning>
-            <p>
-                Ouvrir un terminal à la racine de votre projet
-            </p>
-        </warning>
-        Pour télécharger le fichier compose, suivre les instructions :
-        <code-block lang="Bash">
-        curl -sS https://raw.githubusercontent.com/studoo-app/edu-framework/2.0/compose.yaml -o compose.yaml
-        </code-block>
-    </tab>
-</tabs>
+    
+        Saisir la commande suivante :
+
+        ```bash
+        curl --ssl-no-revoke -o compose.yaml https://raw.githubusercontent.com/studoo-app/edu-framework/main/compose.yaml
+        ```
+
+=== ":fontawesome-brands-apple: MAC OS"
+
+    Ouvrir un terminal à la racine de votre projet
+
+    Pour télécharger le fichier compose, suivre les instructions :
+
+    ```bash
+    curl -sS https://raw.githubusercontent.com/studoo-app/edu-framework/2.0/compose.yaml -o compose.yaml
+    ```
+
 
 3. **Modifier le nouveau fichier Docker** :
 
 Vous pouvez modifier le fichier `compose.yaml` pour ajuster les paramètres à votre environnement.
 
-```
+```diff
     environment:
       MYSQL_DATABASE: app_db
 --    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
@@ -107,9 +109,10 @@ Vous pouvez modifier le fichier `compose.yaml` pour ajuster les paramètres à v
       #MYSQL_PASSWORD: app_db_password
 ```
 
-> **Note** : Les commentaires sont ajoutés pour vous aider à comprendre les modifications.
-> Bien respecté la syntaxe YAML pour éviter les erreurs. (indentation, etc.)
-> {style="info"}
+!!! note
+
+    **Note** : Les commentaires sont ajoutés pour vous aider à comprendre les modifications.
+    Bien respecté la syntaxe YAML pour éviter les erreurs. (indentation, etc.)
 
 4. **Démarrer les services** :
 
@@ -119,8 +122,10 @@ docker compose up -d
 
 5. **Supprimer les anciens dossier Docker** :
 
-> Ouvrir un terminal git bash à la racine de votre projet
-> {style="warning"}
+!!! warning "Information importante"
+
+    **Attention** : Avant de supprimer les anciens dossiers Docker, assurez-vous que les services Docker sont bien démarrés.
+    Ouvrir un terminal git bash à la racine de votre projet
 
 ```Bash
 rm -fr docker
@@ -130,7 +135,7 @@ rm -fr docker
 
 > Ouvrir le fichier `composer.json` et supprimer les lignes suivantes :
 
-```
+```diff
   "scripts": {
     "edu:start": [
       "Composer\\Config::disableProcessTimeout",

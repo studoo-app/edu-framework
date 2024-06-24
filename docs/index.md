@@ -4,9 +4,9 @@
   ![Logo Edu Framework](assets/studoo-framework.svg){ width="500" }
 </figure>
     
-Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers une framework Symfony ?".
+Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers un framework comme Symfony ? »
 
-L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter la transition vers le framework Symfony. Ce projet visera à couvrir les aspects fondamentaux, en mettant l'accent sur les meilleures pratiques de développement.
+L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter la transition vers un framework comme Symfony. Ce projet visera à couvrir les aspects fondamentaux, en mettant l'accent sur les meilleures pratiques de développement.
 
 !!! warning "Information importante"
 
@@ -23,13 +23,19 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante :
 ```bash
-composer create-project studoo/edu-framework my_project_name 2.x-dev
+composer create-project studoo/edu-framework-skeleton my_project_name
 ```
 
 Se rendre dans le dossier du projet :
 ```bash
 cd my_project_name
 ```
+
+Puis, saisir cette commande dans votre terminal :
+
+````Bash 
+composer edu:init
+````
 
 Pour démarrer le serveur de développement, vous pouvez utiliser la commande suivante :
 ```bash

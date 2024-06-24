@@ -9,7 +9,7 @@
 [![Total Downloads](https://poser.pugx.org/studoo/edu-framework/downloads)](https://packagist.org/packages/studoo/edu-framework)
 [![License](https://poser.pugx.org/studoo/edu-framework/license)](https://packagist.org/packages/studoo/edu-framework)
 
-Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers une framework Symfony ?".
+Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers un framework Symfony ?".
 
 L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter leur transition vers le framework Symfony. Ce projet visera à couvrir les aspects fondamentaux ainsi que les techniques avancées de Symfony, en mettant l'accent sur les meilleures pratiques de développement.
 
@@ -19,13 +19,19 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante :
 ```bash
-composer create-project studoo/edu-framework my_project_name 2.x-dev
+composer create-project studoo/edu-framework-skeleton my_project_name
 ```
 
 Se rendre dans le dossier du projet :
 ```bash
 cd my_project_name
 ```
+
+Puis, saisir cette commande dans votre terminal :
+
+````Bash 
+composer edu:init
+````
 
 Pour démarrer le serveur de développement, vous pouvez utiliser la commande suivante :
 ```bash
@@ -41,13 +47,12 @@ L'état des pipelines de développement est disponible :
 | Package  | Release | Github actions                                                                                                                                                     |
 | :------- |:--------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Edu Framework | main    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/studoo-app/edu-framework) |
-| Edu Framework | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
 | Edu Framework documentation | main    | [![Deploy](https://github.com/studoo-app/edu-framework-doc/actions/workflows/deploy.yml/badge.svg)](https://github.com/studoo-app/edu-framework-doc)               |
+| Edu Framework | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
 
 ## Equipe de développement
 L'équipe de développement du projet "Edu Framework" est composée de développeurs expérimentés et passionnés par l'enseignement et la transmission du savoir. 
-Chaque membre de l'équipe apporte son expertise et son expérience pour créer un outil pédagogique de qualité.
-Un collectif, appelé [Studoo](https://github.com/studoo-app), est né autour de ces projets pour partager des connaissances et des compétences, et pour contribuer à l'amélioration continue des outils pédagogiques.
+Un collectif, appelé [Studoo](https://github.com/studoo-app), est né autour de ces projets pour partager et contribuer à l'amélioration continue des outils pédagogiques.
 
 - **Founder / Lead tech** : [Benoit Foujols](https://github.com/bfoujols)
 - **Lead dev** : [Julien Pechberty](https://github.com/JPechberty)

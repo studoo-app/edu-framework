@@ -7,7 +7,9 @@
 Nous allons créer un CRUD pour la gestion des villes.
 
 ## Création de la table
- 
+
+Inserez les données suivantes dans votre base de données :
+
 ```sql
 CREATE TABLE ville (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -19,6 +21,8 @@ INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Paris', '75000', 
 INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Marseille', '13000', 800000);
 INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Lyon', '69000', 500000);
 ```
+
+Dans la configuration Docker, nous proposons d'utiliser PhpMyAdmin pour gérer la base de données.
 
 ## Création du CRUD
 
