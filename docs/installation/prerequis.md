@@ -35,7 +35,7 @@ Pour faciliter les installations et la maintenance de votre setup, nous vous rec
 
 **Installation**
 
-=== ":fontawesome-brands-windows: WINDOWS"
+=== ":fontawesome-brands-windows: WINDOWS via Scoop"
 
     !!! warning "Information importante"
     
@@ -52,6 +52,10 @@ Pour faciliter les installations et la maintenance de votre setup, nous vous rec
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh](https://scoop.sh){:target="_blank"}
+
+=== ":fontawesome-brands-windows: WINDOWS via Chocolatey"
+
+    Suivre les instructions sur :simple-chocolatey: [https://community.chocolatey.org](https://community.chocolatey.org/){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -95,7 +99,7 @@ git --version
 
 **Installation**
 
-=== ":fontawesome-brands-windows: WINDOWS"
+=== ":fontawesome-brands-windows: WINDOWS via Scoop"
 
      Pour installation GIT, ouvrez un terminal (PowerShell) pour installer le bucket :
 
@@ -107,6 +111,16 @@ git --version
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=git](https://scoop.sh/#/apps?q=git&id=95a0a6fa98a17215837dbe3e38b75262d6d4d7ae){:target="_blank"}
+
+=== ":fontawesome-brands-windows: WINDOWS via Chocolatey"
+
+     Pour installation GIT, ouvrez un terminal (PowerShell) pour installer le bucket :
+
+    ```bash
+    choco install git
+    ```
+
+    Pour plus informations, visitez le site [https://community.chocolatey.org/packages/git](https://community.chocolatey.org/packages/git){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -145,9 +159,9 @@ php -v
 
 !!! warning "Version obligatoire"
 
-    Le framework est construit à partir de la version PHP 8.1, nous vous recommendons d'installer la version 8.2 ou plus (8.3)
+    Le framework est construit à partir de la version PHP 8.1, nous vous recommandons d'installer la version 8.2 ou plus (8.3)
 
-=== ":fontawesome-brands-windows: WINDOWS"
+=== ":fontawesome-brands-windows: WINDOWS via Scoop"
 
      Pour installation PHP, ouvrez un terminal (PowerShell) pour installer le bucket :
 
@@ -159,6 +173,16 @@ php -v
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=php](https://scoop.sh/#/apps?q=php&id=5101819badef2a2c45455bdb63c0036655741250){:target="_blank"}
+
+=== ":fontawesome-brands-windows: WINDOWS via Chocolatey"
+
+     Pour installation PHP, ouvrez un terminal (PowerShell) pour installer le bucket :
+
+    ```bash
+    choco install php
+    ```
+
+    Pour plus informations, visitez le site [https://community.chocolatey.org/packages/php](https://community.chocolatey.org/packages/php){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -234,7 +258,7 @@ composer --version
 
 **Installation**
 
-=== ":fontawesome-brands-windows: WINDOWS"
+=== ":fontawesome-brands-windows: WINDOWS via Scoop"
 
      Pour installation COMPOSER, ouvrez un terminal (PowerShell) pour installer le bucket :
 
@@ -246,6 +270,16 @@ composer --version
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=composer](https://scoop.sh/#/apps?q=composer&id=9ce50f006acbb8649de41c1a38794e190a8c4453){:target="_blank"}
+
+=== ":fontawesome-brands-windows: WINDOWS via Chocolatey"
+
+     Pour installation composer, ouvrez un terminal (PowerShell) pour installer le bucket :
+
+    ```bash
+    choco install composer
+    ```
+
+    Pour plus informations, visitez le site [https://community.chocolatey.org/packages/composer](https://community.chocolatey.org/packages/composer){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
@@ -286,7 +320,7 @@ curl --version
 **Installation**
 
 
-=== ":fontawesome-brands-windows: WINDOWS"
+=== ":fontawesome-brands-windows: WINDOWS via Scoop"
 
     Pour installer la commande "curl", suivre les instructions :
 
@@ -298,6 +332,16 @@ curl --version
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=curl](https://scoop.sh/#/apps?q=curl&id=09e3750a1f0a703b6de0f8fa4ca1263ef5d59ad3){:target="_blank"}
+
+=== ":fontawesome-brands-windows: WINDOWS via Chocolatey"
+
+     Pour installation CURL, ouvrez un terminal (PowerShell) pour installer le bucket :
+
+    ```bash
+    choco install curl
+    ```
+
+    Pour plus informations, visitez le site [https://community.chocolatey.org/packages/curl](https://community.chocolatey.org/packages/curl){:target="_blank"}
 
 === ":fontawesome-brands-apple: MAC OS"
 
