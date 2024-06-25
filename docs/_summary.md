@@ -25,6 +25,6 @@
     * [Code de conduite](contributor/code_of_conduct.md)
     * [Contribuer au projet](contributor/contributing.md)
 * Annexes
-  * [Glossaire](annexes/glossaire.md)
-  * [FAQ](annexes/faq.md)
+    * [Glossaire](annexes/glossaire.md)
+    * [FAQ](annexes/faq.md)
 * [Changelog](changelog.md)
