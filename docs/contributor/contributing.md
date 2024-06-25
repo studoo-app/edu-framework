@@ -65,5 +65,4 @@ Des controleurs de qualité de code sont mis en place pour vérifier que les nor
 
 Notre projet suit le [Code de conduite](code_of_conduct.md). Veuillez le lire avant de contribuer à notre projet.
 
-
 Merci pour vos contributions !

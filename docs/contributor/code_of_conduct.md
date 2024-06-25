@@ -17,7 +17,7 @@ Nous voulons que notre projet soit accueillant, inclusif et respectueux pour tou
 * Les menaces ou la violence ne seront pas tolérées.
 * L'utilisation abusive ou l'appropriation inappropriée de l'identité d'autrui ne sera pas tolérée.
 
-# Conséquences des comportements inacceptables
+## Conséquences des comportements inacceptables
 
 Les comportements inacceptables peuvent entraîner :
 
