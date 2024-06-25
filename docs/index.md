@@ -33,6 +33,8 @@ cd my_project_name
 
 Puis, saisir cette commande dans votre terminal :
 
+Création du fichier d'environnement
+
 ````Bash 
 composer edu:init
 ````
