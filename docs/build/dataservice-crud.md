@@ -9,8 +9,16 @@ Il est basé sur l'objet PDO de PHP.
 
     Pour plus d'informations sur l'objet PDO, vous pouvez consulter la [documentation officielle](https://www.php.net/manual/fr/book.pdo.php){:target="_blank"}.
 
+!!! warning "Prérequis"
 
-Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](../boost/dataservice.md) avant de continuer sur le CRUD
+    Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](../boost/dataservice.md) avant de continuer sur le CRUD
+
+    L'activation du service DatabaseService est obligatoire pour utiliser le CRUD, il s'oppère dans le fichier .env
+
+    ```diff
+    -- DB_HOST_STATUS=false
+    ++ DB_HOST_STATUS=true
+    ```
 
 ## CRUD
 

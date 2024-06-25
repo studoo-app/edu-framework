@@ -32,7 +32,7 @@ Vous devez modifier les variables suivantes dans le fichier `.env` :
 
 Exemple de configuration de la base de données dans le fichier `.env` :
 
-```
+```dotenv
 ## << Config Database
 ## pour activer la connexion à la base de données, il faut mettre DB_HOST_STATUS=true
 DB_HOST_STATUS=false
