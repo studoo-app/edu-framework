@@ -1,5 +1,16 @@
 # Objectifs pédagogiques
 
+## Framework
+
+**Début d'approche pour l'enseignement d'un framework (Symfony, Laravel ...)**
+
+Introduire un framework comme Symfony ou Laravel permet de montrer comment les concepts de MVC, POO, et les best practices sont appliqués dans un environnement de développement professionnel.
+
+- Commencez par expliquer l'architecture du framework et son cycle de requête/réponse, systeme de routing, etc.
+- Enseignez comment créer des modèles, des vues, et des contrôleurs dans le contexte du framework.
+- Montrez comment utiliser les outils intégrés pour la sécurité, les formulaires, la validation, etc.
+- Expliquez comment configurer et personnaliser le framework pour répondre aux besoins du projet.
+
 ## Architecture MVC
 
 **Appréhender un projet par couche via le concept d'architecture MVC (Model View Controller)**
@@ -15,11 +26,6 @@ L'architecture MVC est un modèle de conception qui sépare une application en t
 **Faire un projet "full POO" et dans les "best practices" attendu par les entreprises**
 
 La programmation orientée objet (POO) est une méthode de programmation qui utilise des classes et des objets. Elle permet de structurer le code de manière à ce qu'il soit plus facile à comprendre, à maintenir et à réutiliser.
-
-- **Encapsulation** : Garder les détails d'implémentation d'une classe à l'intérieur de celle-ci, et exposer uniquement les opérations nécessaires via des méthodes publiques.
-- **Héritage** : Permet de créer de nouvelles classes basées sur des classes existantes.
-- **Polymorphisme** : Permet de traiter les objets de différentes classes à travers une interface commune.
-- **Principe SOLID** : Un ensemble de cinq principes de conception pour rendre le code plus compréhensible, flexible et maintenable.
 
 **Orchestrer via un gestionnaire de dépendance (Composer)**
 
@@ -39,16 +45,7 @@ PHPUnit est un framework de test unitaire pour PHP. Les tests unitaires permette
 - Exécutez régulièrement les tests pour garantir que les modifications n'introduisent pas de régressions.
 - Intégrez les tests unitaires dans un pipeline CI pour automatiser les tests.
 
-## Framework et DevOps
-
-**Début d'approche pour l'enseignement d'un framework (Symfony, Laravel ...)**
-
-Introduire un framework comme Symfony ou Laravel permet de montrer comment les concepts de MVC, POO, et les best practices sont appliqués dans un environnement de développement professionnel.
-
-- Commencez par expliquer l'architecture du framework et son cycle de requête/réponse, systeme de routing, etc.
-- Enseignez comment créer des modèles, des vues, et des contrôleurs dans le contexte du framework.
-- Montrez comment utiliser les outils intégrés pour la sécurité, les formulaires, la validation, etc.
-- Expliquez comment configurer et personnaliser le framework pour répondre aux besoins du projet.
+## DevOps
 
 **Option DevOps (Docker, Deployer ...)**
 
