@@ -293,6 +293,24 @@ php bin/edu make:controller villeUpdate
 
 Voici l'arborescence du projet :
 
+``` hl_lines="7 12 13"
+        ├── app
+        │   ├── Config
+        │   │   └── routes.yaml
+        │   ├── Controller
+        │   │   ├── VilleCreateController.php
+        │   │   ├── VilleReadController.php
+        │   │   └── VilleUpdateController.php
+        │   └── Template
+        │       ├── base.html.twig
+        │       ├── villecreate
+        │       │   └── villecreate.html.twig
+        │       ├── villeupdate
+        │       │   └── villeupdate.html.twig
+        │       └── villeread
+        │           └── villeread.html.twig
+```
+
 Pour modifier une ville, nous devons gérer sa modification via son idenfifiant (clé primaire). 
 
 Dans notre use case, l'identifiant est ville.id. 
