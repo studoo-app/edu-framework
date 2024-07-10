@@ -24,6 +24,18 @@ Il est basé sur l'objet PDO de PHP.
 
 Le CRUD (Create, Read, Update, Delete) est un ensemble d'opérations de base pour la gestion des données dans une base de données.
 
+### Schéma de la base de données
+
+Pour les exemples suivants, nous allons utiliser une table `user` avec les champs `id`, `name` et `email`.
+
+```sql
+CREATE TABLE `user` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(50) NOT NULL,
+  `email` VARCHAR(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+```
+
 ### Create
 
 Pour créer un nouvel enregistrement dans la base de données, vous devez utiliser la méthode `insert` de la classe `DatabaseService`.
@@ -32,7 +44,7 @@ Pour créer un nouvel enregistrement dans la base de données, vous devez utilis
 // Recupere l'object PHP PDO
 $comBase = DatabaseService::getConnect();
 // Requete SQL
-$statementPDO = $comBase->insert("INSERT INTO user (name, email) VALUES ('John Doe', 'ben@toto.fr')");
+$statementPDO = $comBase->query("INSERT INTO user (name, email) VALUES ('John Doe', 'ben@toto.fr')");
 ```
 
 ### Read
