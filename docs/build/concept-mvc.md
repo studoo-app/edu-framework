@@ -8,6 +8,16 @@ Il sépare les préoccupations en trois composants - le modèle contient les don
 
 MVC facilite la maintenance du code en découplant l'interface utilisateur de la logique métier.
 
+## Contrôleur (Controller)
+
+Le contrôleur est l'intermédiaire entre le modèle et la vue. Il gère les événements utilisateur, effectue les traitements nécessaires et coordonne les mises à jour entre le modèle et la vue.
+
+Le contrôleur interprète les actions de l'utilisateur, manipule les données du modèle en conséquence et met à jour la vue pour refléter les changements.
+
+- **Interaction :** Le contrôleur interagit avec la vue en recevant les événements utilisateur et en mettant à jour la vue avec les nouvelles données provenant du modèle. Il interagit avec le modèle en appelant les méthodes appropriées pour manipuler les données et récupérer les informations nécessaires à l'affichage dans la vue.
+- **Technique :** Le contrôleur est souvent associé à un système de routage pour gérer les requêtes HTTP et appeler les méthodes appropriées en fonction de l'URL demandée.
+- **Mots clé :** Request HTTP, GET, POST
+
 ## Modèle (Model)
 
 Le modèle représente les données et la logique métier de l'application. Il se charge de gérer les données, leur structure, leur cohérence et leurs relations. 
@@ -30,13 +40,10 @@ La vue est passive, ce qui signifie qu'elle ne traite pas les événements utili
 - **Technique :** La couche Vue est souvent associée à un moteur de Template (Template engine) pour la gestion et la flexibilité des formats d'affichage. 
 - **Mots clé :** Moteur de template
 
-## Contrôleur (Controller)
+!!! info "Moteur de template TWIG"
 
-Le contrôleur est l'intermédiaire entre le modèle et la vue. Il gère les événements utilisateur, effectue les traitements nécessaires et coordonne les mises à jour entre le modèle et la vue. 
+    Edu Frame utilise le moteur de template TWIG : [https://twig.symfony.com](https://twig.symfony.com){:target="_blank"}
 
-Le contrôleur interprète les actions de l'utilisateur, manipule les données du modèle en conséquence et met à jour la vue pour refléter les changements.
-
-- **Interaction :** Le contrôleur interagit avec la vue en recevant les événements utilisateur et en mettant à jour la vue avec les nouvelles données provenant du modèle. Il interagit avec le modèle en appelant les méthodes appropriées pour manipuler les données et récupérer les informations nécessaires à l'affichage dans la vue.
 
 # Pourquoi utilisé le MVC
 
