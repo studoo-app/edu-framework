@@ -126,6 +126,53 @@ Dans cet exemple, on récupère la ville du formulaire dans le controller avec l
 <source src="../assets/screen-form-simple.mp4" type="video/mp4">
 </video>
 
+### En cas de changement de route dans le formulaire
+
+Si vous avez changé la route dans le fichier de configuration des routes, il faut modifier l'action du formulaire dans le fichier twig. Dur dur si vous avez plusieurs routes à gérer.
+Pour palier à ce problème, vous pouvez utiliser la fonction `{{ getNameToPath('NOM_ROUTE') }}` de twig pour générer l'url de la route.
+
+Dans l'exemple, la route s'appelle "ville" :
+
+``` hl_lines="5"
+hello:
+    uri: /hello
+    controller: Controller\HelloController
+    httpMethod: [GET]
+ville:
+    uri: /ville
+    controller: Controller\VilleController
+    httpMethod: [GET, POST]
+```
+
+Nous allons implémenter la fonction `getNameToPath('NOM_ROUTE')` dans le fichier "ville.html.twig" et plus précisément dans le formulaire :
+
+```diff
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titre }}{% endblock %}
+
+{% block content %}
+    <h1>{{ titre }}</h1>
+        {% if add_ville is not null %}
+            <div class="alert alert-success" role="alert">
+                    La ville est {{ add_ville }}
+                </div>
+        {% endif %}
+
+        <p>Créer une nouvelle ville</p>
+--        <form action="/ville" method="post">
+++        <form action="{{ getNameToPath('ville') }}" method="post">
+            <label for="nom_ville">Ville</label>
+            <input type="text" id="nom_ville" name="nom_ville">
+            <input type="submit" value="Envoyer">
+        </form>
+{% endblock %}s
+```
+
+<video controls>
+<source src="../assets/screen-form-path.mp4" type="video/mp4">
+</video>
+
 !!! info "Pour aller plus loin"
 
     Pour aller plus loin, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md) pour comprendre comment gérer les requêtes HTTP.
