@@ -1,37 +1,64 @@
-# Comment faire un post dans un controller ?
+# Comment faire un formulaire ?
 
-Pour créer un post dans un controller, il faut faire un formulaire dans le fichier twig et un traitement dans le controller.
+Pour créer un post dans un controller, il faut faire un formulaire HTML dans le fichier twig et un traitement dans le controller.
 
 ## Les étapes pour créer un post dans un controller
 
-- Modifier le fichire de configuration des routes "config/routes.yaml"
+- Créer un controller
 - Créer un formulaire dans le fichier twig
 - Créer un traitement dans le controller
 - Comprendre comment fonctionne la classe [Request](../boost/resquet.md) pour récupérer les données du formulaire
 
+
+
+### Création d'un controller
+
+Nous allons créer un page "ville" avec la commande suivante :
+
+```Shell
+php bin/edu make:controller Ville
+```
+
+La commande va générer un controller "VilleController.php" dans le dossier "src/Controller" et un fichier "ville.html.twig" dans le dossier "src/Template/ville".
+Voici l'arborecence des fichiers générés :
+
+``` hl_lines="5 8 9"
+├── app
+│   ├── Config
+│   │   └── routes.yaml
+│   ├── Controller
+│   │   └── VilleController.php
+│   └── Template
+│       ├── base.html.twig
+│       └── ville
+│           └── ville.html.twig
+```
+
 ### Modifier le fichier de configuration des routes
 
+Par défaut, les routes sont en méthode GET. Pour pouvoir envoyer des données en POST, il faut modifier la route dans le fichier de configuration des routes.
 Selectionner dans le fichier "config/routes.yaml" la route de votre controller et ajouter la méthode POST.
 
-Exemple de la route /hello :
+Exemple de la route /ville :
 
 ```diff
-hello:
-  uri: /hello
-  controller: Controller\TestControllerController
+ville:
+  uri: /ville
+  controller: Controller\VilleController
 -  httpMethod: [GET]
 +  httpMethod: [GET,POST]
 ```
 
 !!! warning "Attention"
 
-    Dans le cas d'une erreur "405 Method Not Allowed", vérifiez que la méthode POST est bien ajoutée dans le fichier de configuration des routes.
+    Dans le cas d'une erreur "HTTP 405 Method Not Allowed", vérifiez que la méthode POST est bien ajoutée dans le fichier de configuration des routes.
 
 ### Créer un formulaire dans le fichier twig
 
 Créer un formulaire en methode POST dans le fichier twig pour envoyer les données au controller.
+Selectionner le ficher "ville.html.twig" dans le dossier "src/Template/ville"
 
-Exemple de formulaire :
+Voici un exemple de formulaire :
 
 ```diff
 {% extends "base.html.twig" %}
@@ -40,16 +67,16 @@ Exemple de formulaire :
 
 {% block content %}
     <h1>{{ titre }}</h1>
-+    {% if ville is not null %}
++    {% if nom_ville is not null %}
 +        <div class="alert alert-success" role="alert">
-+            La ville est {{ ville }}
++            La ville est {{ nom_ville }}
 +        </div>
 +    {% endif %}
 +
 +    <p>Créer une nouvelle ville</p>
-+    <form action="/hello" method="post">
-+        <label for="ville">Ville</label>
-+        <input type="text" id="ville" name="ville">
++    <form action="/ville" method="post">
++        <label for="nom_ville">Ville</label>
++        <input type="text" id="nom_ville" name="nom_ville">
 +        <input type="submit" value="Envoyer">
 +    </form>
 {% endblock %}
@@ -57,9 +84,8 @@ Exemple de formulaire :
 
 Dans cet exemple, on affiche un formulaire pour créer une nouvelle ville. 
 
-On récupère la ville dans le controller pour l'afficher.
-Et on affiche la ville si elle est différente de null. (condition if dans la syntaxe twig)
-L'affichage de la ville se fait par la syntaxe twig `{{ ville }}`.
+On affiche la ville si elle est différente de null. (condition if dans la syntaxe twig)
+L'affichage de la ville se fait par la syntaxe twig `{{ nom_ville }}`.
 
 Je vous invite à regarder la documentation de [Twig](https://twig.symfony.com/doc/3.x/){:target="_blank"} pour plus d'informations sur les formulaires.
 
@@ -81,15 +107,15 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class HelloController implements ControllerInterface
+class VilleController implements ControllerInterface
 {
 	public function execute(Request $request): string|null
 	{
-		return TwigCore::getEnvironment()->render('hello/hello.html.twig',
+		return TwigCore::getEnvironment()->render('ville/ville.html.twig',
 		    [
-		        "titre"   => 'HelloController',
+		        "titre"   => 'VilleController',
 - 		        "request" => $request
-+ 		        "ville" => $request->get('ville')
++ 		        "ville" => $request->get('nom_ville')
 		    ]
 		);
 	}
@@ -97,6 +123,7 @@ class HelloController implements ControllerInterface
 ```
 
 Dans cet exemple, on récupère la ville du formulaire dans le controller avec la méthode get de la classe [Request::get($key)](../boost/resquet.md#getkey).
+
 
 !!! info "Pour aller plus loin"
 
