@@ -9,8 +9,6 @@ Pour créer un post dans un controller, il faut faire un formulaire HTML dans le
 - Créer un traitement dans le controller
 - Comprendre comment fonctionne la classe [Request](../boost/resquet.md) pour récupérer les données du formulaire
 
-
-
 ### Création d'un controller
 
 Nous allons créer un page "ville" avec la commande suivante :
@@ -67,9 +65,9 @@ Voici un exemple de formulaire :
 
 {% block content %}
     <h1>{{ titre }}</h1>
-+    {% if nom_ville is not null %}
++    {% if add_ville is not null %}
 +        <div class="alert alert-success" role="alert">
-+            La ville est {{ nom_ville }}
++            La ville est {{ add_ville }}
 +        </div>
 +    {% endif %}
 +
@@ -115,15 +113,18 @@ class VilleController implements ControllerInterface
 		    [
 		        "titre"   => 'VilleController',
 - 		        "request" => $request
-+ 		        "ville" => $request->get('nom_ville')
++ 		        "add_ville" => $request->get('nom_ville')
 		    ]
 		);
 	}
 }
 ```
 
-Dans cet exemple, on récupère la ville du formulaire dans le controller avec la méthode get de la classe [Request::get($key)](../boost/resquet.md#getkey).
+Dans cet exemple, on récupère la ville du formulaire dans le controller avec la méthode `get($key)` de la classe [Request](../boost/resquet.md#getkey).
 
+<video controls>
+<source src="../assets/screen-form-simple.mp4" type="video/mp4">
+</video>
 
 !!! info "Pour aller plus loin"
 

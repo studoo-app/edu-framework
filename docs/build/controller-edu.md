@@ -96,7 +96,9 @@ Dans la vue "hello.html.twig", on affiche le titre de la page "HelloController" 
 
 Vous pouvez accéder à votre controller en tapant l'url suivante : [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
+<figure markdown="span">
 ![HelloController.png](../assets/HelloController.png)
+</figure>
 
 ## Modifier le fichier des routes
 Et modifier le fichier des routes "config/routes.yaml" pour ajouter la route de votre controller.
