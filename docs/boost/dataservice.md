@@ -16,6 +16,7 @@ DatabaseService implémente l'interface de [PHP Data Objects (PDO)](https://www.
 Vous devez avoir une base de données MySQL ou MariaDB pour utiliser cette classe.
 Quelques informations de connexion à la base de données sont nécessaires pour configurer la connexion à la base de données.
 
+
 ## Installation
 
 Pour utiliser la classe DatabaseService, vous devez renseigner les informations de connexion à la base de données dans le fichier `.env` de votre projet.

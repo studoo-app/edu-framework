@@ -12,6 +12,7 @@
     * [Arborescence](build/arborescence.md)
     * [Construire une page](build/controller-edu.md)
     * [Construire un formulaire](build/controller-edu-post.md)
+    * [Gestion des données](build/dataservice-crud.md)
     * [Construire une commande CLI](build/new-command-edu.md)
 * [Consolider](boost/index.md)
     * [Request - La gestion des requêtes HTTP](boost/resquet.md)

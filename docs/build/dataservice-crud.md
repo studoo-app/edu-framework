@@ -1,51 +1,51 @@
-# Faire un CRUD
+# Gestion des données
 
 ## Introduction
 
-Le service DatabaseService permet de gérer les requêtes SQL sur la base de données.
-Il est basé sur l'objet PDO de PHP.
+Nous avons vu dans la documentation précédente comment gérer une page avec un controller et un formulaire en méthode POST.
+La suite logique est de comprendre comment gérer les données dans une base de données.
 
-!!! info "PDO"
+!!! Prérequis "PHP Data Objects (PDO)"
+
+    PDO est un moyen de communiquer de manière efficace avec une base de données en PHP, tout en gardant la flexibilité de changer de type de base de données si nécessaire, sans avoir à réécrire votre code.
 
     Pour plus d'informations sur l'objet PDO, vous pouvez consulter la [documentation officielle](https://www.php.net/manual/fr/book.pdo.php){:target="_blank"}.
 
-!!! warning "Prérequis"
 
-    Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](../boost/dataservice.md) avant de continuer sur le CRUD
+## Prérequis
 
-    L'activation du service DatabaseService est obligatoire pour utiliser le CRUD, il s'oppère dans le fichier .env
+Vous devez activer le service DatabaseService pour utiliser une base de données.
+L'activation du service DatabaseService s'oppère dans le fichier .env
 
-    ```diff
-    -- DB_HOST_STATUS=false
-    ++ DB_HOST_STATUS=true
-    ```
+```diff
+-- DB_HOST_STATUS=false
+++ DB_HOST_STATUS=true
+```
 
-## CRUD
+!!! info "Pour aller plus loin"
 
-Le CRUD (Create, Read, Update, Delete) est un ensemble d'opérations de base pour la gestion des données dans une base de données.
+    Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](../boost/dataservice.md)
 
-### Schéma de la base de données
 
-Pour les exemples suivants, nous allons utiliser une table `user` avec les champs `id`, `name` et `email`.
+## Schéma de la base de données
+
+Pour cet exemple, nous allons utiliser une base de données avec une table `ville` qui contient les champs suivants :
 
 ```sql
-CREATE TABLE `user` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(50) NOT NULL,
-  `email` VARCHAR(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+CREATE TABLE ville (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   nom VARCHAR(255) NOT NULL,
+   code_postal VARCHAR(10) NULL,
+   nombre_habitant INT NULL
+);
+
+INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Paris', '75000', 2200000);
+INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Marseille', '13000', 800000);
+INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Lyon', '69000', 500000);
 ```
 
-### Create
+Dans la configuration Docker, nous proposons d'utiliser PhpMyAdmin pour gérer la base de données.
 
-Pour créer un nouvel enregistrement dans la base de données, vous devez utiliser la méthode `insert` de la classe `DatabaseService`.
-
-```php
-// Recupere l'object PHP PDO
-$comBase = DatabaseService::getConnect();
-// Requete SQL
-$statementPDO = $comBase->query("INSERT INTO user (name, email) VALUES ('John Doe', 'ben@toto.fr')");
-```
 
 ### Read
 
@@ -55,31 +55,9 @@ Pour lire les enregistrements de la base de données, vous devez utiliser la mé
 // Recupere l'object PHP PDO
 $comBase = DatabaseService::getConnect();
 // Requete SQL
-$statementPDO = $comBase->query("SELECT * FROM user");
+$statementPDO = $comBase->query("SELECT * FROM ville");
 // Recuperation des résultats de la requete
 $users = $statementPDO->fetchAll();
-```
-
-### Update
-
-Pour mettre à jour un enregistrement dans la base de données, vous devez utiliser la méthode `update` de la classe `DatabaseService`.
-
-```php
-// Recupere l'object PHP PDO
-$comBase = DatabaseService::getConnect();
-// Requete SQL
-$statementPDO = $comBase->query("UPDATE user SET name='Jane Doe' WHERE id=1");
-```
-
-### Delete
-
-Pour supprimer un enregistrement de la base de données, vous devez utiliser la méthode `delete` de la classe `DatabaseService`.
-
-```php
-// Recupere l'object PHP PDO
-$comBase = DatabaseService::getConnect();
-// Requete SQL
-$statementPDO = $comBase->query("DELETE FROM user WHERE id=1");
 ```
 
 ## Utilisation avancée
@@ -90,7 +68,7 @@ Pour une utilisation plus avancée et sécurisée du CRUD, vous pouvez utiliser 
 // Recupere l'object PHP PDO
 $comBase = DatabaseService::getConnect();
 // Requete SQL préparée
-$statementPDO = $comBase->prepare("SELECT * FROM user WHERE id = :id");
+$statementPDO = $comBase->prepare("SELECT * FROM ville WHERE id = :id");
 $statementPDO->execute(['id' => 1]);
 // Recuperation des résultats de la requete
 $users = $statementPDO->fetchAll();
@@ -104,9 +82,3 @@ $users = $statementPDO->fetchAll();
     - Pour améliorer les performances des requêtes SQL
     - Pour faciliter la gestion des paramètres de la requête
     - Pour rendre le code plus lisible et maintenable
-
-## Exercice pratique
-
-Pour vous entrainer, voici un use case sur la gestion des villes avec une base de données :
-
-- [STEP 1 : Use case "VILLE"](use-case-ville.md)

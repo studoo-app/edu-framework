@@ -43,20 +43,20 @@ php bin/edu make:controller villeRead
 ```
 
 Cette commande va créer un fichier `VilleReadController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `config/routes.yaml` et créer un fichier `villeread.html.twig` dans le dossier `app/Template/villeread`.
-
-Voici l'arborecence du projet :
-
-``` hl_lines="5 8 9"
-├── app
-│   ├── Config
-│   │   └── routes.yaml
-│   ├── Controller
-│   │   └── VilleReadController.php
-│   └── Template
-│       ├── base.html.twig
-│       └── villeread
-│           └── villeread.html.twig
-```
+    
+    Voici l'arborecence du projet :
+    
+    ``` hl_lines="5 8 9"
+    ├── app
+    │   ├── Config
+    │   │   └── routes.yaml
+    │   ├── Controller
+    │   │   └── VilleReadController.php
+    │   └── Template
+    │       ├── base.html.twig
+    │       └── villeread
+    │           └── villeread.html.twig
+    ```
 
 Dans le fichier VilleReadController.php, vous devez ajouter :
 
