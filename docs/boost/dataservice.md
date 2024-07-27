@@ -13,7 +13,7 @@ DatabaseService implémente l'interface de [PHP Data Objects (PDO)](https://www.
 
 
 ## Prérequis
-Vous devez avoir une base de données MySQL ou MariaDB pour utiliser cette classe.
+Vous devez avoir une base de données MySQL, MariaDB ou SQLite pour utiliser cette classe.
 Quelques informations de connexion à la base de données sont nécessaires pour configurer la connexion à la base de données.
 
 
@@ -23,9 +23,15 @@ Pour utiliser la classe DatabaseService, vous devez renseigner les informations 
 
 Vous devez modifier les variables suivantes dans le fichier `.env` :
 
-- **DB_HOST_STATUS** : `true` pour activer la connexion à la base de données, `false` pour la désactiver
-- **DB_TYPE** : le type de base de données (mysql ou mariadb)
-- **DB_HOST** : l'adresse IP ou le nom du serveur de base de données
+
+| Variable | Valeur     | Description                                                                       |
+|--------|------------|-----------------------------------------------------------------------------------|
+| **DB_HOST_STATUS**       | true/false | `true` pour activer la connexion à la base de données, `false` pour la désactiver |
+| **DB_TYPE**  | IP         | l'adresse IP ou le nom du serveur de base de données                              |
+
+
+-  : le type de base de données (mysql ou mariadb)
+- **DB_HOST** : 
 - **DB_SOCKET** : le port de la base de données
 - **DB_USER** : le nom de l'utilisateur de la base de données
 - **DB_PASSWORD** : le mot de passe de l'utilisateur de la base de données
