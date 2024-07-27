@@ -112,7 +112,7 @@ class VilleController implements ControllerInterface
 		return TwigCore::getEnvironment()->render('ville/ville.html.twig',
 		    [
 		        "titre"   => 'VilleController',
-- 		        "request" => $request
+- 		        "request" => $request,
 + 		        "add_ville" => $request->get('nom_ville')
 		    ]
 		);
