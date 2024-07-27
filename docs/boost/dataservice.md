@@ -24,18 +24,15 @@ Pour utiliser la classe DatabaseService, vous devez renseigner les informations 
 Vous devez modifier les variables suivantes dans le fichier `.env` :
 
 
-| Variable | Valeur     | Description                                                                       |
-|--------|------------|-----------------------------------------------------------------------------------|
-| **DB_HOST_STATUS**       | true/false | `true` pour activer la connexion à la base de données, `false` pour la désactiver |
-| **DB_TYPE**  | IP         | l'adresse IP ou le nom du serveur de base de données                              |
-
-
--  : le type de base de données (mysql ou mariadb)
-- **DB_HOST** : 
-- **DB_SOCKET** : le port de la base de données
-- **DB_USER** : le nom de l'utilisateur de la base de données
-- **DB_PASSWORD** : le mot de passe de l'utilisateur de la base de données
-- **DB_NAME** : le nom de la base de données
+| Variable | Valeur par défaut | Description                                                                       |
+|--------|-------------------|-----------------------------------------------------------------------------------|
+| **DB_HOST_STATUS**       | false             | `true` pour activer la connexion à la base de données, `false` pour la désactiver |
+| **DB_TYPE**  | mysql             | le type de base de données `mysql` `mariadb` `sqlite`                             |
+| **DB_HOST**  | 127.0.0.1         | l'adresse IP ou le nom du serveur de base de données                              |
+| **DB_SOCKET**  | 3306              | le port (socket) de la base de données                                            |
+| **DB_USER**  | root              | le nom de l'utilisateur de la base de données                                      |
+| **DB_PASSWORD**  | root              | le mot de passe de l'utilisateur de la base de données                                   |
+| **DB_NAME**  | app_db              | le nom de la base de données                                  |
 
 Exemple de configuration de la base de données dans le fichier `.env` :
 
