@@ -65,7 +65,7 @@ INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES ('Lyon', '69000', 5
 
 ## Création de l'entité Ville et de la couche modèle (Repository)
 
-Nous allons reprendre la page sur [Construire un formulaire](build/controller-edu-post.md)
+Nous allons reprendre la page sur [Construire un formulaire](controller-edu-post.md)
 
 Voici l'arborecence actuelle de notre projet :
 
