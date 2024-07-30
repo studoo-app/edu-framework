@@ -22,6 +22,7 @@
 * [Contribuer](contributor/index.md)
     * [Code de conduite](contributor/code_of_conduct.md)
     * [Contribuer au projet](contributor/contributing.md)
+    * [Contribuer pour la docs](contributor/documentation.md)
 * Annexes
     * [Glossaire](annexes/glossaire.md)
     * [FAQ](annexes/faq.md)

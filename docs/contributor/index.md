@@ -4,6 +4,7 @@ Merci d'envisager de contribuer à notre projet ! Nous apprécions votre temps e
 
 - [Code de conduite](code_of_conduct.md)
 - [Ligne de contribution](contributing.md)
+- [Contribuer pour la documentation](documentation.md)
 
 !!! bug "Communiquez avec nous"
 
