@@ -147,7 +147,7 @@ Un moteur de template est un outil qui permet de séparer le code de présentati
 ### MVC
 Le modèle-vue-contrôleur (MVC) est un motif d'architecture logicielle destiné aux interfaces graphiques lancé en 1978 et très populaire pour les applications web.
 
-- [Architecture MVC](fr-mvc-edu.md){:target="_blank"}
+- [Architecture MVC](../build/concept-mvc.md){:target="_blank"}
 
 ## P
 

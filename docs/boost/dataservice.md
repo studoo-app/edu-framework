@@ -13,8 +13,9 @@ DatabaseService implémente l'interface de [PHP Data Objects (PDO)](https://www.
 
 
 ## Prérequis
-Vous devez avoir une base de données MySQL ou MariaDB pour utiliser cette classe.
+Vous devez avoir une base de données MySQL, MariaDB ou SQLite pour utiliser cette classe.
 Quelques informations de connexion à la base de données sont nécessaires pour configurer la connexion à la base de données.
+
 
 ## Installation
 
@@ -22,17 +23,20 @@ Pour utiliser la classe DatabaseService, vous devez renseigner les informations 
 
 Vous devez modifier les variables suivantes dans le fichier `.env` :
 
-- **DB_HOST_STATUS** : `true` pour activer la connexion à la base de données, `false` pour la désactiver
-- **DB_TYPE** : le type de base de données (mysql ou mariadb)
-- **DB_HOST** : l'adresse IP ou le nom du serveur de base de données
-- **DB_SOCKET** : le port de la base de données
-- **DB_USER** : le nom de l'utilisateur de la base de données
-- **DB_PASSWORD** : le mot de passe de l'utilisateur de la base de données
-- **DB_NAME** : le nom de la base de données
+
+| Variable | Valeur par défaut | Description                                                                       |
+|--------|-------------------|-----------------------------------------------------------------------------------|
+| **DB_HOST_STATUS**       | false             | `true` pour activer la connexion à la base de données, `false` pour la désactiver |
+| **DB_TYPE**  | mysql             | le type de base de données `mysql` `mariadb` `sqlite`                             |
+| **DB_HOST**  | 127.0.0.1         | l'adresse IP ou le nom du serveur de base de données                              |
+| **DB_SOCKET**  | 3306              | le port (socket) de la base de données                                            |
+| **DB_USER**  | root              | le nom de l'utilisateur de la base de données                                      |
+| **DB_PASSWORD**  | root              | le mot de passe de l'utilisateur de la base de données                                   |
+| **DB_NAME**  | app_db              | le nom de la base de données                                  |
 
 Exemple de configuration de la base de données dans le fichier `.env` :
 
-```
+```dotenv
 ## << Config Database
 ## pour activer la connexion à la base de données, il faut mettre DB_HOST_STATUS=true
 DB_HOST_STATUS=false

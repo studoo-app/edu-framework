@@ -236,3 +236,9 @@ tasks:
         else
           task docker-stop
         fi
+
+  start-doc:
+    cmds:
+      - |
+        source venv/bin/activate
+        mkdocs serve

@@ -50,7 +50,6 @@ De plus, veuillez vous assurer que votre code est bien organisé, facile à lire
 Code de conduite
 ----------------
 
-Notre projet suit le [Code de conduite](CODE\_DE\_CONDUITE.md). Veuillez le lire avant de contribuer à notre projet.
-
+Notre projet suit le [Code de conduite](CODE\_OF\_CONDUCT.md). Veuillez le lire avant de contribuer à notre projet.
 
 Merci pour vos contributions !

@@ -34,4 +34,4 @@ Pour installer le framework, vous devez suivre les instructions suivantes :
 !!! bug "Communiquez avec nous"
 
     Nous sommes à votre disposition pour vous aider à démarrer votre projet. N'hésitez pas à nous contacter pour toute question.
-    [Contactez-nous sur github discussions](https://github.com/studoo-app/edu-framework/discussions)
+    [Contactez-nous sur github discussions](https://github.com/studoo-app/edu-framework/discussions){:target="_blank"}

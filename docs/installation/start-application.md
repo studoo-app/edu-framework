@@ -28,6 +28,18 @@ Pour démarrer l'application, il suffit ouvrir un terminal :
     php -S localhost:8042 -t public
     ```
 
+Voici un exemple de résultat de la ligne de commande :
+
+<figure markdown="span">
+![Screen Start Edu App](../assets/screen-edu-start-cli.png)
+</figure>
+
+Voici un exemple de résultat de la page web :
+
+<figure markdown="span">
+![Screen Start Edu App](../assets/screen-edu-start-web.png)
+</figure>
+
 !!! info "Adresse de l'application"
 
     Cette commande va démarrer le serveur de développement à l'adresse [http://localhost:8042](http://localhost:8042){:target="_blank"}.

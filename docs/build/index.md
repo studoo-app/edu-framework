@@ -20,11 +20,7 @@ Pour créer un formulaire dans une page, vous devez suivre les instructions suiv
 
 ## 3. Gestion des données avec un service
 
-Pour gérer les données de votre application, vous devez suivre les instructions suivantes :
-
-- [Construire un CRUD](dataservice-crud.md)
-- [Use case "VILLE" : STEP 1](use-case-ville.md)
-- [Use case "VILLE" : STEP 2](use-case-ville-refactor.md)
+- Coming soon
 
 ## 4. Construire une commande CLI
 

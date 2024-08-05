@@ -30,7 +30,12 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install mkdocs
-        run: pip install mkdocs mkdocs-material markdown-callouts mkdocs-literate-nav mkdocs-git-revision-date-localized-plugin pip install mkdocs-git-committers-plugin-2
+        run: |
+          pip install mkdocs mkdocs-material
+          pip install markdown-callouts
+          pip install mkdocs-literate-nav
+          pip install mkdocs-git-revision-date-localized-plugin
+          pip install mkdocs-git-committers-plugin-2
       - name: Checkout
         uses: actions/checkout@v4
         with:

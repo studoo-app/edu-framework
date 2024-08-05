@@ -37,7 +37,85 @@ villedelete:
     httpMethod: [GET]
 ```
 
-Vous devez maintenant changer les noms dans les fichiers de controller et de vue.
+Et... aussi les appeler par leur nom ! En effet, vous pouvez dynamiquement les appeler par leur nom plutôt
+que par leur uri. 
+
+Le nom est affiché dans le fichier `app\Config\routes.yaml`
+
+Dans le fichier VilleCreateController.php, vous devez ajouter :
+
+```diff
+<?php
+
+namespace Controller;
+
+use Studoo\EduFramework\Core\Controller\ControllerInterface;
+use Studoo\EduFramework\Core\Controller\Request;
+use Studoo\EduFramework\Core\Service\DatabaseService;
+use Studoo\EduFramework\Core\View\TwigCore;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+++ use Studoo\EduFramework\Core\Controller\Route;
+
+class VilleCreateController implements ControllerInterface
+{
+	public function execute(Request $request): string|null
+	{   
+        if ($request->getHttpMethod() === 'POST') {
+            $comBase = DatabaseService::getConnect();
+            $statementPDO = $comBase->prepare("INSERT INTO ville (nom, code_postal, nombre_habitant) VALUES (:nom, :code_postal, :nb_habitant)");
+            $statementPDO->execute([
+                'nom' => $request->get('nom'),
+                'code_postal' => $request->get('code_postal'),
+                'nb_habitant' => (int) $request->get('nombre_habitant')
+            ]);
+
+--            header('Location: /villeread');
+++            header('Location: ' . (new Route())->getNameToPath('villeread'));
+        }
+
+		return TwigCore::getEnvironment()->render('villecreate/villecreate.html.twig',
+		    [
+		        "titre"   => 'VilleCreateController',
+		        "request" => $request
+		    ]
+		);
+	}
+}
+```
+
+Dans le fichier `villecreate.html.twig`, vous devez ajouter :
+
+```diff
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titre }}{% endblock %}
+
+{% block content %}
+<h1>{{ titre }}</h1>
+
+-- <form method="post" action="/villecreate">
+++ <form method="post" action="{{ getNameToPath('villecreate') }}">
+    <div class="form-group">
+        <label for="nom">Ville</label>
+        <input type="text" class="form-control" id="nom" name="nom">
+    </div>
+    <div class="form-group">
+        <label for="code_postal">Code postal</label>
+        <input type="text" class="form-control" id="code_postal" name="code_postal">
+    </div>
+        <div class="form-group">
+        <label for="nombre_habitant">Nombre d'habitant</label>
+        <input type="text" class="form-control" id="nombre_habitant" name="nombre_habitant">
+    </div>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+ </form>
+
+{% endblock %}
+```
+
+Vous devez maintenant changer les noms dans les fichiers de controller et de vue. A vous de jouer !
 
 > Vérifier en rejouant le CRUD de ville si les routes sont bien configurées.
 > {style="warning"}

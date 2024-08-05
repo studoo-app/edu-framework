@@ -21,7 +21,8 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 ## Démarrage rapide
 
-Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante :
+Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante dans un terminal :
+
 ```bash
 composer create-project studoo/edu-framework-skeleton my_project_name
 ```
@@ -31,7 +32,7 @@ Se rendre dans le dossier du projet :
 cd my_project_name
 ```
 
-Puis, saisir cette commande dans votre terminal :
+Cette commande va initialiser le projet Edu Framework :
 
 ````Bash 
 composer edu:init

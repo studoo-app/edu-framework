@@ -18,7 +18,7 @@ php bin/edu
     Ce résultat est un exemple et il ne sera probablement pas le vôtre.
 
     <figure markdown="span">
-    ![Screen Start Edu App](../assets/screen-edu-start.png)
+    ![Screen Start Edu App](../assets/screen-edu-start-cli.png)
     </figure>
 
 Pour voir les commandes disponibles, vous pouvez taper la commande suivante :

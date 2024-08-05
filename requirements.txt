@@ -1,0 +1,6 @@
+mkdocs
+mkdocs-material
+markdown-callouts
+mkdocs-literate-nav
+mkdocs-git-revision-date-localized-plugin
+mkdocs-git-committers-plugin-2

@@ -43,20 +43,20 @@ php bin/edu make:controller villeRead
 ```
 
 Cette commande va créer un fichier `VilleReadController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `config/routes.yaml` et créer un fichier `villeread.html.twig` dans le dossier `app/Template/villeread`.
-
-Voici l'arborecence du projet :
-
-``` hl_lines="5 8 9"
-├── app
-│   ├── Config
-│   │   └── routes.yaml
-│   ├── Controller
-│   │   └── VilleReadController.php
-│   └── Template
-│       ├── base.html.twig
-│       └── villeread
-│           └── villeread.html.twig
-```
+    
+    Voici l'arborecence du projet :
+    
+    ``` hl_lines="5 8 9"
+    ├── app
+    │   ├── Config
+    │   │   └── routes.yaml
+    │   ├── Controller
+    │   │   └── VilleReadController.php
+    │   └── Template
+    │       ├── base.html.twig
+    │       └── villeread
+    │           └── villeread.html.twig
+    ```
 
 Dans le fichier VilleReadController.php, vous devez ajouter :
 
@@ -292,6 +292,24 @@ php bin/edu make:controller villeUpdate
 ```
 
 Voici l'arborescence du projet :
+
+``` hl_lines="7 12 13"
+        ├── app
+        │   ├── Config
+        │   │   └── routes.yaml
+        │   ├── Controller
+        │   │   ├── VilleCreateController.php
+        │   │   ├── VilleReadController.php
+        │   │   └── VilleUpdateController.php
+        │   └── Template
+        │       ├── base.html.twig
+        │       ├── villecreate
+        │       │   └── villecreate.html.twig
+        │       ├── villeupdate
+        │       │   └── villeupdate.html.twig
+        │       └── villeread
+        │           └── villeread.html.twig
+```
 
 Pour modifier une ville, nous devons gérer sa modification via son idenfifiant (clé primaire). 
 
