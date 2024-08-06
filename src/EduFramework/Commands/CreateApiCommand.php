@@ -11,6 +11,7 @@
 namespace Studoo\EduFramework\Commands;
 
 use Nette\PhpGenerator\PhpFile;
+use PhpParser\Node\Expr\Array_;
 use Studoo\EduFramework\Commands\Exception\ControllerAlreadyExistsException;
 use Studoo\EduFramework\Commands\Exception\RouteAlreadyExistsException;
 use Studoo\EduFramework\Core\Controller\ControllerInterface;
@@ -69,9 +70,11 @@ class CreateApiCommand extends Command
         //Format controller-name arg
         $namesCollection = $this->getNamesCollection($input->getArgument('controller-name'));
         //Generate route params in app/Config/routes.yaml
-        $this->generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
+        $router = $this->generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
+        // Generate openapi.php
+        $this->generateOpenApi();
         //Generate Controller Class
-        $this->generateController($namesCollection["className"]);
+        $this->generateController($namesCollection["className"], $router);
         //Close command message
         $io->success("Controller successfully generated");
         return Command::SUCCESS;
@@ -106,10 +109,11 @@ class CreateApiCommand extends Command
     /**
      * Fonction permettant de générer la classe PHP
      * @param string $className Nom de la classe
+     * @param array $router Route générée
      * @return void
      * @throws ControllerAlreadyExistsException
      */
-    private function generateController(string $className): void
+    private function generateController(string $className, array $router): void
     {
         $filename = self::CONTROLLER_DIR . self::API_DIR .  "$className.php";
 
@@ -127,12 +131,15 @@ class CreateApiCommand extends Command
         $namespace->addUse('Twig\Error\LoaderError');
         $namespace->addUse('Twig\Error\RuntimeError');
         $namespace->addUse('Twig\Error\SyntaxError');
+        $namespace->addUse('OpenApi\Attributes');
         //Generate ClassName
         $class = $namespace->addClass($className);
         //Add interface implementation
         $class->addImplement(ControllerInterface::class);
         //Create and design execute method
         $method = $class->addMethod('execute');
+        $method->addAttribute('OpenApi\\Attributes\\Get', ['path' => $router['uri']]);
+        $method->addAttribute('OpenApi\\Attributes\\Response', ['response' => '200', 'description' => 'Mettre une description']);
         $method->setReturnType('string|null');
         $method->addParameter('request')->setType('Studoo\EduFramework\Core\Controller\Request');
         $method->setBody(<<<'CODE'
@@ -153,13 +160,13 @@ class CreateApiCommand extends Command
     /**
      * Fonction permettant d'ajouter la route au fichier de configuration
      * Par défaut la méthode lors de la génération est GET
-     * @param string $name
-     * @param string $uri
-     * @param string $className
-     * @return void
+     * @param string $name Nom de la route
+     * @param string $uri URI de la route
+     * @param string $className Nom de la classe
+     * @return array $router Route générée
      * @throws RouteAlreadyExistsException
      */
-    private function generateRoute(string $name, string $uri, string $className): void
+    private function generateRoute(string $name, string $uri, string $className): array
     {
         if (is_file(self::ROUTES_FILE_PATH) === false) {
             file_put_contents(self::ROUTES_FILE_PATH, '');
@@ -183,5 +190,22 @@ class CreateApiCommand extends Command
         ];
 
         file_put_contents(self::ROUTES_FILE_PATH, Yaml::dump($router));
+
+        return $router[$indexName . $name];
+    }
+
+    private function generateOpenApi(): void
+    {
+        $filename = self::CONTROLLER_DIR . self::API_DIR . 'openapi.php';
+        if (file_exists($filename) === true) {
+            return;
+        }
+
+        $file = new PhpFile();
+        $namespace = $file->addNamespace("Controller\api");
+        $namespace->addUse('OpenApi\Attributes');
+        $class = $namespace->addClass('openapi');
+        $class->addAttribute('OpenApi\\Attributes\\Info', ['title' => 'My First API', 'version' => '0.1']);
+        file_put_contents($filename, $file);
     }
 }
