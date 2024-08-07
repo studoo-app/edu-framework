@@ -76,7 +76,13 @@ class CreateApiCommand extends Command
         //Generate Controller Class
         $this->generateController($namesCollection["className"], $router);
         //Close command message
-        $io->success("Controller successfully generated");
+        $io->block(
+            [
+                "Class : " . self::CONTROLLER_DIR . self::API_DIR . $namesCollection["className"],
+                "URI : " . $router['uri']
+            ]
+        );
+        $io->success("Controller and route successfully generated");
         return Command::SUCCESS;
     }
 
