@@ -19,7 +19,7 @@
     }
   ],
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.2",
     "vlucas/phpdotenv": "^v5.5",
     "twig/twig": "^3.7",
     "nikic/fast-route": "^1.3",

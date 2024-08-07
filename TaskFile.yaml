@@ -38,7 +38,7 @@ vars:
   PHPUNIT: "php vendor/bin/phpunit"
   #
   # PHP QA TOOLS
-  PHPQA: jakzal/phpqa:php8.1-alpine
+  PHPQA: jakzal/phpqa:php8.2-alpine
   PHPQA_RUN: "{{.DOCKER_RUN}} --init -it --rm -v {{.PWD}}:/project -w /project {{.PHPQA}}"
   MYSQL_TESTING_RUN: "{{.DOCKER_RUN}} --init -it --rm -e MYSQL_ROOT_PASSWORD=studoo -e MYSQL_DATABASE=app_db -p 3309:3306 -d mysql:8.0 --name mysql-testing"
 
