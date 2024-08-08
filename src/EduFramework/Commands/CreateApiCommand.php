@@ -200,6 +200,10 @@ class CreateApiCommand extends Command
         return $router[$indexName . $name];
     }
 
+    /**
+     * Génération du fichier de base openapi
+     * @return void
+     */
     private function generateOpenApi(): void
     {
         $filename = self::CONTROLLER_DIR . self::API_DIR . 'openapi.php';
