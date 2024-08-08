@@ -1,3 +1,7 @@
+index:
+    uri: /
+    controller: Controller\HomeController
+    httpMethod: [GET]
 home:
     uri: /home
     controller: Controller\HomeController
