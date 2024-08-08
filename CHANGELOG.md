@@ -2,7 +2,24 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## v2.1.0 (en cours de dev)
+## v2.2.0 - 08/07/2024
+
+**new features**
+
+- [#112](https://github.com/studoo-app/edu-framework/issues/112) Implement OpenAPI @bfoujols
+
+**bug Fixes**
+
+- [#114](https://github.com/studoo-app/edu-framework/issues/114) Update PHP version 8.1 -> 8.2 @bfoujols
+- [#116](https://github.com/studoo-app/edu-framework/pull/116) Add Tests for OpenAPI, Command Cli @bfoujols
+
+> Release notes for v2.2.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.2.0](https://github.com/studoo-app/edu-framework/milestone/17)
+
+<br>
+
+## v2.1.0 - 20/06/2024
 
 **new features**
 
@@ -20,7 +37,7 @@
 >
 > [https://github.com/studoo-app/edu-framework/milestone/v2.1.0](https://github.com/studoo-app/edu-framework/milestone/12)
 
-  <br>
+<br>
 
 ## v2.0.2 - 24/05/2024
 
