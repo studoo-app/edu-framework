@@ -1,0 +1,24 @@
+index:
+    uri: /
+    controller: Controller\HomeController
+    httpMethod: [GET]
+home:
+    uri: /home
+    controller: Controller\HomeController
+    httpMethod: [GET]
+link:
+    uri: /link
+    controller: Controller\LinkController
+    httpMethod: [GET]
+user:
+    uri: /user/{id}
+    controller: Controller\UserController
+    httpMethod: [GET,POST]
+userUpdate:
+    uri: /user/{id}/update
+    controller: Controller\UserController
+    httpMethod: [GET,POST]
+userName:
+    uri: /user/{id:\d+}[/{name}]
+    controller: Controller\UserController
+    httpMethod: [GET,POST]
