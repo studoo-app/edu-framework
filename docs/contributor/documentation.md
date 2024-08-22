@@ -91,7 +91,7 @@ Pour installer MKdocs, tapez la commande suivante :
 Cette commande va installer MKdocs et les dépendances nécessaires.
 
 ```bash
-python -m pip install requirements.txt
+python -m pip install -r requirements.txt
 ```
 !!! abstract "Pour aller plus loin"
 
