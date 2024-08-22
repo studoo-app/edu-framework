@@ -15,6 +15,10 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 > Ce framework n'est pas adapté à une utilisation en production. Il est destiné à des fins pédagogiques.
 
+## Documentation
+
+Voici la documentation en ligne : [https://studoo-app.github.io/edu-framework/](https://studoo-app.github.io/edu-framework/)
+
 ## Démarrage rapide
 
 Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante dans un terminal :
