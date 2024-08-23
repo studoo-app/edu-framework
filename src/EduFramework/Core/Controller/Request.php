@@ -166,4 +166,13 @@ class Request
         $this->route = $route;
         return $this;
     }
+
+    /**
+     * Permet de récupérer le body de la requête HTTP
+     * @return string
+     */
+    public function getBody(): false|string
+    {
+        return file_get_contents('php://input');
+    }
 }
