@@ -133,10 +133,6 @@ class CreateApiCommand extends Command
         //Add Imports
         $namespace->addUse('Studoo\EduFramework\Core\Controller\ControllerInterface');
         $namespace->addUse('Studoo\EduFramework\Core\Controller\Request');
-        $namespace->addUse('Studoo\EduFramework\Core\View\TwigCore');
-        $namespace->addUse('Twig\Error\LoaderError');
-        $namespace->addUse('Twig\Error\RuntimeError');
-        $namespace->addUse('Twig\Error\SyntaxError');
         $namespace->addUse('OpenApi\Attributes');
         //Generate ClassName
         $class = $namespace->addClass($className);
