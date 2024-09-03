@@ -106,6 +106,12 @@ markdown_extensions:
   - md_in_html
 
 plugins:
+  - social:
+      cards_layout: default/invert
+      cards_layout_options:
+        title: Light Education PHP framework
+        description: "Documentation Edu Framework PHP Light Education"
+        logo: assets/studoo-edu.svg
   - offline
   - search
   - literate-nav:

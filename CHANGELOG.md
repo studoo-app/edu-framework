@@ -2,7 +2,24 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## v2.2.0 - 08/07/2024
+## v2.2.1 - 23/08/2024
+
+**new features**
+
+- [#119](https://github.com/studoo-app/edu-framework/issues/119) add Request::getBody() @bfoujols
+
+**bug Fixes**
+
+- [#117](https://github.com/studoo-app/edu-framework/issues/117) Fix class not use in API controller @bfoujols
+- Fix Doc install pip package
+
+> Release notes for v2.2.1
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.2.1](https://github.com/studoo-app/edu-framework/milestone/18)
+
+<br>
+
+## v2.2.0 - 08/08/2024
 
 **new features**
 
