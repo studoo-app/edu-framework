@@ -15,6 +15,10 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 > Ce framework n'est pas adapté à une utilisation en production. Il est destiné à des fins pédagogiques.
 
+## Documentation
+
+Voici la documentation en ligne : [https://studoo-app.github.io/edu-framework/](https://studoo-app.github.io/edu-framework/)
+
 ## Démarrage rapide
 
 Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante dans un terminal :
@@ -51,9 +55,11 @@ L'état des pipelines de développement est disponible :
 | Edu Framework documentation | main    | [![Deploy](https://github.com/studoo-app/edu-framework-doc/actions/workflows/deploy.yml/badge.svg)](https://github.com/studoo-app/edu-framework-doc)               |
 | Edu Framework | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
 
-## Equipe de développement
-L'équipe de développement du projet "Edu Framework" est composée de développeurs expérimentés et passionnés par l'enseignement et la transmission du savoir. 
-Un collectif, appelé [Studoo](https://github.com/studoo-app), est né autour de ces projets pour partager et contribuer à l'amélioration continue des outils pédagogiques.
+## Dashboard 
+
+![Alt](https://repobeats.axiom.co/api/embed/a46fce2a15244cb1f57a05fa73692ee5253d4296.svg "Repobeats analytics image")
+
+## Teams Core Studoo
 
 - **Founder / Lead tech** : [Benoit Foujols](https://github.com/bfoujols)
 - **Lead dev** : [Julien Pechberty](https://github.com/JPechberty)

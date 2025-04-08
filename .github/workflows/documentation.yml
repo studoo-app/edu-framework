@@ -36,6 +36,8 @@ jobs:
           pip install mkdocs-literate-nav
           pip install mkdocs-git-revision-date-localized-plugin
           pip install mkdocs-git-committers-plugin-2
+          pip install pillow 
+          pip install cairosvg
       - name: Checkout
         uses: actions/checkout@v4
         with:

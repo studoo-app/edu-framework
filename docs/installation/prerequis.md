@@ -169,7 +169,7 @@ php -v
     scoop bucket add versions
     ```
     ```bash
-    scoop install versions/php82
+    scoop install versions/php83
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=php](https://scoop.sh/#/apps?q=php&id=5101819badef2a2c45455bdb63c0036655741250){:target="_blank"}
@@ -189,7 +189,7 @@ php -v
     Pour installation PHP, ouvrez un terminal
     
     ```bash
-    brew install php@8.2
+    brew install php@8.3
     ```
 
     Pour plus informations, visitez le site [https://formulae.brew.sh/formula/php](https://formulae.brew.sh/formula/php#default){:target="_blank"}
