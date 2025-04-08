@@ -35,6 +35,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class StartCommand extends CommandManage
 {
+    /**
+     * Configure la commande en ajoutant les options nécessaires.
+     *
+     * Cette méthode est appelée pour configurer la commande avant son exécution.
+     * Elle permet d'ajouter des options à la commande, comme le port d'écoute
+     * du serveur de développement. L'option 'port' peut être spécifiée en
+     * utilisant `-p` ou `--port` dans la ligne de commande. Si aucune valeur
+     * n'est fournie, la valeur par défaut de 8042 sera utilisée.
+     *
+     * @return void
+     */
     protected function configure(): void
     {
         parent::configure();
