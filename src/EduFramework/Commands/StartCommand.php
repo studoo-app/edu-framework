@@ -89,7 +89,7 @@ class StartCommand extends CommandManage
             'Pour arrêter le serveur de développement, appuyer sur CTRL+X CTRL+C'
         );
 
-        exec("Composer\\Config::disableProcessTimeout",);
+//        exec("Composer\\Config::disableProcessTimeout",);
         exec("php -S localhost:$port -t public");
 
         return Command::SUCCESS;
