@@ -17,6 +17,7 @@ use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -34,11 +35,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class StartCommand extends CommandManage
 {
+    protected function configure(): void
+    {
+        parent::configure();
+
+        $this->addOption(
+            'port',
+            'p',
+            InputOption::VALUE_OPTIONAL,
+            "Port d\'écoute du serveur de développement",
+            8042
+        );
+    }
+
     /**
      * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Récupération du port en option
+        $port = $input->getOption('port');
+
         self::$stdOutput->writeln([
             CommandBanner::getBanner(),
             'Check des prérequis d\'' . ConfigCore::getConfig('name'),
@@ -61,7 +78,8 @@ class StartCommand extends CommandManage
             'Pour arrêter le serveur de développement, appuyer sur CTRL+X CTRL+C'
         );
 
-        exec("composer edu:start");
+        exec("Composer\\Config::disableProcessTimeout",);
+        exec("php -S localhost:$port -t public");
 
         return Command::SUCCESS;
     }
