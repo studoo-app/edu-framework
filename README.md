@@ -7,7 +7,10 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/studoo-app/edu-framework/badge)](https://www.codefactor.io/repository/github/studoo-app/edu-framework)
 [![Latest Stable Version](https://poser.pugx.org/studoo/edu-framework/v)](https://packagist.org/packages/studoo/edu-framework)
 [![Total Downloads](https://poser.pugx.org/studoo/edu-framework/downloads)](https://packagist.org/packages/studoo/edu-framework)
-[![License](https://poser.pugx.org/studoo/edu-framework/license)](https://packagist.org/packages/studoo/edu-framework)
+[![License](https://poser.pugx.org/studoo/edu-framework/license)](https://packagist.org/packages/studoo/edu-framework) \
+[![DeepSource](https://app.deepsource.com/gh/studoo-app/edu-framework.svg/?label=active+issues&show_trend=true&token=JAPelQzMwu64R4rtyb8XUGZP)](https://app.deepsource.com/gh/studoo-app/edu-framework/)
+[![DeepSource](https://app.deepsource.com/gh/studoo-app/edu-framework.svg/?label=resolved+issues&show_trend=true&token=JAPelQzMwu64R4rtyb8XUGZP)](https://app.deepsource.com/gh/studoo-app/edu-framework/)
+
 
 Le projet "Edu Framework" vise à répondre à une problématique récurrente identifiée lors de nos formations : "Comment faire une transition vers un framework Symfony ?".
 

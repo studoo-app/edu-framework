@@ -71,14 +71,14 @@ class StartCommand extends CommandManage
     /**
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, \Symfony\Component\Console\Output\ConsoleOutputInterface|OutputInterface $output): int
     {
         // Récupération du port en option
         $port = $input->getOption('port');
         $noCheck = $input->getOption('no-start');
 
         if ($noCheck === false) {
-            $animationSlash = self::$outPut->section();
+            $animationSlash = $output->section();
             for ($slash = 0; $slash <= 5; $slash++) {
                 $animationSlash->writeln([
                     CommandBanner::getBanner($slash)
@@ -93,7 +93,7 @@ class StartCommand extends CommandManage
             ''
         ]);
 
-        $check = new CkeckStack($output, self::$stdOutput);
+        $check = new CkeckStack(self::$outPut, self::$stdOutput);
         $check->render();
 
         //self::$stdOutput->info();
