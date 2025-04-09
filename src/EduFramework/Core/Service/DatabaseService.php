@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Edu Framework by studoo
  *
@@ -49,7 +50,6 @@ class DatabaseService
      * Permets de récupérer la connexion à la base de données
      *
      * @return PDO
-     * @throws Exception
      */
     public static function getConnect(): PDO
     {

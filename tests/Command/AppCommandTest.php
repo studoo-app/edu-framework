@@ -10,6 +10,10 @@ class AppCommandTest extends TestCase
 {
     public function testCommandDefault(): void
     {
+        $_ENV["DB_TYPE"] = "mysql";
+        $_ENV["DB_PASSWORD"] = "studoo";
+        $_ENV["DB_SOCKET"] = "8006";
+
         $application = new AppCommand();
         $command = $application->find("default");
         $commandeTester = new CommandTester($command);

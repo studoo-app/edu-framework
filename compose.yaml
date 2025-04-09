@@ -9,12 +9,44 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: app_db
-      MYSQL_ROOT_PASSWORD: studoo
+      MYSQL_ROOT_PASSWORD: studoo # Si tu changes le mot de passe root, change aussi le mot de passe dans le fichier .env et dans la config du service dbgate
       #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      #MYSQL_USER: app_db_user
-      #MYSQL_PASSWORD: app_db_password
+      MYSQL_USER: app_db_user
+      MYSQL_PASSWORD: app_db_password
     volumes:
       - ./var/dbdata:/var/lib/mysql
+  mailer:
+    container_name: edu-web-mailer
+    image: axllent/mailpit
+    ports:
+      - "1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+  dbgate:
+    container_name: edu-web-dbgate
+    image: dbgate/dbgate
+    restart: always
+    ports:
+      - 8082:3000
+    volumes:
+      - ./var/dbgate:/root/.dbgate
+      - ./var/sqlite:/home/jan
+    environment:
+      CONNECTIONS: con1,con2
+
+      LABEL_con1: MySql
+      SERVER_con1: database
+      USER_con1: root
+      PASSWORD_con1: studoo
+      PORT_con1: 3306
+      ENGINE_con1: mysql@dbgate-plugin-mysql
+
+      LABEL_con2: SQLite
+      FILE_con2: /home/jan/app_db.sqlite
+      ENGINE_con2: sqlite@dbgate-plugin-sqlite
+
   phpmyadmin:
     container_name: edu-web-pma
     image: phpmyadmin/phpmyadmin
@@ -30,9 +62,6 @@ services:
     restart: always
     links:
       - database
-  mailer:
-    container_name: edu-web-mailer
-    image: schickling/mailcatcher
-    ports: [ "1025:1025", "1080:1080" ]
 volumes:
-  dbdata:
+  dbgate-data:
+    driver: local

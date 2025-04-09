@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Ce fichier fait partie du Studoo
  *

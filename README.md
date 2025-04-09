@@ -19,32 +19,6 @@ L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de gui
 
 Voici la documentation en ligne : [https://studoo-app.github.io/edu-framework/](https://studoo-app.github.io/edu-framework/)
 
-## Démarrage rapide
-
-Pour créer un nouveau projet Edu Framework, vous pouvez utiliser la commande suivante dans un terminal :
-
-```bash
-composer create-project studoo/edu-framework-skeleton my_project_name
-```
-
-Se rendre dans le dossier du projet :
-```bash
-cd my_project_name
-```
-
-Cette commande va initialiser le projet Edu Framework :
-
-````Bash 
-composer edu:init
-````
-
-Pour démarrer le serveur de développement, vous pouvez utiliser la commande suivante :
-```bash
-php bin/edu start
-```
-
-> [Découvrez comment démarrer votre projet](https://studoo-app.github.io/edu-framework/)
-
 ## CI pipelines
 
 L'état des pipelines de développement est disponible :
@@ -61,5 +35,7 @@ L'état des pipelines de développement est disponible :
 
 ## Teams Core Studoo
 
-- **Founder / Lead tech** : [Benoit Foujols](https://github.com/bfoujols)
-- **Lead dev** : [Julien Pechberty](https://github.com/JPechberty)
+| Role                      | Name             |
+|---------------------------|------------------|
+| Founder / Lead tech       | [Benoit Foujols](https://github.com/bfoujols)|
+|Lead dev| [Julien Pechberty](https://github.com/JPechberty) |
