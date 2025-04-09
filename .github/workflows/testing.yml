@@ -30,7 +30,8 @@ jobs:
           MYSQL_ROOT_PASSWORD: studoo
           #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
-          - 3306:3306
+          - 8006:8006
+        command: --port=8006
     strategy:
         fail-fast: true
         matrix:
@@ -58,7 +59,7 @@ jobs:
       - name: Wait for MySQL
         run: |
           sudo apt-get install -y netcat-traditional
-          while ! nc -z 127.0.0.1 3306; do   
+          while ! nc -z 127.0.0.1 8006; do   
             sleep 1
             echo "Waiting for MySQL..."
           done
