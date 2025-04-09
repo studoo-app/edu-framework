@@ -57,7 +57,7 @@ jobs:
 
       - name: Wait for MySQL
         run: |
-          sudo apt-get install -y netcat
+          sudo apt-get install -y netcat-traditional
           while ! nc -z 127.0.0.1 3306; do   
             sleep 1
             echo "Waiting for MySQL..."
