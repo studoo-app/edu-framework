@@ -25,8 +25,7 @@ class StartCommandTest extends TestCase
     }
     public function testCommandWithCustomPort(): void
     {
-        $this->commandeTester->execute(['--port' => 9000]);
-        $this->commandeTester->getInput()->setInteractive(false);
+        $this->commandeTester->execute(['--port' => 9000, '--no-start' => true]);
         $output = $this->commandeTester->getDisplay();
         $this->assertStringContainsString('php -S localhost:9000 -t public', $output);
     }

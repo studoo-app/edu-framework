@@ -44,6 +44,7 @@ class StartCommand extends CommandManage
      * du serveur de développement. L'option 'port' peut être spécifiée en
      * utilisant `-p` ou `--port` dans la ligne de commande. Si aucune valeur
      * n'est fournie, la valeur par défaut de 8042 sera utilisée.
+     * L'option 'no-check' permet de ne pas démarrer le service.
      *
      * @return void
      */
@@ -58,6 +59,13 @@ class StartCommand extends CommandManage
             "Port d\'écoute du serveur de développement",
             8042
         );
+
+        $this->addOption(
+            'no-start',
+            null,
+            InputOption::VALUE_NONE,
+            'Ne pas démarrer le service'
+        );
     }
 
     /**
@@ -67,6 +75,7 @@ class StartCommand extends CommandManage
     {
         // Récupération du port en option
         $port = $input->getOption('port');
+        $noCheck = $input->getOption('no-start');
 
         self::$stdOutput->writeln([
             CommandBanner::getBanner(),
@@ -91,6 +100,14 @@ class StartCommand extends CommandManage
             'Pour arrêter le serveur de développement, appuyer sur CTRL+X CTRL+C'
         );
 
+        if ($noCheck === true) {
+            self::$stdOutput->writeln([
+                '',
+                'Le service ne sera pas démarré',
+                ''
+            ]);
+            return Command::SUCCESS;
+        }
         exec("php -S localhost:$port -t public");
 
         return Command::SUCCESS;
