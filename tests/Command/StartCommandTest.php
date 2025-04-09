@@ -3,8 +3,6 @@
 namespace Command;
 
 use PHPUnit\Framework\TestCase;
-use Studoo\EduFramework\Commands\DefaultCommand;
-use Studoo\EduFramework\Commands\Extends\AppCommand;
 use Studoo\EduFramework\Commands\StartCommand;
 use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Application;
@@ -16,9 +14,9 @@ class StartCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $command = new StartCommand();
-        $application->add($command);
-        $this->commandeTester = new CommandTester($application->get("start"));
+        $application->add(new StartCommand());
+        $command = $application->find("start");
+        $this->commandeTester = new CommandTester($command);
     }
 
     protected function tearDown(): void
@@ -28,6 +26,7 @@ class StartCommandTest extends TestCase
     public function testCommandWithCustomPort(): void
     {
         $this->commandeTester->execute(['--port' => 9000]);
+        $this->commandeTester->getInput()->setInteractive(false);
         $output = $this->commandeTester->getDisplay();
         $this->assertStringContainsString('php -S localhost:9000 -t public', $output);
     }
