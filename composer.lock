@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7813f19d8e460380ab13e1b4ac9cccc4",
+    "content-hash": "4073aa6c8fa694dbbbd141489ece9eca",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -1224,6 +1224,67 @@
                 }
             ],
             "time": "2024-06-19T12:30:46+00:00"
+        },
+        {
+            "name": "symfony/process",
+            "version": "7.3.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "d65479e099c5e23ce6d9f1d975faeeaad90b1c5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/d65479e099c5e23ce6d9f1d975faeeaad90b1c5b",
+                "reference": "d65479e099c5e23ce6d9f1d975faeeaad90b1c5b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Executes commands in sub-processes",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/process/tree/7.3"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-03-13T12:25:57+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -4282,8 +4343,11 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "nette/php-generator": 20,
-        "zircote/swagger-php": 20,
-        "roave/security-advisories": 20
+        "roave/security-advisories": 20,
+        "symfony/filesystem": 20,
+        "symfony/process": 20,
+        "twig/twig": 20,
+        "zircote/swagger-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -4291,6 +4355,6 @@
         "php": ">=8.2",
         "ext-pdo": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
