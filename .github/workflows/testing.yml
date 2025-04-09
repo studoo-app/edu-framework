@@ -68,7 +68,7 @@ jobs:
         run: sleep 15
 
       - name: Generate SQL
-        run: mysql -h 127.0.0.1 -u root -p${{secrets.MYSQL_PWD}} app_db < tests/Config/EtudiantMysql.sql
+        run: mysql -h 127.0.0.1 -P 8006 -u root -p${{secrets.MYSQL_PWD}} app_db < tests/Config/EtudiantMysql.sql
 
       - name: Install dependencies
         run: composer self-update && composer install && composer dump-autoload
