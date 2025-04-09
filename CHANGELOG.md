@@ -2,6 +2,27 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.3.0 - 10/04/2025
+
+**new features**
+
+- [#69](https://github.com/studoo-app/edu-framework/issues/69) Add custom listening socket (#69) Thanks @CapelleGab
+- [#122](https://github.com/studoo-app/edu-framework/issues/122) Add Manage DB by dbgate @bfoujols
+- [#120](https://github.com/studoo-app/edu-framework/issues/120) Add MailPit Service @bfoujols
+- [#97](https://github.com/studoo-app/edu-framework/issues/97) Add slash command @bfoujols
+
+**bug Fixes**
+
+- [#130](https://github.com/studoo-app/edu-framework/issues/130) github action E: Package 'netcat' has no installation candidate @bfoujols
+- [#129](https://github.com/studoo-app/edu-framework/issues/129) run command taskfile before-commit @bfoujols
+
+> Release notes for v2.3.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.0](https://github.com/studoo-app/edu-framework/milestone/19)
+
+<br>
+
+
 ## v2.2.1 - 23/08/2024
 
 **new features**

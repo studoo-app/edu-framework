@@ -27,6 +27,6 @@ class StartCommandTest extends TestCase
     {
         $this->commandeTester->execute(['--port' => 9000, '--no-start' => true]);
         $output = $this->commandeTester->getDisplay();
-        $this->assertStringContainsString('php -S localhost:9000 -t public', $output);
+        $this->assertStringContainsString('localhost:9000', $output);
     }
 }

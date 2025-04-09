@@ -77,8 +77,18 @@ class StartCommand extends CommandManage
         $port = $input->getOption('port');
         $noCheck = $input->getOption('no-start');
 
+        if ($noCheck === false) {
+            $animationSlash = self::$outPut->section();
+            for ($slash = 0; $slash <= 5; $slash++) {
+                $animationSlash->writeln([
+                    CommandBanner::getBanner($slash)
+                ]);
+                usleep(500000); // (0.5 seconde)
+                $slash < 5 ? $animationSlash->clear() : "";
+            }
+        }
+
         self::$stdOutput->writeln([
-            CommandBanner::getBanner(),
             'Check des prérequis d\'' . ConfigCore::getConfig('name'),
             ''
         ]);
@@ -92,7 +102,7 @@ class StartCommand extends CommandManage
             '',
             CommandBanner::getDoc(),
             'Démarage du serveur de développement...',
-            "php -S localhost:$port -t public",
+            "L'application est disponible à l'adresse suivante : http://localhost:$port",
             ''
         ]);
 
