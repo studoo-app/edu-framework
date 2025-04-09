@@ -45,22 +45,67 @@ class CommandBanner
      * @throws \Exception
      * @var $message string Add text in banner
      */
-    public static function getBanner(): ?string
+    public static function getBanner($slash = 5): ?string
     {
         $date = new \DateTime("now", new DateTimeZone("Europe/Paris"));
         self::$timeExecStart = $date;
         self::$timeExecStartMicro = microtime(true);
 
-        $banner = "<info>";
-        $banner .= "           _          __                           \n";
-        $banner .= "   ___  __| |_   _   / _|_ __ __ _ _ __ ___   ___  \n";
-        $banner .= "  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \ / _ \ \n";
-        $banner .= " |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/ \n";
-        $banner .= "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___| \n";
-        $banner .= "                        </info><comment>" . ConfigCore::getConfig('version') . " ";
-        $banner .= ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+        $banner[0] =   "<comment>" .
+            "           _        \n" .
+            "   ___  __| |_   _  \n" .
+            "  / _ \/ _` | | | | \n" .
+            " |  __/ (_| | |_| | \n" .
+            "  \___|\__,_|\__,_| \n" .
+            "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
 
-        return $banner;
+        $banner[1] =   "<info>" .
+            "           _          __ \n" .
+            "   ___  __| |_   _   / _|\n" .
+            "  / _ \/ _` | | | | | |_|\n" .
+            " |  __/ (_| | |_| | |  _|\n" .
+            "  \___|\__,_|\__,_| |_| |\n" .
+            "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+
+        $banner[2] =   "<comment>" .
+            "           _          __      \n" .
+            "   ___  __| |_   _   / _|_ __ \n" .
+            "  / _ \/ _` | | | | | |_| '__/\n" .
+            " |  __/ (_| | |_| | |  _| | | \n" .
+            "  \___|\__,_|\__,_| |_| |_|   \n" .
+            "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
+
+        $banner[3] =   "<info>" .
+            "           _          __           \n" .
+            "   ___  __| |_   _   / _|_ __ __ _ \n" .
+            "  / _ \/ _` | | | | | |_| '__/ _` |\n" .
+            " |  __/ (_| | |_| | |  _| | | (_| |\n" .
+            "  \___|\__,_|\__,_| |_| |_|  \__,_|\n" .
+            "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+
+        $banner[4] =   "<comment>" .
+            "           _          __                      \n" .
+            "   ___  __| |_   _   / _|_ __ __ _ _ __ ___   \n" .
+            "  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \  \n" .
+            " |  __/ (_| | |_| | |  _| | | (_| | | | | | | \n" .
+            "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_| \n" .
+            "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
+
+        $banner[5] =   "<info>" .
+            "           _          __                           \n" .
+            "   ___  __| |_   _   / _|_ __ __ _ _ __ ___   ___  \n" .
+            "  / _ \/ _` | | | | | |_| '__/ _` | '_ ` _ \ / _ \ \n" .
+            " |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/ \n" .
+            "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___| \n" .
+            "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
+            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+
+        return $banner[$slash] ?? $banner[5];
     }
 
     /**

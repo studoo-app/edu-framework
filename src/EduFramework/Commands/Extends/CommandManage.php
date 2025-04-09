@@ -23,6 +23,8 @@ class CommandManage extends Command
      */
     protected static SymfonyStyle $stdOutput;
 
+    protected static OutputInterface $outPut;
+
     /**
      * Initialisation
      *
@@ -42,6 +44,7 @@ class CommandManage extends Command
         }
 
         self::$stdOutput = new SymfonyStyle($input, $output);
+        self::$outPut = $output;
     }
 
     /**

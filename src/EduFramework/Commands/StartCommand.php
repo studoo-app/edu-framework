@@ -19,7 +19,9 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * Class StartCommand
@@ -71,19 +73,29 @@ class StartCommand extends CommandManage
     /**
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, ConsoleOutputInterface|OutputInterface $output): int
     {
         // Récupération du port en option
         $port = $input->getOption('port');
         $noCheck = $input->getOption('no-start');
 
+        if ($noCheck === false) {
+            $animationSlash = $output->section();
+            for ($slash = 0; $slash <= 5; $slash++) {
+                $animationSlash->writeln([
+                    CommandBanner::getBanner($slash)
+                ]);
+                usleep(500000); // (0.5 seconde)
+                $slash < 5 ? $animationSlash->clear() : "";
+            }
+        }
+
         self::$stdOutput->writeln([
-            CommandBanner::getBanner(),
             'Check des prérequis d\'' . ConfigCore::getConfig('name'),
             ''
         ]);
 
-        $check = new CkeckStack($output, self::$stdOutput);
+        $check = new CkeckStack(self::$outPut, self::$stdOutput);
         $check->render();
 
         //self::$stdOutput->info();
@@ -92,7 +104,7 @@ class StartCommand extends CommandManage
             '',
             CommandBanner::getDoc(),
             'Démarage du serveur de développement...',
-            "php -S localhost:$port -t public",
+            "L'application est disponible à l'adresse suivante : http://localhost:$port",
             ''
         ]);
 
@@ -108,7 +120,15 @@ class StartCommand extends CommandManage
             ]);
             return Command::SUCCESS;
         }
-        exec("php -S localhost:$port -t public");
+
+        $process = new Process(['php', '-S', 'localhost:' . $port, '-t', 'public']);
+        $process->run(function ($type, $buffer): void {
+            if (Process::ERR === $type) {
+                echo 'ERR > '.$buffer;
+            } else {
+                echo 'OUT > '.$buffer;
+            }
+        });
 
         return Command::SUCCESS;
     }
