@@ -48,6 +48,7 @@ class DatabaseServiceTest extends TestCase
 
         $_ENV["DB_TYPE"] = "mysql";
         $_ENV["DB_PASSWORD"] = "studoo";
+        $_ENV["DB_SOCKET"] = "8006";
 
         new DatabaseService();
         $this->assertInstanceOf(PDO::class, DatabaseService::getConnect());

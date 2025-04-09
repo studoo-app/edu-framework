@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Edu Framework by studoo
  *
@@ -164,7 +165,7 @@ class CreateControllerCommand extends Command
      */
     private function generateRoute(string $name, string $uri, string $className): void
     {
-        if(is_file(self::ROUTES_FILE_PATH) === false) {
+        if (is_file(self::ROUTES_FILE_PATH) === false) {
             file_put_contents(self::ROUTES_FILE_PATH, '');
         }
 
