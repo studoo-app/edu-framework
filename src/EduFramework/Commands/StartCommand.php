@@ -79,7 +79,7 @@ class StartCommand extends CommandManage
         $port = $input->getOption('port');
         $noCheck = $input->getOption('no-start');
 
-        if ($noCheck === false) {
+        if ($noCheck === false && $output instanceof ConsoleOutputInterface) {
             $animationSlash = $output->section();
             for ($slash = 0; $slash <= 5; $slash++) {
                 $animationSlash->writeln([
