@@ -122,6 +122,7 @@ class StartCommand extends CommandManage
         }
 
         $process = new Process(['php', '-S', 'localhost:' . $port, '-t', 'public']);
+        $process->setTimeout(null);
         $process->run(function ($type, $buffer): void {
             if (Process::ERR === $type) {
                 echo 'ERR > '.$buffer;
