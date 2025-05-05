@@ -70,6 +70,7 @@ class CkeckStack
             '<info>Extension check : </info>',
         ]);
 
+        $this->checkExtension('pdo_sqlite');
         $this->checkExtension('pdo_mysql');
         $this->checkExtension('mbstring');
         $this->checkExtension('openssl');

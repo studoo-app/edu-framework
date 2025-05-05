@@ -98,8 +98,6 @@ class StartCommand extends CommandManage
         $check = new CkeckStack(self::$outPut, self::$stdOutput);
         $check->render();
 
-        //self::$stdOutput->info();
-
         self::$stdOutput->writeln([
             '',
             CommandBanner::getDoc(),
@@ -124,10 +122,9 @@ class StartCommand extends CommandManage
         $process = new Process(['php', '-S', 'localhost:' . $port, '-t', 'public']);
         $process->setTimeout(null);
         $process->run(function ($type, $buffer): void {
-            if (Process::ERR === $type) {
-                echo 'ERR > '.$buffer;
-            } else {
-                echo 'OUT > '.$buffer;
+            if (!str_contains($buffer, 'Accepted') && !str_contains($buffer, 'Closing')) {
+                    self::$stdOutput->write($buffer);
+                    //(new BufferToServer($buffer))->getFormatBuffer();
             }
         });
 
