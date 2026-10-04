@@ -97,7 +97,7 @@ class DebugLogsController implements ControllerInterface
      */
     private function filterStatus(string|null $status): string|null
     {
-        return $this->filterPattern($status, '/^[1-5]\d{0,2}$/');
+        return $this->filterPattern($status, '/^(?:[2-5]|[1-5]\d{2})$/');
     }
 
     /**
