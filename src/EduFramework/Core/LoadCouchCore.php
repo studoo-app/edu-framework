@@ -12,6 +12,7 @@
 namespace Studoo\EduFramework\Core;
 
 use Dotenv\Dotenv;
+use PDO;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
@@ -41,8 +42,10 @@ class LoadCouchCore
             (new DatabaseService());
         }
 
-        // Gestion des logs
-        (new LogsService());
+        // Gestion des logs (le service de logs nécessite le driver PDO SQLite)
+        if (in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+            (new LogsService());
+        }
 
         // Gestion des routes
         $route = new FastRouteCore();

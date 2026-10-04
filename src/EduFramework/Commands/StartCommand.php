@@ -130,7 +130,11 @@ class StartCommand extends CommandManage
                 $log = (new BufferToServer($buffer))->getFormatBuffer();
                 $logJson = json_encode($log);
                 if ($logJson !== false) {
-                    LogsService::addLog($logJson);
+                    try {
+                        LogsService::addLog($logJson);
+                    } catch (\Exception $e) {
+                        error_log('[EduFramework Logs] ' . $e->getMessage());
+                    }
                 }
             }
         });

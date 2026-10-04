@@ -23,11 +23,11 @@ class LogsInitialiser
                 $pdo->exec("CREATE TABLE serv_logs (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         event_date TEXT DEFAULT (datetime('now')),
-                                        event_desc BLOB 
+                                        event_desc TEXT
                                     )");
             }
         } catch (\PDOException $e) {
-            echo "Error: " . $e->getMessage();
+            error_log('[EduFramework Logs] ' . $e->getMessage());
         }
     }
 }
