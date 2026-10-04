@@ -76,8 +76,12 @@ class LogsService
      *
      * Filtres disponibles :
      * - method : méthode HTTP (GET, POST, ...)
-     * - status : famille de code statut (2, 3, 4 ou 5 pour 2xx, 3xx, 4xx, 5xx)
+     * - status : code statut complet (500) ou famille de code statut (2, 3, 4 ou 5 pour 2xx, 3xx, 4xx, 5xx)
      * - search : recherche textuelle dans l'événement
+     * - ip : adresse IP du client
+     * - url : fragment du chemin de la requête
+     * - token : identifiant du log
+     * - from / until : bornes de date (YYYY-MM-DD, heure locale)
      *
      * @param int $limit Nombre de logs à récupérer
      * @param int $offset Décalage pour la pagination
@@ -133,6 +137,23 @@ class LogsService
     }
 
     /**
+     * Permets de compter les logs par famille de code statut (2xx à 5xx),
+     * en tenant compte des filtres sauf celui sur le statut
+     *
+     * @param array<string, string|null> $filters Filtres optionnels
+     * @return array<string, int> Nombre de logs par famille ('2', '3', '4', '5')
+     */
+    public static function countByStatusFamily(array $filters = []): array
+    {
+        $counts = [];
+        foreach (['2', '3', '4', '5'] as $family) {
+            $counts[$family] = self::countLogs(['status' => $family] + $filters);
+        }
+
+        return $counts;
+    }
+
+    /**
      * Construit la clause WHERE et les paramètres SQL correspondant aux filtres
      *
      * @param array<string, string|null> $filters Filtres optionnels
@@ -155,12 +176,49 @@ class LogsService
 
         if (empty($filters['search']) === false) {
             $where[] = "event_desc LIKE :search ESCAPE '\\'";
-            $params[':search'] = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['search']) . '%';
+            $params[':search'] = '%' . self::escapeLike($filters['search']) . '%';
+        }
+
+        if (empty($filters['ip']) === false) {
+            $where[] = "event_desc LIKE :ip ESCAPE '\\'";
+            $params[':ip'] = '%"ip_port":"' . self::escapeLike($filters['ip']) . '%';
+        }
+
+        if (empty($filters['url']) === false) {
+            // Le chemin est stocké encodé en JSON (ex. "/" devient "\/")
+            $where[] = "event_desc LIKE :url ESCAPE '\\'";
+            $params[':url'] = '%"path":"%' . self::escapeLike(substr((string) json_encode($filters['url']), 1, -1)) . '%';
+        }
+
+        if (empty($filters['token']) === false) {
+            $where[] = 'id = :token';
+            $params[':token'] = $filters['token'];
+        }
+
+        if (empty($filters['from']) === false) {
+            $where[] = "date(event_date, 'localtime') >= :from";
+            $params[':from'] = $filters['from'];
+        }
+
+        if (empty($filters['until']) === false) {
+            $where[] = "date(event_date, 'localtime') <= :until";
+            $params[':until'] = $filters['until'];
         }
 
         return [
             (count($where) === 0 ? '' : ' WHERE ' . implode(' AND ', $where)),
             $params,
         ];
+    }
+
+    /**
+     * Échappe les caractères spéciaux d'un motif LIKE (ESCAPE '\')
+     *
+     * @param string $value Valeur à échapper
+     * @return string
+     */
+    private static function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 }

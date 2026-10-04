@@ -31,8 +31,12 @@ class DebugLogsController implements ControllerInterface
      * - page : numéro de page (défaut 1)
      * - limit : nombre de logs par page (défaut 20, max 100)
      * - method : filtre sur la méthode HTTP (GET, POST, ...)
-     * - status : filtre sur la famille de code statut (2, 3, 4 ou 5)
+     * - status : filtre sur le code statut (500) ou sur sa famille (2, 3, 4 ou 5)
      * - search : recherche textuelle dans l'événement
+     * - ip : filtre sur l'adresse IP du client
+     * - url : filtre sur le chemin de la requête
+     * - token : filtre sur l'identifiant du log
+     * - from / until : bornes de date (YYYY-MM-DD)
      *
      * @param Request $request Requête HTTP
      * @return string|null
@@ -45,6 +49,11 @@ class DebugLogsController implements ControllerInterface
             'method' => $this->filterMethod($request->get('method')),
             'status' => $this->filterStatus($request->get('status')),
             'search' => $request->get('search'),
+            'ip' => $this->filterPattern($request->get('ip'), '/^[0-9a-fA-F:.]{1,45}$/'),
+            'url' => $request->get('url'),
+            'token' => $this->filterPattern(ltrim((string) $request->get('token'), '#'), '/^\d{1,18}$/'),
+            'from' => $this->filterPattern($request->get('from'), '/^\d{4}-\d{2}-\d{2}$/'),
+            'until' => $this->filterPattern($request->get('until'), '/^\d{4}-\d{2}-\d{2}$/'),
         ];
 
         $limit = min(100, max(1, (int) ($request->get('limit') ?? 20)));
@@ -59,6 +68,8 @@ class DebugLogsController implements ControllerInterface
             'page' => $page,
             'pages' => $pages,
             'limit' => $limit,
+            'counts' => ['all' => LogsService::countLogs(['status' => null] + $filters)]
+                + LogsService::countByStatusFamily($filters),
             'logs' => LogsService::getLogs($limit, ($page - 1) * $limit, $filters),
         ]);
     }
@@ -79,15 +90,25 @@ class DebugLogsController implements ControllerInterface
     }
 
     /**
-     * Valide le filtre sur la famille de code statut
+     * Valide le filtre sur le code statut (500) ou sur sa famille (5)
      *
-     * @param string|null $status Famille de code statut (2xx à 5xx)
+     * @param string|null $status Code statut ou famille de code statut (2xx à 5xx)
      * @return string|null
      */
     private function filterStatus(string|null $status): string|null
     {
-        return (is_string($status) === true && in_array($status, ['2', '3', '4', '5'], true) === true)
-            ? $status
-            : null;
+        return $this->filterPattern($status, '/^[1-5]\d{0,2}$/');
+    }
+
+    /**
+     * Valide une valeur de filtre à l'aide d'une expression régulière
+     *
+     * @param string|null $value Valeur à valider
+     * @param string $pattern Expression régulière
+     * @return string|null La valeur si elle est valide, sinon null
+     */
+    private function filterPattern(string|null $value, string $pattern): string|null
+    {
+        return (is_string($value) === true && preg_match($pattern, $value) === 1) ? $value : null;
     }
 }

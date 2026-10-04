@@ -5,501 +5,601 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Profiler | Edu Framework</title>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
+        html, body { height: 100%; margin: 0; }
 
         body {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 13px;
-            color: #333;
-            background-color: #fff;
+            font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #222;
+            background-color: #f9f9f9;
             display: flex;
             flex-direction: column;
             -webkit-font-smoothing: antialiased;
         }
 
+        a { color: #0e6db5; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
         /* ===== Barre supérieure ===== */
-        .profiler-topbar {
-            height: 44px;
-            background-color: #1a1a1a;
-            color: #eee;
+        .topbar {
+            height: 54px;
+            background-color: #222;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 20px;
             flex-shrink: 0;
         }
 
-        .profiler-topbar .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-        }
-
-        .profiler-topbar .meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 12px;
-            color: #aaa;
-        }
+        .topbar .brand { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 600; }
+        .topbar .brand span { font-weight: normal; color: #aaa; }
+        .topbar .meta { display: flex; align-items: center; gap: 14px; font-size: 12px; color: #aaa; }
 
         .badge-env {
-            background-color: #36b393;
-            color: #000;
+            background-color: #4f805d;
+            color: #fff;
             padding: 2px 8px;
             border-radius: 3px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* ===== Corps : sidebar + contenu ===== */
-        .profiler-body {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
+        .btn {
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #fff;
+            background-color: #666;
+            border: 0;
+            border-radius: 2px;
+            padding: 6px 12px;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .profiler-sidebar {
-            width: 210px;
-            background-color: #252526;
+        .btn:hover { background-color: #777; text-decoration: none; }
+
+        /* ===== Bandeau de la requête (vert / orange / rouge selon le statut) ===== */
+        .summary { padding: 14px 20px 12px; color: #fff; background-color: #4f805d; flex-shrink: 0; }
+        .summary.s-3xx { background-color: #3a7d8c; }
+        .summary.s-4xx { background-color: #a46a1f; }
+        .summary.s-5xx { background-color: #b0413e; }
+        .summary h2 { margin: 0 0 10px; font-size: 24px; font-weight: 600; word-break: break-all; }
+        .summary .meta { display: flex; gap: 22px; flex-wrap: wrap; font-size: 12px; }
+        .summary .meta b { opacity: 0.8; margin-right: 4px; }
+
+        .page-title { padding: 14px 20px; background-color: #e0e0e0; border-bottom: 1px solid #ccc; flex-shrink: 0; }
+        .page-title h2 { margin: 0; font-size: 24px; font-weight: normal; }
+
+        /* ===== Corps : sidebar + contenu ===== */
+        .layout { display: flex; flex: 1; min-height: 0; }
+
+        .sidebar {
+            width: 220px;
+            background-color: #444;
             color: #ccc;
-            padding: 12px 0;
             flex-shrink: 0;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
 
-        .profiler-sidebar nav {
-            display: flex;
-            flex-direction: column;
-        }
+        .sidebar .shortcuts { display: flex; gap: 8px; padding: 10px; background-color: #333; }
+        .sidebar .shortcuts .btn { padding: 5px 9px; font-size: 12px; white-space: nowrap; }
 
-        .profiler-sidebar a {
-            color: #ccc;
-            text-decoration: none;
-            padding: 9px 16px;
-            border-left: 3px solid transparent;
+        .sidebar nav a {
+            color: #ddd;
+            font-size: 15px;
+            padding: 11px 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .profiler-sidebar a:hover:not(.disabled) {
-            background-color: #2d2d2d;
-        }
-
-        .profiler-sidebar a.active {
-            background-color: #2d2d2d;
-            border-left-color: #36b393;
-            color: #fff;
-        }
-
-        .profiler-sidebar a.disabled {
-            color: #666;
-            cursor: not-allowed;
-        }
-
-        .profiler-sidebar .count {
-            background-color: #36b393;
-            color: #000;
-            font-size: 11px;
-            padding: 1px 7px;
-            border-radius: 9px;
-            font-weight: bold;
-        }
-
-        .profiler-sidebar .sidebar-footer {
-            margin-top: auto;
-            padding: 10px 16px;
-            font-size: 11px;
-            color: #666;
-            border-top: 1px solid #333;
-        }
-
-        /* ===== Contenu ===== */
-        .profiler-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 24px;
-        }
-
-        .content-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-        }
-
-        .content-header h1 {
-            font-size: 20px;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .content-header h1 span {
-            font-size: 13px;
-            font-weight: normal;
-            color: #888;
-        }
-
-        .filters {
-            display: flex;
             gap: 10px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
+            border-bottom: 1px solid #3a3a3a;
         }
 
-        .filters select, .filters input {
+        .sidebar nav a:hover:not(.disabled) { background-color: #555; text-decoration: none; }
+        .sidebar nav a.active { background-color: #666; color: #fff; }
+        .sidebar nav a.disabled { color: #777; cursor: not-allowed; }
+        .sidebar nav .ico { width: 22px; text-align: center; }
+        .sidebar nav .count { margin-left: auto; background-color: #e0e0e0; color: #444; font-size: 11px; padding: 1px 7px; border-radius: 3px; font-weight: bold; }
+
+        .sidebar form { padding: 14px 10px; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar form label { display: flex; align-items: center; font-size: 13px; color: #ddd; }
+        .sidebar form label span { width: 62px; flex-shrink: 0; }
+        .sidebar form input, .sidebar form select {
+            flex: 1;
+            min-width: 0;
             font-family: inherit;
             font-size: 13px;
-            padding: 5px 8px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background-color: #fff;
-            color: #333;
+            padding: 5px 6px;
+            border: 0;
+            background-color: #ccc;
+            color: #222;
         }
 
-        .filters input {
-            min-width: 220px;
-        }
+        .sidebar form .actions { text-align: right; }
 
-        /* ===== Table des logs ===== */
-        .logs-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-        }
+        .sidebar .sidebar-footer { margin-top: auto; padding: 10px 14px; font-size: 11px; color: #888; border-top: 1px solid #3a3a3a; }
 
-        .logs-table th {
-            text-align: left;
-            padding: 7px 10px;
-            background-color: #f5f5f5;
-            border-bottom: 2px solid #ddd;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #666;
-        }
+        .content { flex: 1; overflow-y: auto; padding: 20px; }
+        .content h1 { margin: 0 0 18px; font-size: 26px; font-weight: normal; }
+        .hidden { display: none !important; }
 
-        .logs-table td {
-            padding: 6px 10px;
-            border-bottom: 1px solid #e6e6e6;
-            white-space: nowrap;
-        }
-
-        .logs-table tr.log-row {
+        /* ===== Onglets avec compteurs ===== */
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tabs button {
+            font-family: inherit;
+            font-size: 16px;
             cursor: pointer;
+            padding: 8px 14px;
+            color: #444;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-right: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .logs-table tr.log-row:hover {
-            background-color: #f2fbf8;
-        }
+        .tabs button:last-child { border-right: 1px solid #ddd; }
+        .tabs button:hover { background-color: #f3f3f3; }
+        .tabs button.active { background-color: #666; border-color: #666; color: #fff; }
+        .tabs button .count { background-color: #e8e8e8; color: #555; font-size: 12px; padding: 1px 7px; border-radius: 3px; }
+        .tabs button.active .count { background-color: #222; color: #fff; }
+        .tabs button.empty { color: #999; }
 
-        .logs-table td.raw-cell {
-            white-space: pre-wrap;
-            color: #999;
-            font-style: italic;
-        }
+        /* ===== Tables ===== */
+        table.profiler-table { width: 100%; border-collapse: collapse; background-color: #fff; border: 1px solid #ddd; }
+        .profiler-table th { text-align: left; padding: 10px 12px; background-color: #e0e0e0; font-size: 15px; }
+        .profiler-table td { padding: 12px; border-top: 1px solid #e5e5e5; vertical-align: top; }
+        .profiler-table td.time { color: #777; font-size: 13px; white-space: nowrap; }
+        .profiler-table td.nowrap { white-space: nowrap; }
+        .profiler-table td.channel { font-weight: bold; font-size: 13px; }
+        .profiler-table td.empty-state { text-align: center; color: #999; padding: 40px 0; }
+        .profiler-table tr.raw td { color: #999; font-style: italic; }
+        .profiler-table tr.log-row.highlight td { background-color: #fffbe6; }
 
-        .logs-table tr.detail-row td {
-            background-color: #f9f9f9;
-            padding: 10px;
-        }
-
-        .logs-table pre {
-            margin: 0;
+        .log-context { margin-top: 6px; font-size: 12px; color: #777; word-break: break-all; }
+        .log-context b { color: #444; }
+        .log-context pre {
+            margin: 6px 0 0;
+            padding: 8px 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
             font-size: 12px;
             white-space: pre-wrap;
             font-family: 'SFMono-Regular', Consolas, monospace;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px 0;
+            color: #333;
         }
 
         /* ===== Badges ===== */
-        .m-GET { color: #000; background-color: #61affe; padding: 1px 6px; border-radius: 3px; }
-        .m-POST { color: #000; background-color: #ffc862; padding: 1px 6px; border-radius: 3px; }
-        .m-PUT { color: #000; background-color: #fca02f; padding: 1px 6px; border-radius: 3px; }
-        .m-DELETE { color: #fff; background-color: #f93e3e; padding: 1px 6px; border-radius: 3px; }
-        .m-PATCH { color: #000; background-color: #50e3c2; padding: 1px 6px; border-radius: 3px; }
+        .m-GET, .m-POST, .m-PUT, .m-DELETE, .m-PATCH, .m-OTHER { font-weight: bold; font-size: 12px; padding: 1px 6px; border-radius: 3px; color: #000; background-color: #ddd; }
+        .m-GET { background-color: #61affe; }
+        .m-POST { background-color: #ffc862; }
+        .m-PUT { background-color: #fca02f; }
+        .m-DELETE { background-color: #f93e3e; color: #fff; }
+        .m-PATCH { background-color: #50e3c2; }
 
-        .s-2xx { color: #2e7d32; font-weight: bold; }
-        .s-3xx { color: #0097a7; font-weight: bold; }
-        .s-4xx { color: #ef6c00; font-weight: bold; }
-        .s-5xx { color: #c62828; font-weight: bold; }
+        .status-badge { display: inline-block; min-width: 38px; text-align: center; font-weight: bold; color: #fff; padding: 4px 8px; border-radius: 2px; background-color: #4f805d; }
+        .status-badge.s-3xx { background-color: #3a7d8c; }
+        .status-badge.s-4xx { background-color: #a46a1f; }
+        .status-badge.s-5xx { background-color: #b0413e; }
+        .status-text.s-2xx { color: #4f805d; }
+        .status-text.s-3xx { color: #3a7d8c; }
+        .status-text.s-4xx { color: #a46a1f; }
+        .status-text.s-5xx { color: #b0413e; }
+        .status-text { font-weight: bold; }
 
-        /* ===== Pagination ===== */
-        .pagination {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .pagination button {
-            cursor: pointer;
-            background-color: #f5f5f5;
-            color: #333;
-            border: 1px solid #ccc;
-            padding: 4px 12px;
-            border-radius: 3px;
-            font-size: 13px;
-        }
-
-        .pagination button:hover:not([disabled]) {
-            background-color: #e6e6e6;
-        }
-
-        .pagination button[disabled] {
-            opacity: 0.4;
-            cursor: default;
-        }
-
-        .pagination select {
-            font-family: inherit;
-            font-size: 13px;
-            padding: 4px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
+        .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+        .pagination button[disabled] { opacity: 0.4; cursor: default; }
+        .pagination select { font-family: inherit; font-size: 13px; padding: 4px; border: 1px solid #ccc; }
+        .back-link { margin-bottom: 14px; }
     </style>
 </head>
 <body>
-    <header class="profiler-topbar">
+    <header class="topbar">
         <div class="brand">
-            <img src="{{ logoEF }}" alt="Logo Edu Framework" width="22px">
-            <strong>PROFILER</strong>
+            <img src="{{ logoEF }}" alt="Logo Edu Framework" width="30px">
+            <div>Edu Framework <span>Profiler</span></div>
         </div>
         <div class="meta">
             <span class="badge-env">{{ appEnv }}</span>
-            <span>v{{ version }}</span>
+            <span>{{ version }}</span>
             <span>PHP {{ phpVersion }}</span>
+            <a class="btn" href="https://studoo-app.github.io/edu-framework" target="_blank" rel="noopener">Documentation</a>
         </div>
     </header>
 
-    <div class="profiler-body">
-        <aside class="profiler-sidebar">
-            <nav>
-                <a href="#" class="active" id="navLogs">&#128202; Logs <span id="sidebarCount" class="count">0</span></a>
-                <a href="#" class="disabled" title="Bient&ocirc;t disponible">&#127760; Request</a>
-                <a href="#" class="disabled" title="Bient&ocirc;t disponible">&#9889; Performance</a>
+    <section class="summary" id="summary">
+        <h2 id="summaryUrl"></h2>
+        <div class="meta">
+            <span><b>M&eacute;thode :</b> <span id="summaryMethod"></span></span>
+            <span><b>Statut HTTP :</b> <span id="summaryStatus"></span></span>
+            <span><b>IP :</b> <span id="summaryIp"></span></span>
+            <span><b>Re&ccedil;ue le :</b> <span id="summaryDate"></span></span>
+            <span><b>Token :</b> <span id="summaryToken"></span></span>
+        </div>
+    </section>
+
+    <section class="page-title" id="searchTitle"><h2>Recherche de requ&ecirc;tes</h2></section>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="shortcuts">
+                <button type="button" class="btn" id="btnLast10">10 derniers</button>
+                <button type="button" class="btn" id="btnLatest">Dernier</button>
+                <button type="button" class="btn" id="btnSearch" title="Recherche">&#128269;</button>
+            </div>
+
+            <nav id="logsNav">
+                <a href="#" class="disabled" title="Bient&ocirc;t disponible"><span class="ico">&#9881;</span> Requ&ecirc;te / R&eacute;ponse</a>
+                <a href="#" class="disabled" title="Bient&ocirc;t disponible"><span class="ico">&#9201;</span> Performance</a>
+                <a href="#logs" class="active"><span class="ico">&#10071;</span> Logs <span id="sidebarCount" class="count">0</span></a>
             </nav>
+
+            <form id="searchForm" autocomplete="off">
+                <label><span>IP</span><input type="text" name="ip"></label>
+                <label><span>M&eacute;thode</span>
+                    <select name="method">
+                        <option value="">Toutes</option>
+                        <option>GET</option>
+                        <option>POST</option>
+                        <option>PUT</option>
+                        <option>DELETE</option>
+                        <option>PATCH</option>
+                    </select>
+                </label>
+                <label><span>Statut</span><input type="text" name="status" inputmode="numeric" placeholder="500"></label>
+                <label><span>URL</span><input type="text" name="url"></label>
+                <label><span>Token</span><input type="text" name="token" inputmode="numeric"></label>
+                <label><span>Depuis</span><input type="date" name="from"></label>
+                <label><span>Jusqu'au</span><input type="date" name="until"></label>
+                <label><span>R&eacute;sultats</span>
+                    <select name="limit">
+                        <option>10</option>
+                        <option selected>20</option>
+                        <option>50</option>
+                        <option>100</option>
+                    </select>
+                </label>
+                <div class="actions"><button type="submit" class="btn">Rechercher</button></div>
+            </form>
+
             <div class="sidebar-footer">
-                Edu Framework Profiler<br>
                 Les logs sont enregistr&eacute;s dans <code>var/logs/core_logs.sqlite</code>
             </div>
         </aside>
 
-        <main class="profiler-content">
-            <div class="content-header">
-                <h1>Logs <span id="logsTotal"></span></h1>
-                <button type="button" class="pagination" id="btnRefresh" style="cursor: pointer;">&#10227; Rafra&icirc;chir</button>
+        <main class="content">
+            <!-- Vue : résultats de recherche -->
+            <div id="viewSearch">
+                <h1 id="searchTotal"></h1>
+                <table class="profiler-table">
+                    <thead>
+                        <tr>
+                            <th>Statut</th><th>IP</th><th>M&eacute;thode</th><th>URL</th><th>Date</th><th>Token</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchBody"></tbody>
+                </table>
             </div>
 
-            <div class="filters">
-                <select id="filterMethod">
-                    <option value="">Toutes les m&eacute;thodes</option>
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                    <option value="PATCH">PATCH</option>
-                </select>
-                <select id="filterStatus">
-                    <option value="">Tous les statuts</option>
-                    <option value="2">2xx - Succ&egrave;s</option>
-                    <option value="3">3xx - Redirection</option>
-                    <option value="4">4xx - Erreur client</option>
-                    <option value="5">5xx - Erreur serveur</option>
-                </select>
-                <input type="text" id="filterSearch" placeholder="Rechercher dans les logs...">
+            <!-- Vue : messages de log -->
+            <div id="viewLogs" class="hidden">
+                <h1>Messages de log</h1>
+                <div class="back-link hidden" id="tokenFilter">
+                    Requ&ecirc;te <b id="tokenFilterId"></b> uniquement &mdash; <a href="#logs">afficher tous les logs</a>
+                </div>
+                <div class="tabs" id="tabs">
+                    <button type="button" data-status="" class="active">Tous <span class="count" data-count="all">0</span></button>
+                    <button type="button" data-status="2">2xx <span class="count" data-count="2">0</span></button>
+                    <button type="button" data-status="3">3xx <span class="count" data-count="3">0</span></button>
+                    <button type="button" data-status="4">4xx <span class="count" data-count="4">0</span></button>
+                    <button type="button" data-status="5">5xx <span class="count" data-count="5">0</span></button>
+                </div>
+                <table class="profiler-table">
+                    <thead>
+                        <tr><th>Heure</th><th>Canal</th><th>Message</th></tr>
+                    </thead>
+                    <tbody id="logsBody"></tbody>
+                </table>
             </div>
-
-            <table class="logs-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Date</th>
-                        <th>M&eacute;thode</th>
-                        <th>Statut</th>
-                        <th>IP:port</th>
-                        <th>Chemin</th>
-                        <th>Re&ccedil;ue le</th>
-                    </tr>
-                </thead>
-                <tbody id="logsBody"></tbody>
-            </table>
 
             <div class="pagination">
                 <span id="pageInfo">1 / 1</span>
-                <button type="button" id="btnPrev">&#9664; Pr&eacute;c&eacute;dent</button>
-                <button type="button" id="btnNext">Suivant &#9654;</button>
-                <select id="pageSize">
-                    <option value="20">20 / page</option>
-                    <option value="50">50 / page</option>
-                    <option value="100">100 / page</option>
-                </select>
+                <button type="button" class="btn" id="btnPrev">&#9664; Pr&eacute;c&eacute;dent</button>
+                <button type="button" class="btn" id="btnNext">Suivant &#9654;</button>
             </div>
         </main>
     </div>
 
     <script>
         (function() {
-            var state = { page: 1, limit: 20, pages: 1, method: '', status: '', search: '' };
-            var searchTimer = null;
+            var CONTEXT_MAX = 80;
+            var view = 'search';
+            var token = '';
+            var logsStatus = '';
+            var pages = { search: 1, logs: 1 };
+            var pagesTotal = 1;
+            var searchFilters = { limit: 20 };
 
-            function createCell(content) {
-                var td = document.createElement('td');
-                td.textContent = content;
-                return td;
+            function $(id) { return document.getElementById(id); }
+            function el(tag, className, text) {
+                var node = document.createElement(tag);
+                if (className) { node.className = className; }
+                if (text !== undefined && text !== null) { node.textContent = text; }
+                return node;
             }
 
-            function createMethodBadge(method) {
-                var span = document.createElement('span');
-                span.className = 'm-' + method;
-                span.textContent = method;
-                return span;
+            function statusClass(code) { return 's-' + String(code).charAt(0) + 'xx'; }
+            function methodBadge(method) {
+                var known = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+                return el('span', 'm-' + (known.indexOf(method) === -1 ? 'OTHER' : method), method);
+            }
+            function isHttp(log) { return log.event && log.event.method !== undefined && log.event.method !== null; }
+            function timeOf(log) {
+                var match = /\d{2}:\d{2}:\d{2}/.exec((log.event && log.event.timestamp) || log.event_date || '');
+                return match ? match[0] : '';
             }
 
-            function createStatusBadge(statusCode) {
-                var span = document.createElement('span');
-                span.className = 's-' + String(statusCode).charAt(0) + 'xx';
-                span.textContent = statusCode;
-                return span;
+            function query(params) {
+                var url = new URLSearchParams();
+                Object.keys(params).forEach(function(key) {
+                    if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
+                });
+                return fetch('/edu-logs?' + url.toString()).then(function(response) { return response.json(); });
             }
 
-            function appendDetailRow(tr, log) {
-                var detailTr = document.createElement('tr');
-                detailTr.className = 'detail-row';
-                var td = document.createElement('td');
-                td.colSpan = 7;
-                var pre = document.createElement('pre');
-                pre.textContent = JSON.stringify(log.event, null, 2);
-                td.appendChild(pre);
-                detailTr.appendChild(td);
-                tr.after(detailTr);
-                return detailTr;
+            function fail(error) { console.error('[EduFramework Profiler]', error); }
+
+            // ----- Contexte d'un log : tronqué si long, complet au clic ("Show full context") -----
+            function contextOf(log) {
+                var context = {};
+                Object.keys(log.event || {}).forEach(function(key) {
+                    if (key !== 'path' && key !== 'raw') { context[key] = log.event[key]; }
+                });
+                return context;
+            }
+
+            function buildContext(log) {
+                var context = contextOf(log);
+                var inline = Object.keys(context).map(function(key) { return key + ' => ' + context[key]; }).join(', ');
+                var box = el('div', 'log-context');
+                box.appendChild(el('b', null, 'Contexte : '));
+
+                if (inline.length <= CONTEXT_MAX) {
+                    box.appendChild(document.createTextNode('[ ' + inline + ' ]'));
+                    return box;
+                }
+
+                var short = el('span', null, '[ ' + inline.substring(0, CONTEXT_MAX) + ' ... ');
+                var link = el('a', null, 'Afficher le contexte complet');
+                link.href = '#';
+                var full = el('pre', 'hidden', JSON.stringify(log.event, null, 2));
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var open = full.classList.toggle('hidden') === false;
+                    link.textContent = open ? 'Masquer le contexte' : 'Afficher le contexte complet';
+                });
+                short.appendChild(link);
+                box.appendChild(short);
+                box.appendChild(full);
+                return box;
+            }
+
+            // ----- Vue "messages de log" -----
+            function renderSummary(log) {
+                var summary = $('summary');
+                if (!log || !isHttp(log)) {
+                    summary.classList.add('hidden');
+                    return;
+                }
+                summary.classList.remove('hidden');
+                summary.className = 'summary ' + statusClass(log.event.status_code);
+                $('summaryUrl').textContent = log.event.path;
+                $('summaryMethod').textContent = log.event.method;
+                $('summaryStatus').textContent = log.event.status_code;
+                $('summaryIp').textContent = log.event.ip_port;
+                $('summaryDate').textContent = log.event.timestamp;
+                $('summaryToken').textContent = '#' + log.id;
+            }
+
+            function renderCounts(counts) {
+                document.querySelectorAll('#tabs [data-count]').forEach(function(node) {
+                    var value = counts[node.getAttribute('data-count')] || 0;
+                    node.textContent = value;
+                    node.parentNode.classList.toggle('empty', value === 0);
+                });
+                $('sidebarCount').textContent = counts.all || 0;
             }
 
             function renderLogs(data) {
-                var body = document.getElementById('logsBody');
+                var body = $('logsBody');
                 body.innerHTML = '';
-
-                document.getElementById('logsTotal').textContent = '(' + data.total + ')';
-                document.getElementById('sidebarCount').textContent = data.total;
+                renderCounts(data.counts);
 
                 if (data.logs.length === 0) {
-                    var tr = document.createElement('tr');
-                    var td = document.createElement('td');
-                    td.colSpan = 7;
-                    td.className = 'empty-state';
-                    td.textContent = 'Aucun log ne correspond à ces filtres';
+                    var tr = el('tr');
+                    var td = el('td', 'empty-state', 'Aucun log dans cette cat\u00e9gorie');
+                    td.colSpan = 3;
                     tr.appendChild(td);
                     body.appendChild(tr);
                 }
 
                 data.logs.forEach(function(log) {
-                    var event = log.event || {};
-                    var tr = document.createElement('tr');
-                    tr.className = 'log-row';
+                    var tr = el('tr', isHttp(log) ? 'log-row' : 'raw');
+                    tr.appendChild(el('td', 'time', timeOf(log)));
 
-                    tr.appendChild(createCell('#' + log.id));
-                    tr.appendChild(createCell(log.event_date));
+                    if (isHttp(log)) {
+                        var tdChannel = el('td', 'channel');
+                        tdChannel.appendChild(methodBadge(log.event.method));
+                        tr.appendChild(tdChannel);
 
-                    if (event.method !== undefined && event.method !== null) {
-                        var tdMethod = document.createElement('td');
-                        tdMethod.appendChild(createMethodBadge(event.method));
-                        tr.appendChild(tdMethod);
-
-                        var tdStatus = document.createElement('td');
-                        tdStatus.appendChild(createStatusBadge(event.status_code));
-                        tr.appendChild(tdStatus);
-
-                        tr.appendChild(createCell(event.ip_port));
-                        tr.appendChild(createCell(event.path));
-                        tr.appendChild(createCell(event.timestamp));
+                        var tdMessage = el('td');
+                        tdMessage.appendChild(document.createTextNode(log.event.path + ' \u2192 '));
+                        tdMessage.appendChild(el('span', 'status-text ' + statusClass(log.event.status_code), log.event.status_code));
+                        tdMessage.appendChild(buildContext(log));
+                        tr.appendChild(tdMessage);
                     } else {
-                        var tdRaw = document.createElement('td');
-                        tdRaw.colSpan = 4;
-                        tdRaw.className = 'raw-cell';
-                        tdRaw.textContent = event.raw;
-                        tr.appendChild(tdRaw);
+                        tr.appendChild(el('td', 'channel', 'raw'));
+                        tr.appendChild(el('td', null, log.event.raw));
                     }
-
-                    var detailTr = null;
-                    tr.addEventListener('click', function() {
-                        if (detailTr === null) {
-                            detailTr = appendDetailRow(tr, log);
-                        } else {
-                            detailTr.remove();
-                            detailTr = null;
-                        }
-                    });
-
                     body.appendChild(tr);
                 });
 
-                state.pages = data.pages || 1;
-                document.getElementById('pageInfo').textContent = state.page + ' / ' + state.pages;
-                document.getElementById('btnPrev').disabled = state.page <= 1;
-                document.getElementById('btnNext').disabled = state.page >= state.pages;
+                setPages(data, 'logs');
             }
 
             function loadLogs() {
-                var params = new URLSearchParams();
-                params.set('page', state.page);
-                params.set('limit', state.limit);
-                if (state.method !== '') { params.set('method', state.method); }
-                if (state.status !== '') { params.set('status', state.status); }
-                if (state.search !== '') { params.set('search', state.search); }
-
-                fetch('/edu-logs?' + params.toString())
-                    .then(function(response) { return response.json(); })
-                    .then(renderLogs)
-                    .catch(function(error) { console.error('[EduFramework Profiler]', error); });
+                query({ page: pages.logs, limit: 20, status: logsStatus, token: token }).then(function(data) {
+                    renderLogs(data);
+                    if (token !== '') {
+                        renderSummary(data.logs[0]);
+                    } else {
+                        return query({ limit: 1 }).then(function(latest) { renderSummary(latest.logs[0]); });
+                    }
+                }).catch(fail);
             }
 
-            function resetPageAndLoad() {
-                state.page = 1;
+            // ----- Vue "recherche" -----
+            function renderSearch(data) {
+                var body = $('searchBody');
+                body.innerHTML = '';
+                $('searchTotal').textContent = data.total + (data.total > 1 ? ' r\u00e9sultats trouv\u00e9s' : ' r\u00e9sultat trouv\u00e9');
+
+                if (data.logs.length === 0) {
+                    var tr = el('tr');
+                    var td = el('td', 'empty-state', 'Aucune requ\u00eate ne correspond \u00e0 cette recherche');
+                    td.colSpan = 6;
+                    tr.appendChild(td);
+                    body.appendChild(tr);
+                }
+
+                data.logs.forEach(function(log) {
+                    var tr = el('tr');
+                    if (!isHttp(log)) {
+                        var tdRaw = el('td', null, log.event.raw);
+                        tdRaw.colSpan = 5;
+                        tr.appendChild(tdRaw);
+                    } else {
+                        var tdStatus = el('td', 'nowrap');
+                        tdStatus.appendChild(el('span', 'status-badge ' + statusClass(log.event.status_code), log.event.status_code));
+                        tr.appendChild(tdStatus);
+                        tr.appendChild(el('td', null, log.event.ip_port));
+                        var tdMethod = el('td');
+                        tdMethod.appendChild(methodBadge(log.event.method));
+                        tr.appendChild(tdMethod);
+                        tr.appendChild(el('td', null, log.event.path));
+                        tr.appendChild(el('td', 'time', log.event.timestamp));
+                    }
+                    var tdToken = el('td');
+                    var link = el('a', null, '#' + log.id);
+                    link.href = '#logs/' + log.id;
+                    tdToken.appendChild(link);
+                    tr.appendChild(tdToken);
+                    body.appendChild(tr);
+                });
+
+                setPages(data, 'search');
+            }
+
+            function loadSearch() {
+                var params = Object.assign({ page: pages.search }, searchFilters);
+                query(params).then(renderSearch).catch(fail);
+            }
+
+            // ----- Pagination et navigation -----
+            function setPages(data, name) {
+                pages[name] = data.page;
+                pagesTotal = data.pages || 1;
+                $('pageInfo').textContent = data.page + ' / ' + pagesTotal;
+                $('btnPrev').disabled = data.page <= 1;
+                $('btnNext').disabled = data.page >= pagesTotal;
+            }
+
+            function show(name) {
+                view = name;
+                var isSearch = name === 'search';
+                $('viewSearch').classList.toggle('hidden', !isSearch);
+                $('viewLogs').classList.toggle('hidden', isSearch);
+                $('searchForm').classList.toggle('hidden', !isSearch);
+                $('logsNav').classList.toggle('hidden', isSearch);
+                $('searchTitle').classList.toggle('hidden', !isSearch);
+                if (isSearch) { $('summary').classList.add('hidden'); }
+            }
+
+            function route() {
+                var hash = window.location.hash.replace(/^#/, '').split('/');
+                if (hash[0] === 'logs') {
+                    token = hash[1] || '';
+                    $('tokenFilter').classList.toggle('hidden', token === '');
+                    $('tokenFilterId').textContent = '#' + token;
+                    pages.logs = 1;
+                    show('logs');
+                    loadLogs();
+                } else {
+                    show('search');
+                    loadSearch();
+                }
+            }
+
+            function readForm() {
+                var data = new FormData($('searchForm'));
+                var filters = {};
+                data.forEach(function(value, key) { filters[key] = String(value).trim(); });
+                return filters;
+            }
+
+            $('searchForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                searchFilters = readForm();
+                pages.search = 1;
+                if (window.location.hash !== '' && window.location.hash !== '#search') {
+                    window.location.hash = '#search';
+                } else {
+                    loadSearch();
+                }
+            });
+
+            $('btnSearch').addEventListener('click', function() {
+                window.location.hash = '#search';
+                $('searchForm').querySelector('input').focus();
+            });
+
+            $('btnLast10').addEventListener('click', function() {
+                $('searchForm').reset();
+                $('searchForm').elements.limit.value = '10';
+                searchFilters = { limit: 10 };
+                pages.search = 1;
+                if (view === 'search') { loadSearch(); } else { window.location.hash = '#search'; }
+            });
+
+            $('btnLatest').addEventListener('click', function() {
+                query({ limit: 1 }).then(function(data) {
+                    if (data.logs.length > 0) { window.location.hash = '#logs/' + data.logs[0].id; }
+                }).catch(fail);
+            });
+
+            $('tabs').addEventListener('click', function(event) {
+                var button = event.target.closest('button');
+                if (button === null) { return; }
+                logsStatus = button.getAttribute('data-status');
+                document.querySelectorAll('#tabs button').forEach(function(node) { node.classList.toggle('active', node === button); });
+                pages.logs = 1;
                 loadLogs();
-            }
-
-            document.getElementById('btnRefresh').addEventListener('click', loadLogs);
-            document.getElementById('btnPrev').addEventListener('click', function() {
-                if (state.page > 1) { state.page--; loadLogs(); }
-            });
-            document.getElementById('btnNext').addEventListener('click', function() {
-                if (state.page < state.pages) { state.page++; loadLogs(); }
-            });
-            document.getElementById('pageSize').addEventListener('change', function() {
-                state.limit = parseInt(this.value, 10);
-                resetPageAndLoad();
-            });
-            document.getElementById('filterMethod').addEventListener('change', function() {
-                state.method = this.value;
-                resetPageAndLoad();
-            });
-            document.getElementById('filterStatus').addEventListener('change', function() {
-                state.status = this.value;
-                resetPageAndLoad();
-            });
-            document.getElementById('filterSearch').addEventListener('input', function() {
-                clearTimeout(searchTimer);
-                searchTimer = setTimeout(function() {
-                    state.search = document.getElementById('filterSearch').value.trim();
-                    resetPageAndLoad();
-                }, 300);
             });
 
-            loadLogs();
+            $('btnPrev').addEventListener('click', function() {
+                if (pages[view] > 1) { pages[view]--; view === 'search' ? loadSearch() : loadLogs(); }
+            });
+            $('btnNext').addEventListener('click', function() {
+                if (pages[view] < pagesTotal) { pages[view]++; view === 'search' ? loadSearch() : loadLogs(); }
+            });
+
+            window.addEventListener('hashchange', route);
+            route();
         })();
     </script>
 </body>

@@ -181,4 +181,49 @@ class LogsServiceTest extends TestCase
             $this->assertSame('500', $log['event']['status_code']);
         }
     }
+
+    public function testGetLogsFiltersByExactStatusCode(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/exact-500","status_code":"500"}');
+        LogsService::addLog('{"method":"GET","path":"/exact-503","status_code":"503"}');
+
+        $logs = LogsService::getLogs(50, 0, ['status' => '503']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertSame('503', $log['event']['status_code']);
+        }
+    }
+
+    public function testGetLogsFiltersByIpUrlAndToken(): void
+    {
+        // Même encodage que StartCommand : les "/" sont échappés en "\/"
+        LogsService::addLog((string) json_encode(['method' => 'GET', 'path' => '/blog/post', 'status_code' => '200', 'ip_port' => '10.1.2.3:4444']));
+        $id = (int) LogsService::getConnect()->lastInsertId();
+
+        $this->assertSame([$id], array_column(LogsService::getLogs(50, 0, ['ip' => '10.1.2.3', 'url' => '/blog/post']), 'id'));
+        $this->assertSame([$id], array_column(LogsService::getLogs(50, 0, ['token' => (string) $id]), 'id'));
+        $this->assertSame([], LogsService::getLogs(50, 0, ['token' => (string) $id, 'url' => '/unknown']));
+    }
+
+    public function testGetLogsFiltersByDateRange(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/dated","status_code":"200"}');
+        $today = date('Y-m-d');
+
+        $this->assertNotEmpty(LogsService::getLogs(50, 0, ['from' => $today, 'until' => $today]));
+        $this->assertSame(0, LogsService::countLogs(['until' => '2000-01-01']));
+        $this->assertSame(0, LogsService::countLogs(['from' => '2999-01-01']));
+    }
+
+    public function testCountByStatusFamilyIgnoresTheStatusFilter(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/family","status_code":"404"}');
+
+        $counts = LogsService::countByStatusFamily(['status' => '2']);
+
+        $this->assertSame(['2', '3', '4', '5'], array_map('strval', array_keys($counts)));
+        $this->assertGreaterThanOrEqual(1, $counts['4']);
+        $this->assertSame(LogsService::countLogs(['status' => '4']), $counts['4']);
+    }
 }
