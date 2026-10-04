@@ -21,9 +21,9 @@ class LogsService
 
     /**
      * Objet PDO pour la connexion à la base de données des logs
-     * @var PDO
+     * @var PDO|null
      */
-    private static PDO $dbConnectLogs;
+    private static ?PDO $dbConnectLogs = null;
 
     /**
      * Initialise la connexion à la base de données des logs (définie par la config sqlite_logs_path)
@@ -49,7 +49,7 @@ class LogsService
      */
     public static function getConnect(): PDO
     {
-        if (isset(self::$dbConnectLogs) === false) {
+        if (self::$dbConnectLogs === null) {
             new self();
         }
         return self::$dbConnectLogs;
