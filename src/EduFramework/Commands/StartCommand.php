@@ -128,8 +128,9 @@ class StartCommand extends CommandManage
                 self::$stdOutput->write($buffer);
 
                 $log = (new BufferToServer($buffer))->getFormatBuffer();
-                if ($log['path'] !== null && str_starts_with($log['path'], '/edu-logs')) {
-                    // Les requêtes de la barre de debug ne sont pas journalisées
+                if ($log['path'] !== null
+                    && (str_starts_with($log['path'], '/edu-logs') || str_starts_with($log['path'], '/_debug/'))) {
+                    // Les requêtes du profiler et de la barre de debug ne sont pas journalisées
                     return;
                 }
                 $logJson = json_encode($log);

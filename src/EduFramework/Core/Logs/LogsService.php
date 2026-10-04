@@ -74,15 +74,27 @@ class LogsService
      * L'événement (event_desc) est décodé : s'il s'agit d'un JSON, le tableau
      * décodé est retourné, sinon le texte brut est disponible dans la clé 'raw'.
      *
+     * Filtres disponibles :
+     * - method : méthode HTTP (GET, POST, ...)
+     * - status : famille de code statut (2, 3, 4 ou 5 pour 2xx, 3xx, 4xx, 5xx)
+     * - search : recherche textuelle dans l'événement
+     *
      * @param int $limit Nombre de logs à récupérer
      * @param int $offset Décalage pour la pagination
+     * @param array<string, string|null> $filters Filtres optionnels
      * @return array<int, array<string, mixed>> Liste des logs (id, event_date, event)
      */
-    public static function getLogs(int $limit = 20, int $offset = 0): array
+    public static function getLogs(int $limit = 20, int $offset = 0, array $filters = []): array
     {
+        [$where, $params] = self::buildFilters($filters);
+
         $stmt = self::getConnect()->prepare(
-            'SELECT id, event_date, event_desc FROM serv_logs ORDER BY id DESC LIMIT :limit OFFSET :offset'
+            'SELECT id, event_date, event_desc FROM serv_logs' . $where
+            . ' ORDER BY id DESC LIMIT :limit OFFSET :offset'
         );
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, PDO::PARAM_STR);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -101,12 +113,54 @@ class LogsService
     }
 
     /**
-     * Permets de compter le nombre total de logs enregistrés
+     * Permets de compter le nombre total de logs enregistrés,
+     * en tenant compte des mêmes filtres que getLogs()
      *
+     * @param array<string, string|null> $filters Filtres optionnels
      * @return int Nombre total de logs
      */
-    public static function countLogs(): int
+    public static function countLogs(array $filters = []): int
     {
-        return (int) self::getConnect()->query('SELECT COUNT(*) FROM serv_logs')->fetchColumn();
+        [$where, $params] = self::buildFilters($filters);
+
+        $stmt = self::getConnect()->prepare('SELECT COUNT(*) FROM serv_logs' . $where);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, PDO::PARAM_STR);
+        }
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Construit la clause WHERE et les paramètres SQL correspondant aux filtres
+     *
+     * @param array<string, string|null> $filters Filtres optionnels
+     * @return array{0: string, 1: array<string, string>} Clause WHERE (avec un préfixe espace) et paramètres
+     */
+    private static function buildFilters(array $filters): array
+    {
+        $where = [];
+        $params = [];
+
+        if (empty($filters['method']) === false) {
+            $where[] = "event_desc LIKE :method ESCAPE '\\'";
+            $params[':method'] = '%"method":"' . $filters['method'] . '"%';
+        }
+
+        if (empty($filters['status']) === false) {
+            $where[] = "event_desc LIKE :status ESCAPE '\\'";
+            $params[':status'] = '%"status_code":"' . $filters['status'] . '%';
+        }
+
+        if (empty($filters['search']) === false) {
+            $where[] = "event_desc LIKE :search ESCAPE '\\'";
+            $params[':search'] = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['search']) . '%';
+        }
+
+        return [
+            (count($where) === 0 ? '' : ' WHERE ' . implode(' AND ', $where)),
+            $params,
+        ];
     }
 }

@@ -14,6 +14,7 @@ namespace Studoo\EduFramework\Core;
 use Dotenv\Dotenv;
 use PDO;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
+use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
@@ -55,6 +56,7 @@ class LoadCouchCore
 
         // Route interne de la barre de debug (uniquement en mode dev)
         if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev') {
+            $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
             $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
         }
 

@@ -78,7 +78,8 @@ class TwigCore
     public function render(string|TemplateWrapper $name, array $context = []): string
     {
         $response = self::$twig->render($name, $context);
-        if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev') {
+        if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev'
+            && ConfigCore::getRequest()->getRoute() !== '/_debug/profiler') {
             $debugBar = new studooBarreDebug();
             $response .= $debugBar->generateCssGlobal();
             $response .= $debugBar->generateBarDebug();

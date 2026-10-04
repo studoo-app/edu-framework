@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profiler | Edu Framework</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 13px;
+            color: #333;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Barre supérieure ===== */
+        .profiler-topbar {
+            height: 44px;
+            background-color: #1a1a1a;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+
+        .profiler-topbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .profiler-topbar .meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .badge-env {
+            background-color: #36b393;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* ===== Corps : sidebar + contenu ===== */
+        .profiler-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .profiler-sidebar {
+            width: 210px;
+            background-color: #252526;
+            color: #ccc;
+            padding: 12px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profiler-sidebar nav {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profiler-sidebar a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 9px 16px;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profiler-sidebar a:hover:not(.disabled) {
+            background-color: #2d2d2d;
+        }
+
+        .profiler-sidebar a.active {
+            background-color: #2d2d2d;
+            border-left-color: #36b393;
+            color: #fff;
+        }
+
+        .profiler-sidebar a.disabled {
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .profiler-sidebar .count {
+            background-color: #36b393;
+            color: #000;
+            font-size: 11px;
+            padding: 1px 7px;
+            border-radius: 9px;
+            font-weight: bold;
+        }
+
+        .profiler-sidebar .sidebar-footer {
+            margin-top: auto;
+            padding: 10px 16px;
+            font-size: 11px;
+            color: #666;
+            border-top: 1px solid #333;
+        }
+
+        /* ===== Contenu ===== */
+        .profiler-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .content-header h1 {
+            font-size: 20px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .content-header h1 span {
+            font-size: 13px;
+            font-weight: normal;
+            color: #888;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .filters select, .filters input {
+            font-family: inherit;
+            font-size: 13px;
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .filters input {
+            min-width: 220px;
+        }
+
+        /* ===== Table des logs ===== */
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        .logs-table th {
+            text-align: left;
+            padding: 7px 10px;
+            background-color: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .logs-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #e6e6e6;
+            white-space: nowrap;
+        }
+
+        .logs-table tr.log-row {
+            cursor: pointer;
+        }
+
+        .logs-table tr.log-row:hover {
+            background-color: #f2fbf8;
+        }
+
+        .logs-table td.raw-cell {
+            white-space: pre-wrap;
+            color: #999;
+            font-style: italic;
+        }
+
+        .logs-table tr.detail-row td {
+            background-color: #f9f9f9;
+            padding: 10px;
+        }
+
+        .logs-table pre {
+            margin: 0;
+            font-size: 12px;
+            white-space: pre-wrap;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 0;
+        }
+
+        /* ===== Badges ===== */
+        .m-GET { color: #000; background-color: #61affe; padding: 1px 6px; border-radius: 3px; }
+        .m-POST { color: #000; background-color: #ffc862; padding: 1px 6px; border-radius: 3px; }
+        .m-PUT { color: #000; background-color: #fca02f; padding: 1px 6px; border-radius: 3px; }
+        .m-DELETE { color: #fff; background-color: #f93e3e; padding: 1px 6px; border-radius: 3px; }
+        .m-PATCH { color: #000; background-color: #50e3c2; padding: 1px 6px; border-radius: 3px; }
+
+        .s-2xx { color: #2e7d32; font-weight: bold; }
+        .s-3xx { color: #0097a7; font-weight: bold; }
+        .s-4xx { color: #ef6c00; font-weight: bold; }
+        .s-5xx { color: #c62828; font-weight: bold; }
+
+        /* ===== Pagination ===== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .pagination button {
+            cursor: pointer;
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .pagination button:hover:not([disabled]) {
+            background-color: #e6e6e6;
+        }
+
+        .pagination button[disabled] {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .pagination select {
+            font-family: inherit;
+            font-size: 13px;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <header class="profiler-topbar">
+        <div class="brand">
+            <img src="{{ logoEF }}" alt="Logo Edu Framework" width="22px">
+            <strong>PROFILER</strong>
+        </div>
+        <div class="meta">
+            <span class="badge-env">{{ appEnv }}</span>
+            <span>v{{ version }}</span>
+            <span>PHP {{ phpVersion }}</span>
+        </div>
+    </header>
+
+    <div class="profiler-body">
+        <aside class="profiler-sidebar">
+            <nav>
+                <a href="#" class="active" id="navLogs">&#128202; Logs <span id="sidebarCount" class="count">0</span></a>
+                <a href="#" class="disabled" title="Bient&ocirc;t disponible">&#127760; Request</a>
+                <a href="#" class="disabled" title="Bient&ocirc;t disponible">&#9889; Performance</a>
+            </nav>
+            <div class="sidebar-footer">
+                Edu Framework Profiler<br>
+                Les logs sont enregistr&eacute;s dans <code>var/logs/core_logs.sqlite</code>
+            </div>
+        </aside>
+
+        <main class="profiler-content">
+            <div class="content-header">
+                <h1>Logs <span id="logsTotal"></span></h1>
+                <button type="button" class="pagination" id="btnRefresh" style="cursor: pointer;">&#10227; Rafra&icirc;chir</button>
+            </div>
+
+            <div class="filters">
+                <select id="filterMethod">
+                    <option value="">Toutes les m&eacute;thodes</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="">Tous les statuts</option>
+                    <option value="2">2xx - Succ&egrave;s</option>
+                    <option value="3">3xx - Redirection</option>
+                    <option value="4">4xx - Erreur client</option>
+                    <option value="5">5xx - Erreur serveur</option>
+                </select>
+                <input type="text" id="filterSearch" placeholder="Rechercher dans les logs...">
+            </div>
+
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>M&eacute;thode</th>
+                        <th>Statut</th>
+                        <th>IP:port</th>
+                        <th>Chemin</th>
+                        <th>Re&ccedil;ue le</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+
+            <div class="pagination">
+                <span id="pageInfo">1 / 1</span>
+                <button type="button" id="btnPrev">&#9664; Pr&eacute;c&eacute;dent</button>
+                <button type="button" id="btnNext">Suivant &#9654;</button>
+                <select id="pageSize">
+                    <option value="20">20 / page</option>
+                    <option value="50">50 / page</option>
+                    <option value="100">100 / page</option>
+                </select>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            var state = { page: 1, limit: 20, pages: 1, method: '', status: '', search: '' };
+            var searchTimer = null;
+
+            function createCell(content) {
+                var td = document.createElement('td');
+                td.textContent = content;
+                return td;
+            }
+
+            function createMethodBadge(method) {
+                var span = document.createElement('span');
+                span.className = 'm-' + method;
+                span.textContent = method;
+                return span;
+            }
+
+            function createStatusBadge(statusCode) {
+                var span = document.createElement('span');
+                span.className = 's-' + String(statusCode).charAt(0) + 'xx';
+                span.textContent = statusCode;
+                return span;
+            }
+
+            function appendDetailRow(tr, log) {
+                var detailTr = document.createElement('tr');
+                detailTr.className = 'detail-row';
+                var td = document.createElement('td');
+                td.colSpan = 7;
+                var pre = document.createElement('pre');
+                pre.textContent = JSON.stringify(log.event, null, 2);
+                td.appendChild(pre);
+                detailTr.appendChild(td);
+                tr.after(detailTr);
+                return detailTr;
+            }
+
+            function renderLogs(data) {
+                var body = document.getElementById('logsBody');
+                body.innerHTML = '';
+
+                document.getElementById('logsTotal').textContent = '(' + data.total + ')';
+                document.getElementById('sidebarCount').textContent = data.total;
+
+                if (data.logs.length === 0) {
+                    var tr = document.createElement('tr');
+                    var td = document.createElement('td');
+                    td.colSpan = 7;
+                    td.className = 'empty-state';
+                    td.textContent = 'Aucun log ne correspond à ces filtres';
+                    tr.appendChild(td);
+                    body.appendChild(tr);
+                }
+
+                data.logs.forEach(function(log) {
+                    var event = log.event || {};
+                    var tr = document.createElement('tr');
+                    tr.className = 'log-row';
+
+                    tr.appendChild(createCell('#' + log.id));
+                    tr.appendChild(createCell(log.event_date));
+
+                    if (event.method !== undefined && event.method !== null) {
+                        var tdMethod = document.createElement('td');
+                        tdMethod.appendChild(createMethodBadge(event.method));
+                        tr.appendChild(tdMethod);
+
+                        var tdStatus = document.createElement('td');
+                        tdStatus.appendChild(createStatusBadge(event.status_code));
+                        tr.appendChild(tdStatus);
+
+                        tr.appendChild(createCell(event.ip_port));
+                        tr.appendChild(createCell(event.path));
+                        tr.appendChild(createCell(event.timestamp));
+                    } else {
+                        var tdRaw = document.createElement('td');
+                        tdRaw.colSpan = 4;
+                        tdRaw.className = 'raw-cell';
+                        tdRaw.textContent = event.raw;
+                        tr.appendChild(tdRaw);
+                    }
+
+                    var detailTr = null;
+                    tr.addEventListener('click', function() {
+                        if (detailTr === null) {
+                            detailTr = appendDetailRow(tr, log);
+                        } else {
+                            detailTr.remove();
+                            detailTr = null;
+                        }
+                    });
+
+                    body.appendChild(tr);
+                });
+
+                state.pages = data.pages || 1;
+                document.getElementById('pageInfo').textContent = state.page + ' / ' + state.pages;
+                document.getElementById('btnPrev').disabled = state.page <= 1;
+                document.getElementById('btnNext').disabled = state.page >= state.pages;
+            }
+
+            function loadLogs() {
+                var params = new URLSearchParams();
+                params.set('page', state.page);
+                params.set('limit', state.limit);
+                if (state.method !== '') { params.set('method', state.method); }
+                if (state.status !== '') { params.set('status', state.status); }
+                if (state.search !== '') { params.set('search', state.search); }
+
+                fetch('/edu-logs?' + params.toString())
+                    .then(function(response) { return response.json(); })
+                    .then(renderLogs)
+                    .catch(function(error) { console.error('[EduFramework Profiler]', error); });
+            }
+
+            function resetPageAndLoad() {
+                state.page = 1;
+                loadLogs();
+            }
+
+            document.getElementById('btnRefresh').addEventListener('click', loadLogs);
+            document.getElementById('btnPrev').addEventListener('click', function() {
+                if (state.page > 1) { state.page--; loadLogs(); }
+            });
+            document.getElementById('btnNext').addEventListener('click', function() {
+                if (state.page < state.pages) { state.page++; loadLogs(); }
+            });
+            document.getElementById('pageSize').addEventListener('change', function() {
+                state.limit = parseInt(this.value, 10);
+                resetPageAndLoad();
+            });
+            document.getElementById('filterMethod').addEventListener('change', function() {
+                state.method = this.value;
+                resetPageAndLoad();
+            });
+            document.getElementById('filterStatus').addEventListener('change', function() {
+                state.status = this.value;
+                resetPageAndLoad();
+            });
+            document.getElementById('filterSearch').addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(function() {
+                    state.search = document.getElementById('filterSearch').value.trim();
+                    resetPageAndLoad();
+                }, 300);
+            });
+
+            loadLogs();
+        })();
+    </script>
+</body>
+</html>

@@ -117,4 +117,68 @@ class LogsServiceTest extends TestCase
 
         $this->assertSame($countBefore + 1, LogsService::countLogs());
     }
+
+    public function testGetLogsFiltersByMethod(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/filter-method","status_code":"200","ip_port":"127.0.0.1:1111","timestamp":"now"}');
+        LogsService::addLog('{"method":"POST","path":"/filter-method","status_code":"200","ip_port":"127.0.0.1:2222","timestamp":"now"}');
+
+        $logs = LogsService::getLogs(50, 0, ['method' => 'POST']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertSame('POST', $log['event']['method']);
+        }
+    }
+
+    public function testGetLogsFiltersByStatusFamily(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/filter-status-ok","status_code":"200"}');
+        LogsService::addLog('{"method":"GET","path":"/filter-status-err","status_code":"404"}');
+
+        $logs = LogsService::getLogs(50, 0, ['status' => '4']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertStringStartsWith('4', (string) $log['event']['status_code']);
+        }
+    }
+
+    public function testGetLogsFiltersBySearch(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/needle-search","status_code":"200"}');
+
+        $logs = LogsService::getLogs(50, 0, ['search' => 'needle-search']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertStringContainsString('needle-search', (string) $log['event']['path']);
+        }
+    }
+
+    public function testCountLogsRespectsFilters(): void
+    {
+        $totalAll = LogsService::countLogs();
+        $totalPost = LogsService::countLogs(['method' => 'POST']);
+
+        $this->assertLessThanOrEqual($totalAll, $totalPost);
+
+        LogsService::addLog('{"method":"POST","path":"/filter-count","status_code":"200"}');
+
+        $this->assertSame($totalPost + 1, LogsService::countLogs(['method' => 'POST']));
+        $this->assertSame($totalAll + 1, LogsService::countLogs());
+    }
+
+    public function testGetLogsFiltersCombined(): void
+    {
+        LogsService::addLog('{"method":"POST","path":"/combined","status_code":"500","ip_port":"127.0.0.1:3333","timestamp":"now"}');
+
+        $logs = LogsService::getLogs(50, 0, ['method' => 'POST', 'status' => '5', 'search' => 'combined']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertSame('POST', $log['event']['method']);
+            $this->assertSame('500', $log['event']['status_code']);
+        }
+    }
 }
