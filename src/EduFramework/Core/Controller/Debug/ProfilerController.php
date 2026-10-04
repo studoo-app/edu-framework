@@ -41,8 +41,13 @@ class ProfilerController implements ControllerInterface
         ConfigCore::setConfig('twig_path', __DIR__ . '/../Template');
         TwigCore::setEnvironment();
 
+        $templateName = 'profiler.html.twig';
+        if (empty($templateName)) {
+            throw new \RuntimeException('Template name for profiler page cannot be empty');
+        }
+
         return TwigCore::getEnvironment()->render(
-            'profiler.html.twig',
+            $templateName,
             [
                 'version'    => ConfigCore::getConfig('version'),
                 'phpVersion' => PHP_VERSION,

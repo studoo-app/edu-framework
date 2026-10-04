@@ -55,6 +55,7 @@ class DebugLogsController implements ControllerInterface
             'from' => $this->filterPattern($request->get('from'), '/^\d{4}-\d{2}-\d{2}$/'),
             'until' => $this->filterPattern($request->get('until'), '/^\d{4}-\d{2}-\d{2}$/'),
         ];
+        $filters = $filters ?? [];
 
         $limit = min(100, max(1, (int) ($request->get('limit') ?? 20)));
         $page = max(1, (int) ($request->get('page') ?? 1));
