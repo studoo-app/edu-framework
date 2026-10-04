@@ -15,6 +15,8 @@ use Studoo\EduFramework\Commands\Extends\CkeckStack;
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Formatter\BufferToServer;
+use Studoo\EduFramework\Core\Logs\LogsService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -123,8 +125,13 @@ class StartCommand extends CommandManage
         $process->setTimeout(null);
         $process->run(function ($type, $buffer): void {
             if (!str_contains($buffer, 'Accepted') && !str_contains($buffer, 'Closing')) {
-                    self::$stdOutput->write($buffer);
-                    //(new BufferToServer($buffer))->getFormatBuffer();
+                self::$stdOutput->write($buffer);
+
+                $log = (new BufferToServer($buffer))->getFormatBuffer();
+                $logJson = json_encode($log);
+                if ($logJson !== false) {
+                    LogsService::addLog($logJson);
+                }
             }
         });
 

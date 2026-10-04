@@ -15,14 +15,26 @@ use Exception;
 use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 
+/**
+ * Class DatabaseSqlite
+ * Classe pour gérer la connexion à une base de données SQLite.
+ *
+ * @package Studoo\EduFramework\Core\Service
+ * @property string $dbName Nom de la base de données
+ */
 class DatabaseSqlite implements DatabaseInterface
 {
     /**
+     * Permets de récupérer la connexion à la base de données
+     * 
+     * @param string|null $dbName Nom de la base de données
+     * @param string|null $pathToSqliteLogs Chemin vers le fichier SQLite
+     * @throws Exception
      * @return PDO
      */
-    public function getManager(): PDO
+    public function getManager(string|null $dbName = null, string|null $pathToSqliteLogs = null): PDO
     {
-        $pathToSqliteFile = ConfigCore::getConfig('sqlite_path');
+        $pathToSqliteFile = ($pathToSqliteLogs === null ? ConfigCore::getConfig('sqlite_path') : $pathToSqliteLogs);
 
         if (is_dir($pathToSqliteFile) === false) {
             mkdir($pathToSqliteFile, 0777, true);
@@ -32,6 +44,6 @@ class DatabaseSqlite implements DatabaseInterface
             throw new Exception("SQLite database file does not exist at the provided path. <" . ConfigCore::getConfig('sqlite_path') . "> ");
         }
 
-        return new PDO('sqlite:' . $pathToSqliteFile . ConfigCore::getEnv('DB_NAME') . ".sqlite");
+        return new PDO('sqlite:' . $pathToSqliteFile . ($dbName === null ? ConfigCore::getEnv('DB_NAME') : $dbName) . ".sqlite");
     }
 }

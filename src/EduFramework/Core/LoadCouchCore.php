@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core;
 
 use Dotenv\Dotenv;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -39,6 +40,9 @@ class LoadCouchCore
         if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
             (new DatabaseService());
         }
+
+        // Gestion des logs
+        (new LogsService());
 
         // Gestion des routes
         $route = new FastRouteCore();
