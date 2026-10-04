@@ -34,6 +34,9 @@ class HttpErrorDefaultController implements ControllerInterface
      */
     public function execute(Request $request): string
     {
+        if (headers_sent() === false) {
+            http_response_code(500);
+        }
         return TwigCore::getEnvironment()->render(
             'error/http-Default.html.twig',
             []

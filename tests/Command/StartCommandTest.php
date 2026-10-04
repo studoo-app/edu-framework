@@ -10,6 +10,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class StartCommandTest extends TestCase
 {
+    private ?CommandTester $commandeTester = null;
+
     protected function setUp(): void
     {
         (new ConfigCore([]));

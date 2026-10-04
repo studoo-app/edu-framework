@@ -12,7 +12,11 @@
 namespace Studoo\EduFramework\Core;
 
 use Dotenv\Dotenv;
+use PDO;
+use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
+use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -40,10 +44,21 @@ class LoadCouchCore
             (new DatabaseService());
         }
 
+        // Gestion des logs (le service de logs nécessite le driver PDO SQLite)
+        if (in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+            (new LogsService());
+        }
+
         // Gestion des routes
         $route = new FastRouteCore();
         // LoadCouchCore des routes depuis le fichier de configuration
         $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
+
+        // Route interne de la barre de debug (uniquement en mode dev)
+        if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev' && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+            $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
+            $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
+        }
 
         try {
             // Récupération de la route à appeler
