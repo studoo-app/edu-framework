@@ -33,7 +33,7 @@ class BufferToServer extends BufferFormat
      */
     public function getFormatBuffer(): array
     {
-        preg_match('/\[(.*?)\] (\d+\.\d+\.\d+\.\d+:\d+) \[(\d+)\]: (\w+) (.+)/', self::getBuffer(), $matches);
+        preg_match('/^\[(.*?)\]\s+(\S+:\d+)\s+\[(\d{3})\]:\s+([A-Z]+)\s+(.+?)\r?\n?$/', self::getBuffer(), $matches);
 
         return [
                 'raw' => (is_array($matches) && isset($matches[0]) ? $matches[0] : self::getBuffer()),
