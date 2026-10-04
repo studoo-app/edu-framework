@@ -170,7 +170,7 @@ HTML;
             . '<button type="button" class="edu-tb-close" title="Réduire la barre" onclick="eduToolbarToggle(true)">&times;</button>'
             . '</div></div>'
             . '<button type="button" id="edu-tb-mini" title="Afficher la barre de debug" aria-label="Afficher la barre de debug" onclick="eduToolbarToggle(false)">'
-            . '<img src="' . $logo . '" alt=""></button>'
+            . '<img src="' . $logo . '" alt=""></button>';
     }
 
     /**
