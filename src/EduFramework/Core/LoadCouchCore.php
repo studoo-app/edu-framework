@@ -55,7 +55,7 @@ class LoadCouchCore
         $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
 
         // Route interne de la barre de debug (uniquement en mode dev)
-        if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev') {
+        if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev' && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
             $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
             $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
         }
