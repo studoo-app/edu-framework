@@ -68,4 +68,45 @@ class LogsService
         $stmt->bindParam(':event_desc', $eventDesc, PDO::PARAM_STR);
         $stmt->execute();
     }
+
+    /**
+     * Permets de récupérer les logs enregistrés, du plus récent au plus ancien.
+     * L'événement (event_desc) est décodé : s'il s'agit d'un JSON, le tableau
+     * décodé est retourné, sinon le texte brut est disponible dans la clé 'raw'.
+     *
+     * @param int $limit Nombre de logs à récupérer
+     * @param int $offset Décalage pour la pagination
+     * @return array<int, array<string, mixed>> Liste des logs (id, event_date, event)
+     */
+    public static function getLogs(int $limit = 20, int $offset = 0): array
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT id, event_date, event_desc FROM serv_logs ORDER BY id DESC LIMIT :limit OFFSET :offset'
+        );
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $logs = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $event = json_decode((string) $row['event_desc'], true);
+            $logs[] = [
+                'id' => (int) $row['id'],
+                'event_date' => $row['event_date'],
+                'event' => (is_array($event) === true ? $event : ['raw' => (string) $row['event_desc']]),
+            ];
+        }
+
+        return $logs;
+    }
+
+    /**
+     * Permets de compter le nombre total de logs enregistrés
+     *
+     * @return int Nombre total de logs
+     */
+    public static function countLogs(): int
+    {
+        return (int) self::getConnect()->query('SELECT COUNT(*) FROM serv_logs')->fetchColumn();
+    }
 }

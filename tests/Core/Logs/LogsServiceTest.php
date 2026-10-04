@@ -72,4 +72,49 @@ class LogsServiceTest extends TestCase
         $stmt->execute();
         $this->assertSame($eventDesc, $stmt->fetchColumn());
     }
+
+    public function testGetLogsReturnsJsonEventsDecodedAndNewestFirst(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/first","status_code":"200"}');
+        LogsService::addLog('{"method":"POST","path":"/second","status_code":"404"}');
+
+        $logs = LogsService::getLogs(2, 0);
+
+        $this->assertCount(2, $logs);
+        $this->assertSame('POST', $logs[0]['event']['method']);
+        $this->assertSame('/second', $logs[0]['event']['path']);
+        $this->assertSame('GET', $logs[1]['event']['method']);
+        $this->assertSame('/first', $logs[1]['event']['path']);
+        $this->assertGreaterThan($logs[1]['id'], $logs[0]['id']);
+    }
+
+    public function testGetLogsReturnsRawFallbackForNonJsonEvents(): void
+    {
+        LogsService::addLog('message brut du serveur');
+
+        $logs = LogsService::getLogs(1, 0);
+
+        $this->assertSame(['raw' => 'message brut du serveur'], $logs[0]['event']);
+    }
+
+    public function testGetLogsPaginatesWithLimitAndOffset(): void
+    {
+        LogsService::addLog('{"method":"GET","path":"/page-1"}');
+        LogsService::addLog('{"method":"GET","path":"/page-2"}');
+
+        // Ordre DESC : offset 0 = la plus récente (/page-2), offset 1 = la suivante (/page-1)
+        $page = LogsService::getLogs(1, 1);
+
+        $this->assertCount(1, $page);
+        $this->assertSame('/page-1', $page[0]['event']['path']);
+    }
+
+    public function testCountLogs(): void
+    {
+        $countBefore = LogsService::countLogs();
+
+        LogsService::addLog('{"method":"GET","path":"/count"}');
+
+        $this->assertSame($countBefore + 1, LogsService::countLogs());
+    }
 }
