@@ -47,7 +47,7 @@ class CreateControllerCommand extends Command
 
     protected function configure(): void
     {
-        $this->AddArgument('controller-name', InputArgument::REQUIRED, 'Controller name');
+        $this->addArgument('controller-name', InputArgument::REQUIRED, 'Controller name');
     }
 
     /**
@@ -63,7 +63,7 @@ class CreateControllerCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         //Format controller-name arg
-        $namesCollection = self::getNamesCollection($input->getArgument('controller-name'));
+        $namesCollection = $this->getNamesCollection($input->getArgument('controller-name'));
         //Generate route params in app/Config/routes.yaml
         $this->generateRoute($namesCollection["uri"], $namesCollection["uri"], $namesCollection["className"]);
         //Generate Controller Class
