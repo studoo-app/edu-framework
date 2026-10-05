@@ -33,6 +33,15 @@
 - Fix FastRouteCoreTest failures caused by APP_ENV state leaking between tests @bfoujols
 - Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
 
+**documentation**
+
+- new [Migrer de la version 2.2 à la version 2.3](docs/migrate/migration-2_2-2_3.md)
+- new [La barre de debug et le profiler](docs/boost/debug-bar.md)
+- update [Start/Stop l'application](docs/installation/start-application.md) : options de la commande `start`
+- update [Comment installer les services](docs/installation/start-services.md) : MailPit et dbgate
+- update [Avant de démarrer](docs/installation/prerequis.md) : extension `pdo_sqlite` et PHP 8.4 minimum
+- update [L'arborescence du projet](docs/build/arborescence.md) : correction du fichier `compose.yaml`
+
 > Release notes for v2.3.0
 >
 > [https://github.com/studoo-app/edu-framework/milestone/v2.3.0](https://github.com/studoo-app/edu-framework/milestone/19)

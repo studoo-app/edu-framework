@@ -30,7 +30,7 @@ L'arborescence du projet est la structure de votre projet. Elle est composée de
 ├── .env
 ├── .env.example
 ├── .gitignore
-├── compose.json
+├── compose.yaml
 ├── composer.json
 ├── README.md
 └── LICENSE

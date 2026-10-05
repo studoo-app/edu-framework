@@ -20,6 +20,7 @@
     * [Route - Générer une URL par le nom](boost/route.md)
     * [La barre de debug et le profiler](boost/debug-bar.md)
 * [Migrer](migrate/major.md)
+    * [Migrer de la version 2.2 à la version 2.3](migrate/migration-2_2-2_3.md)
     * [Migrer de la version 1.0 à la version 2.0](migrate/migration-1_2-2_0.md)
 * [Contribuer](contributor/index.md)
     * [Code de conduite](contributor/code_of_conduct.md)
