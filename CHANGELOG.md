@@ -2,20 +2,6 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## v2.4.0 - en cours
-
-**new features**
-
-- Update PHP minimum version 8.2 -> 8.4 (composer, bin/edu, CI, doc) @bfoujols
-- Update dependencies (vlucas/phpdotenv v5.7, nette/php-generator, zircote/swagger-php, symfony/yaml 6.3 -> 6.4) @bfoujols
-
-**bug Fixes**
-
-- Fix debug toolbar always showing an empty controller instead of "aucun" (Request::hasHander always true) @bfoujols
-- Fix PHP 8.5 deprecation (PDO::MYSQL_ATTR_INIT_COMMAND -> PDO\MYSQL::ATTR_INIT_COMMAND) @bfoujols
-- Fix FastRouteCoreTest failures caused by APP_ENV state leaking between tests @bfoujols
-- Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
-
 ## v2.3.0 - 05/10/2026
 
 **new features**
@@ -29,6 +15,8 @@
 - [#122](https://github.com/studoo-app/edu-framework/issues/122) Add Manage DB by dbgate @bfoujols
 - [#120](https://github.com/studoo-app/edu-framework/issues/120) Add MailPit Service @bfoujols
 - [#97](https://github.com/studoo-app/edu-framework/issues/97) Add slash command @bfoujols
+- Update PHP minimum version 8.2 -> 8.4 (composer, bin/edu, CI, doc) @bfoujols
+- Update dependencies (vlucas/phpdotenv v5.7, nette/php-generator, zircote/swagger-php, symfony/yaml 6.3 -> 6.4) @bfoujols
 
 **bug Fixes**
 
@@ -40,10 +28,14 @@
 - [#129](https://github.com/studoo-app/edu-framework/issues/129) run command taskfile before-commit @bfoujols
 - Fix CI failure on profiler page and logs endpoint @bfoujols
 - Fix CI failure on debug toolbar (missing semicolon) and deprecated dynamic property @bfoujols
+- Fix debug toolbar always showing an empty controller instead of "aucun" (Request::hasHander always true) @bfoujols
+- Fix PHP 8.5 deprecation (PDO::MYSQL_ATTR_INIT_COMMAND -> PDO\MYSQL::ATTR_INIT_COMMAND) @bfoujols
+- Fix FastRouteCoreTest failures caused by APP_ENV state leaking between tests @bfoujols
+- Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
 
-> Release notes for v2.4.0
+> Release notes for v2.3.0
 >
-> [https://github.com/studoo-app/edu-framework/milestone/v2.4.0](https://github.com/studoo-app/edu-framework/milestone/20)
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.0](https://github.com/studoo-app/edu-framework/milestone/19)
 
 <br>
 
