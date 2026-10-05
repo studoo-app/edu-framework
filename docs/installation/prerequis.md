@@ -12,6 +12,7 @@ Voici la liste des composants nécessaires pour assurer le bon déroulement du p
     * [ ] OpenSSL extension
     * [ ] mbstring extension
     * [ ] pdo_mysql extension
+    * [ ] pdo_sqlite extension
 - [ ] [:simple-composer: Gestionnaire de dépendance](prerequis.md#gestionnaire-de-dependance)
 - [ ] [:simple-curl: Commande CURL](prerequis.md#commande-curl) 
 - [ ] [:simple-docker: Environnement local](prerequis.md#environnement-local) 
@@ -149,17 +150,17 @@ php -v
     Ce résultat est un exemple et il ne sera probablement pas le vôtre.
 
     ````Bash
-    PHP 8.1.21 (cli) (built: Jul  6 2023 16:08:36) (NTS)
+    PHP 8.4.11 (cli) (built: Sep  2 2026 16:08:36) (NTS)
     Copyright (c) The PHP Group
-    Zend Engine v4.1.21, Copyright (c) Zend Technologies
-    with Zend OPcache v8.1.21, Copyright (c), by Zend Technologies
+    Zend Engine v4.4.11, Copyright (c) Zend Technologies
+    with Zend OPcache v8.4.11, Copyright (c), by Zend Technologies
     ````
 
 **Installation**
 
 !!! warning "Version obligatoire"
 
-    Le framework est construit à partir de la version PHP 8.1, nous vous recommandons d'installer la version 8.2 ou plus (8.3)
+    Le framework nécessite au minimum la version PHP 8.4, nous vous recommandons d'installer la version 8.4 ou plus (8.5)
 
 === ":fontawesome-brands-windows: WINDOWS via Scoop"
 
@@ -169,7 +170,7 @@ php -v
     scoop bucket add versions
     ```
     ```bash
-    scoop install versions/php83
+    scoop install versions/php84
     ```
 
     Pour plus informations, visitez le site [https://scoop.sh/#/apps?q=php](https://scoop.sh/#/apps?q=php&id=5101819badef2a2c45455bdb63c0036655741250){:target="_blank"}
@@ -189,7 +190,7 @@ php -v
     Pour installation PHP, ouvrez un terminal
     
     ```bash
-    brew install php@8.3
+    brew install php@8.4
     ```
 
     Pour plus informations, visitez le site [https://formulae.brew.sh/formula/php](https://formulae.brew.sh/formula/php#default){:target="_blank"}
@@ -205,12 +206,12 @@ php --ini
 Vous aurez un résultat similaire à celui-ci :
 
 ````Bash
-Configuration File (php.ini) Path: /usr/local/etc/php/8.2
-Loaded Configuration File:         /usr/local/etc/php/8.2/php.ini
-Scan for additional .ini files in: /usr/local/etc/php/8.2/conf.d 
-Additional .ini files parsed:      /usr/local/etc/php/8.2/conf.d/ext-opcache.ini
+Configuration File (php.ini) Path: /usr/local/etc/php/8.4
+Loaded Configuration File:         /usr/local/etc/php/8.4/php.ini
+Scan for additional .ini files in: /usr/local/etc/php/8.4/conf.d 
+Additional .ini files parsed:      /usr/local/etc/php/8.4/conf.d/ext-opcache.ini
 ````
-Dans cet exemple, le fichier php.ini se trouve dans le dossier "/usr/local/etc/php/8.2". 
+Dans cet exemple, le fichier php.ini se trouve dans le dossier "/usr/local/etc/php/8.4". 
 
 #### OpenSSL extension
 Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
@@ -233,6 +234,20 @@ Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suiv
 
 ````Bash
 ;extension=pdo_mysql
+````
+Enlever le point-virgule pour activer l'extension.
+
+#### pdo_sqlite extension
+
+!!! warning "A partir de la version v2.3.0"
+
+    L'extension `pdo_sqlite` est nécessaire au fonctionnement du service de logs,
+    de la [barre de debug et du profiler](../boost/debug-bar.md).
+
+Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
+
+````Bash
+;extension=pdo_sqlite
 ````
 Enlever le point-virgule pour activer l'extension.
 

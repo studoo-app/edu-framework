@@ -44,6 +44,31 @@ Voici un exemple de résultat de la page web :
 
     Cette commande va démarrer le serveur de développement à l'adresse [http://localhost:8042](http://localhost:8042){:target="_blank"}.
 
+## Les options de la commande start
+
+La commande `php bin/edu start` dispose d'options (à partir de la version v2.3.0) :
+
+| Option            | Description                                                                                      |
+|-------------------|--------------------------------------------------------------------------------------------------|
+| `-p` ou `--port`  | Permet de changer le port d'écoute du serveur de développement (défaut : `8042`)                 |
+| `--no-start`      | Vérifie les prérequis de votre environnement sans démarrer le serveur de développement            |
+
+Exemple pour démarrer l'application sur le port 9090 :
+
+```bash
+php bin/edu start -p 9090
+```
+
+Exemple pour vérifier les prérequis sans démarrer le serveur :
+
+```bash
+php bin/edu start --no-start
+```
+
+!!! tip "Journalisation des requêtes"
+
+    Lorsque le serveur est démarré via `php bin/edu start`, chaque requête HTTP reçue est journalisée dans une base SQLite (`var/logs/core_logs.sqlite`).
+    Ces logs sont consultables depuis le [profiler](../boost/debug-bar.md#le-profiler).
 
 ## Arrêtez l'application
 

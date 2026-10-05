@@ -34,7 +34,7 @@ jobs:
     strategy:
         fail-fast: true
         matrix:
-            php-versions: [ '8.2' ]
+            php-versions: [ '8.4', '8.5' ]
     steps:
       # https://github.com/actions/checkout (official)
       - name: Checkout

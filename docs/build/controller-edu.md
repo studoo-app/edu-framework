@@ -24,7 +24,7 @@ Nous allons créer un page "Hello" avec la commande suivante :
 php bin/edu make:controller Hello
 ```
 
-La commande va générer un controller "HelloController.php" dans le dossier "src/Controller" et un fichier "hello.html.twig" dans le dossier "src/Template/hello".
+La commande va générer un controller "HelloController.php" dans le dossier "app/Controller" et un fichier "hello.html.twig" dans le dossier "app/Template/hello".
 Voici l'arborecence des fichiers générés :
 
 ``` hl_lines="5 8 9"
@@ -40,7 +40,7 @@ Voici l'arborecence des fichiers générés :
 ```
 
 ### Le fichier HelloController.php
-Cette commande va créer un fichier "HelloController.php" dans le dossier "src/Controller". 
+Cette commande va créer un fichier "HelloController.php" dans le dossier "app/Controller". 
 
 ```php 
 <?php
@@ -80,7 +80,7 @@ Deux variables sont passées au template : "titre" et "request".
 
 
 ### Le fichier hello.html.twig
-Et va aussi créer un fichier "hello.html.twig" dans le dossier "src/Template/hello".
+Et va aussi créer un fichier "hello.html.twig" dans le dossier "app/Template/hello".
 
 ```twig
 {% extends "base.html.twig" %}
@@ -101,7 +101,7 @@ Vous pouvez accéder à votre controller en tapant l'url suivante : [http://loca
 </figure>
 
 ## Modifier le fichier des routes
-Et modifier le fichier des routes "config/routes.yaml" pour ajouter la route de votre controller.
+Et modifier le fichier des routes "app/Config/routes.yaml" pour ajouter la route de votre controller.
 
 ```yaml
 hello:
@@ -112,7 +112,7 @@ hello:
 
 Vous pouvez accéder à votre controller en tapant l'url suivante : [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
-Vous pouvez modifier le fichier des routes "config/routes.yaml" pour changer l'url de votre controller.
+Vous pouvez modifier le fichier des routes "app/Config/routes.yaml" pour changer l'url de votre controller.
 Remplacer "/hello" par "/bonjour" par exemple.
 
 ```diff

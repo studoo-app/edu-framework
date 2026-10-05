@@ -6,4 +6,5 @@ Après une première prise en main, vous pouvez avancer dans le développement d
 
 - [Classe Request - La gestion des requêtes HTTP](resquet.md)
 - [DatabaseService - La gestion des données](dataservice.md)
-
+- [Route - Générer une URL par le nom](route.md)
+- [La barre de debug et le profiler](debug-bar.md)

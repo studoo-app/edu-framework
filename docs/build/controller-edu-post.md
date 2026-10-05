@@ -17,7 +17,7 @@ Nous allons créer un page "ville" avec la commande suivante :
 php bin/edu make:controller Ville
 ```
 
-La commande va générer un controller "VilleController.php" dans le dossier "src/Controller" et un fichier "ville.html.twig" dans le dossier "src/Template/ville".
+La commande va générer un controller "VilleController.php" dans le dossier "app/Controller" et un fichier "ville.html.twig" dans le dossier "app/Template/ville".
 Voici l'arborecence des fichiers générés :
 
 ``` hl_lines="5 8 9"
@@ -35,7 +35,7 @@ Voici l'arborecence des fichiers générés :
 ### Modifier le fichier de configuration des routes
 
 Par défaut, les routes sont en méthode GET. Pour pouvoir envoyer des données en POST, il faut modifier la route dans le fichier de configuration des routes.
-Selectionner dans le fichier "config/routes.yaml" la route de votre controller et ajouter la méthode POST.
+Selectionner dans le fichier "app/Config/routes.yaml" la route de votre controller et ajouter la méthode POST.
 
 Exemple de la route /ville :
 
@@ -54,7 +54,7 @@ ville:
 ### Créer un formulaire dans le fichier twig
 
 Créer un formulaire en methode POST dans le fichier twig pour envoyer les données au controller.
-Selectionner le ficher "ville.html.twig" dans le dossier "src/Template/ville"
+Selectionner le ficher "ville.html.twig" dans le dossier "app/Template/ville"
 
 Voici un exemple de formulaire :
 
@@ -166,7 +166,7 @@ Nous allons implémenter la fonction `getNameToPath('NOM_ROUTE')` dans le fichie
             <input type="text" id="nom_ville" name="nom_ville">
             <input type="submit" value="Envoyer">
         </form>
-{% endblock %}s
+{% endblock %}
 ```
 
 <video controls>
@@ -175,5 +175,8 @@ Nous allons implémenter la fonction `getNameToPath('NOM_ROUTE')` dans le fichie
 
 !!! info "Pour aller plus loin"
 
-    Pour aller plus loin, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md) pour comprendre comment gérer les requêtes HTTP.
+    Pour aller plus loin sur la génération d'URL par le nom de la route (routes avec paramètres, redirections, ...),
+    vous pouvez lire la documentation de la classe [Route](../boost/route.md).
+
+    Pour comprendre comment gérer les requêtes HTTP, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md).
 

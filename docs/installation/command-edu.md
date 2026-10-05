@@ -38,6 +38,23 @@ Voici les commandes disponibles par version :
 | make:api        | génération d'un controller type json API      | v2.0                   |
 | make:command    | génération d'un commande line                 | v2.0                   |
 
+### Les options de la commande start
+
+La commande `start` accepte des options pour adapter le démarrage à vos besoins (à partir de la version v2.3.0) :
+
+```bash
+php bin/edu start --no-start
+```
+
+| Option            | Description                                                                        |
+|-------------------|-------------------------------------------------------------------------------------|
+| `-p` ou `--port`  | Change le port d'écoute du serveur de développement (défaut : `8042`)              |
+| `--no-start`      | Vérifie les prérequis de votre environnement sans démarrer le serveur              |
+
+!!! info "Pour aller plus loin"
+
+    Vous pouvez consulter la page [Start/Stop l'application](start-application.md) pour plus de détails sur la commande `start`.
+
 ___
 
 ## Si vous rencontrez une erreur

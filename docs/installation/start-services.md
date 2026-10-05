@@ -66,7 +66,28 @@ Les services sont prêts à être utilisés. Vous pouvez maintenant démarrer vo
 |---------------------------------------------------------------|------------------------|------------------------------------------------|-----------|
 | :simple-mysql: [MySQL](https://hub.docker.com/_/mysql){:target="_blank"}                                      | 3306                   | 127.0.0.1:3306                                 | Mysql 8.0 |
 | :simple-phpmyadmin: [PHPMyAdmin](https://www.phpmyadmin.net/){:target="_blank"} | 8081                   | [http://127.0.0.1:8081](http://127.0.0.1:8081){:target="_blank"} | PMA 5.2.x |
-| :simple-minutemailer: [Mailcatcher](https://mailcatcher.me/){:target="_blank"}  | 1025                   | [http://127.0.0.1:1080](http://127.0.0.1:1080){:target="_blank"} | latest |
+| :octicons-mail-24: [MailPit](https://github.com/axllent/mailpit){:target="_blank"}  | 1025 (SMTP) / 8025 (UI)   | [http://127.0.0.1:8025](http://127.0.0.1:8025){:target="_blank"} | latest |
+| :simple-docker: [dbgate](https://dbgate.org){:target="_blank"}  | 8082                   | [http://127.0.0.1:8082](http://127.0.0.1:8082){:target="_blank"} | latest |
+
+!!! info "MailPit : le service de mail"
+
+    MailPit remplace Mailcatcher depuis la version v2.3.0.
+    Il fait office de serveur SMTP (port `1025`) pour tester l'envoi de mails depuis votre application,
+    et propose une interface web (port `8025`) pour consulter les mails envoyés.
+
+    La variable d'environnement `MAILER_DSN` de votre fichier `.env` doit pointer vers ce service :
+
+    ```dotenv
+    MAILER_DSN="smtp://localhost:1025"
+    ```
+
+!!! info "dbgate : le client de base de données"
+
+    Le service [dbgate](https://dbgate.org){:target="_blank"} remplace avantageusement un client SQL installé sur votre poste.
+    Il propose deux connexions pré-configurées :
+
+    - **MySql** : serveur `database`, utilisateur `root`, mot de passe `studoo` (base `app_db`)
+    - **SQLite** : fichier `var/sqlite/app_db.sqlite`
 
 !!! info 
     

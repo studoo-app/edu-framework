@@ -93,7 +93,7 @@ class Request
      */
     public function hasHander(): bool
     {
-        return isset($this->hander);
+        return $this->hander !== '';
     }
 
     /**

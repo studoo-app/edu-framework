@@ -2,19 +2,45 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## v2.3.0 - 10/04/2025
+## v2.3.0 - 05/10/2026
 
 **new features**
 
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Implement SQLite logging service for server request logs @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add BufferFormat and BufferToServer classes for log formatting @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add logs navigation in the debug bar @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Replace in-bar logs panel with a Symfony-style profiler page @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Enhance filtering capabilities and add status family counting @bfoujols
 - [#69](https://github.com/studoo-app/edu-framework/issues/69) Add custom listening socket (#69) Thanks @CapelleGab
 - [#122](https://github.com/studoo-app/edu-framework/issues/122) Add Manage DB by dbgate @bfoujols
 - [#120](https://github.com/studoo-app/edu-framework/issues/120) Add MailPit Service @bfoujols
 - [#97](https://github.com/studoo-app/edu-framework/issues/97) Add slash command @bfoujols
+- Update PHP minimum version 8.2 -> 8.4 (composer, bin/edu, CI, doc) @bfoujols
+- Update dependencies (vlucas/phpdotenv v5.7, nette/php-generator, zircote/swagger-php, symfony/yaml 6.3 -> 6.4) @bfoujols
 
 **bug Fixes**
 
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Make SQLite logging non-blocking and resilient @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Send proper HTTP status codes from error controllers @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Gate debug routes on SQLite availability to prevent PDOException @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Buffer stream chunks into complete lines to preserve adjacent request logs @bfoujols
 - [#130](https://github.com/studoo-app/edu-framework/issues/130) github action E: Package 'netcat' has no installation candidate @bfoujols
 - [#129](https://github.com/studoo-app/edu-framework/issues/129) run command taskfile before-commit @bfoujols
+- Fix CI failure on profiler page and logs endpoint @bfoujols
+- Fix CI failure on debug toolbar (missing semicolon) and deprecated dynamic property @bfoujols
+- Fix debug toolbar always showing an empty controller instead of "aucun" (Request::hasHander always true) @bfoujols
+- Fix PHP 8.5 deprecation (PDO::MYSQL_ATTR_INIT_COMMAND -> PDO\MYSQL::ATTR_INIT_COMMAND) @bfoujols
+- Fix FastRouteCoreTest failures caused by APP_ENV state leaking between tests @bfoujols
+- Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
+
+**documentation**
+
+- new [Migrer de la version 2.2 à la version 2.3](docs/migrate/migration-2_2-2_3.md)
+- new [La barre de debug et le profiler](docs/boost/debug-bar.md)
+- update [Start/Stop l'application](docs/installation/start-application.md) : options de la commande `start`
+- update [Comment installer les services](docs/installation/start-services.md) : MailPit et dbgate
+- update [Avant de démarrer](docs/installation/prerequis.md) : extension `pdo_sqlite` et PHP 8.4 minimum
+- update [L'arborescence du projet](docs/build/arborescence.md) : correction du fichier `compose.yaml`
 
 > Release notes for v2.3.0
 >
