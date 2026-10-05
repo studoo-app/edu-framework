@@ -80,13 +80,12 @@ class StartCommand extends CommandManage
         $noCheck = $input->getOption('no-start');
 
         if ($noCheck === false) {
-            $animationSlash = $output->section();
             for ($slash = 0; $slash <= 5; $slash++) {
-                $animationSlash->writeln([
+                $output->writeln([
                     CommandBanner::getBanner($slash)
                 ]);
                 usleep(500000); // (0.5 seconde)
-                $slash < 5 ? $animationSlash->clear() : "";
+                // Note : clear() n'est pas disponible sans section(), donc on ne l'utilise pas ici
             }
         }
 

@@ -12,6 +12,7 @@ composer.phar
 .php-cs-fixer.cache
 .php-cs-fixer.php
 .phpunit.result.cache
+.codacy/logs/
 
 # Environment
 .env
@@ -20,3 +21,5 @@ clover.xml
 # Documentation
 venv/**
 .cache/**
+site/**
+.DS_Store
