@@ -2,6 +2,17 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.4.0 - en cours
+
+**new features**
+
+- Update PHP minimum version 8.2 -> 8.4 (composer, bin/edu, CI, doc) @bfoujols
+- Update dependencies (vlucas/phpdotenv v5.7, nette/php-generator, zircote/swagger-php, symfony/yaml 6.3 -> 6.4) @bfoujols
+
+**bug Fixes**
+
+- Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
+
 ## v2.3.0 - 05/10/2026
 
 **new features**
