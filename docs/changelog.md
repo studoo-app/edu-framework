@@ -48,9 +48,9 @@
 - update [Comment installer les services](installation/start-services.md) : MailPit et dbgate
 - update [Avant de démarrer](installation/prerequis.md) : extension `pdo_sqlite`
 
-> Release notes for v2.4.0
+> Release notes for v2.3.0
 >
-> [https://github.com/studoo-app/edu-framework/milestone/20](https://github.com/studoo-app/edu-framework/milestone/20)
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.0](https://github.com/studoo-app/edu-framework/milestone/19)
 
   <br>
 
