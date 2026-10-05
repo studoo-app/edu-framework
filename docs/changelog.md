@@ -2,6 +2,36 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.3.2 - 05/10/2026
+
+**new features**
+
+- Add documentation for building APIs and CRUD operations @bfoujols
+
+**bug Fixes**
+
+- [#143](https://github.com/studoo-app/edu-framework/issues/143) Mettre à jour les chemins de sqlite et des logs pour utiliser des chemins relatifs @bfoujols
+- fix: mettre à jour la vérification de version PHP à 8.4 et ajuster les messages d'erreur @bfoujols
+- test: remplacer sha1 par hash('sha256', ...) dans FastRouteCoreTest @bfoujols
+
+> Release notes for v2.3.2
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.2](https://github.com/studoo-app/edu-framework/milestone/21)
+
+<br>
+
+## v2.3.1 - 05/10/2026
+
+**bug Fixes**
+
+- [#143](https://github.com/studoo-app/edu-framework/issues/143) Mettre à jour les chemins de sqlite et des logs pour utiliser des chemins relatifs @bfoujols
+
+> Release notes for v2.3.1
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.1](https://github.com/studoo-app/edu-framework/milestone/20)
+
+<br>
+
 ## v2.3.0 - 05/10/2026
 
 **new features**
