@@ -18,12 +18,20 @@ Pour créer un formulaire dans une page, vous devez suivre les instructions suiv
 
 - [Comment construire un formulaire en methode POST avec un controller](controller-edu-post.md)
 
-## 3. Gestion des données avec un service
+## 3. Construire le CRUD
 
-- Coming soon
+Pour construire le CRUD complet d'une entité (Create, Read, Update, Delete), vous devez suivre les instructions suivantes :
+
+- [Comment construire le CRUD de l'entité ville](dataservice-select.md)
 
 ## 4. Construire une commande CLI
 
 Pour créer une nouvelle commande, vous devez suivre les instructions suivantes :
 
 - [Comment construire une commande CLI](new-command-edu.md)
+
+## 5. Construire une API
+
+Pour créer une API JSON (controller, route et documentation OpenAPI), vous devez suivre les instructions suivantes :
+
+- [Comment construire une API](controller-edu-api.md)
