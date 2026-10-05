@@ -13,6 +13,11 @@ class FastRouteCoreTest extends TestCase
 
     public function setUp(): void
     {
+        // Neutralise APP_ENV : un test précédent (AppCommandTest) charge le .env
+        // racine (APP_ENV=dev) de maniere immutable, ce qui declencherait l'injection
+        // de la barre de debug dans le rendu et casserait les hashs ci-dessous.
+        unset($_ENV['APP_ENV'], $_SERVER['APP_ENV']);
+
         (new ConfigCore([
             'twig_path' => __DIR__ . '/../../app/Template',
             'route_config_path' => __DIR__ . "/../Config/"

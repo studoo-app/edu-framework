@@ -11,6 +11,9 @@
 
 **bug Fixes**
 
+- Fix debug toolbar always showing an empty controller instead of "aucun" (Request::hasHander always true) @bfoujols
+- Fix PHP 8.5 deprecation (PDO::MYSQL_ATTR_INIT_COMMAND -> PDO\MYSQL::ATTR_INIT_COMMAND) @bfoujols
+- Fix FastRouteCoreTest failures caused by APP_ENV state leaking between tests @bfoujols
 - Fix security advisories on symfony/yaml (CVE-2026-45304, CVE-2026-45305, CVE-2026-45133) @bfoujols
 
 ## v2.3.0 - 05/10/2026
