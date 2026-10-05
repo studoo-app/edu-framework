@@ -12,6 +12,7 @@ Voici la liste des composants nécessaires pour assurer le bon déroulement du p
     * [ ] OpenSSL extension
     * [ ] mbstring extension
     * [ ] pdo_mysql extension
+    * [ ] pdo_sqlite extension
 - [ ] [:simple-composer: Gestionnaire de dépendance](prerequis.md#gestionnaire-de-dependance)
 - [ ] [:simple-curl: Commande CURL](prerequis.md#commande-curl) 
 - [ ] [:simple-docker: Environnement local](prerequis.md#environnement-local) 
@@ -233,6 +234,20 @@ Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suiv
 
 ````Bash
 ;extension=pdo_mysql
+````
+Enlever le point-virgule pour activer l'extension.
+
+#### pdo_sqlite extension
+
+!!! warning "A partir de la version v2.3.0"
+
+    L'extension `pdo_sqlite` est nécessaire au fonctionnement du service de logs,
+    de la [barre de debug et du profiler](../boost/debug-bar.md).
+
+Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
+
+````Bash
+;extension=pdo_sqlite
 ````
 Enlever le point-virgule pour activer l'extension.
 

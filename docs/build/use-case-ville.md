@@ -42,7 +42,7 @@ La commande `make:crontroller` :
 php bin/edu make:controller villeRead
 ```
 
-Cette commande va créer un fichier `VilleReadController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `config/routes.yaml` et créer un fichier `villeread.html.twig` dans le dossier `app/Template/villeread`.
+Cette commande va créer un fichier `VilleReadController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `app/Config/routes.yaml` et créer un fichier `villeread.html.twig` dans le dossier `app/Template/villeread`.
     
     Voici l'arborecence du projet :
     
@@ -149,7 +149,7 @@ La commmande `make:controller` :
 php bin/edu make:controller villeCreate
 ```
 
-Cette commande va créer un fichier `VilleCreateController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `config/routes.yaml` et créer un fichier `villecreate.html.twig` dans le dossier `app/Template/villecreate`.
+Cette commande va créer un fichier `VilleCreateController.php` dans le dossier `app/Controller`, ajouter des lignes dans le fichier `app/Config/routes.yaml` et créer un fichier `villecreate.html.twig` dans le dossier `app/Template/villecreate`.
 
 Voici l'arborecence du projet :
 
@@ -352,10 +352,10 @@ Aller dans le fichier `template/villeread/villeread.html.twig`
 ```
 
 Dans ce code, on ajoute une colonne `Action` à notre tableau et un lien avec URL `/villeupdate/` en passant `ville.id` en argument GET.
-Un nouveau format de route se crée dans le fichier `config/routes.yaml` pour la route `villeupdate`.
+Un nouveau format de route se crée dans le fichier `app/Config/routes.yaml` pour la route `villeupdate`.
 `{id}` est un paramètre dynamique inclut dans la route qui permet de récupérer l'identifiant de la ville à modifier.
 
-Vous devez ajouter la route `villeupdate` dans le fichier `config/routes.yaml`.
+Vous devez ajouter la route `villeupdate` dans le fichier `app/Config/routes.yaml`.
 
 ```diff
 villeupdate:
@@ -563,7 +563,7 @@ Aller dans le fichier `template/villeread/villeread.html.twig`
 
 Dans ce code, on ajoute une colonne `Action` à notre tableau et un lien avec URL `/villedelete/` en passant `ville.id` en argument GET.
 
-Vous devez ajouter la route `villedelete` dans le fichier `config/routes.yaml`.
+Vous devez ajouter la route `villedelete` dans le fichier `app/Config/routes.yaml`.
 
 ```diff
 villedelete:

@@ -2,6 +2,78 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.3.0 - 05/10/2026
+
+**new features**
+
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Implement SQLite logging service for server request logs @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add BufferFormat and BufferToServer classes for log formatting @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add logs navigation in the debug bar @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Replace in-bar logs panel with a Symfony-style profiler page @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Enhance filtering capabilities and add status family counting @bfoujols
+- [#69](https://github.com/studoo-app/edu-framework/issues/69) Add custom listening socket (#69) Thanks @CapelleGab
+- [#122](https://github.com/studoo-app/edu-framework/issues/122) Add Manage DB by dbgate @bfoujols
+- [#120](https://github.com/studoo-app/edu-framework/issues/120) Add MailPit Service @bfoujols
+- [#97](https://github.com/studoo-app/edu-framework/issues/97) Add slash command @bfoujols
+
+**bug Fixes**
+
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Make SQLite logging non-blocking and resilient @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Send proper HTTP status codes from error controllers @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Gate debug routes on SQLite availability to prevent PDOException @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Buffer stream chunks into complete lines to preserve adjacent request logs @bfoujols
+- [#130](https://github.com/studoo-app/edu-framework/issues/130) github action E: Package 'netcat' has no installation candidate @bfoujols
+- [#129](https://github.com/studoo-app/edu-framework/issues/129) run command taskfile before-commit @bfoujols
+- Fix CI failure on profiler page and logs endpoint @bfoujols
+- Fix CI failure on debug toolbar (missing semicolon) and deprecated dynamic property @bfoujols
+
+**documentation**
+
+- new [La barre de debug et le profiler](boost/debug-bar.md)
+- update [Start/Stop l'application](installation/start-application.md) : options de la commande `start`
+- update [Comment installer les services](installation/start-services.md) : MailPit et dbgate
+- update [Avant de démarrer](installation/prerequis.md) : extension `pdo_sqlite`
+
+> Release notes for v2.4.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/20](https://github.com/studoo-app/edu-framework/milestone/20)
+
+  <br>
+
+## v2.2.1 - 23/08/2024
+
+**new features**
+
+- [#119](https://github.com/studoo-app/edu-framework/issues/119) add Request::getBody() @bfoujols
+
+**bug Fixes**
+
+- [#117](https://github.com/studoo-app/edu-framework/issues/117) Fix class not use in API controller @bfoujols
+- Fix Doc install pip package
+
+> Release notes for v2.2.1
+>
+> [https://github.com/studoo-app/edu-framework/milestone/18](https://github.com/studoo-app/edu-framework/milestone/18)
+
+  <br>
+
+## v2.2.0 - 08/08/2024
+
+**new features**
+
+- [#112](https://github.com/studoo-app/edu-framework/issues/112) Implement OpenAPI @bfoujols
+
+**bug Fixes**
+
+- [#114](https://github.com/studoo-app/edu-framework/issues/114) Update PHP version 8.1 -> 8.2 @bfoujols
+- [#116](https://github.com/studoo-app/edu-framework/pull/116) Add Tests for OpenAPI, Command Cli @bfoujols
+
+> Release notes for v2.2.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/17](https://github.com/studoo-app/edu-framework/milestone/17)
+
+  <br>
+
 ## v2.1.0 - 20/06/2024
 
 **new features**

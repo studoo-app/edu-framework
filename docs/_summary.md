@@ -17,6 +17,8 @@
 * [Consolider](boost/index.md)
     * [Request - La gestion des requêtes HTTP](boost/resquet.md)
     * [DatabaseService - La gestion des données](boost/dataservice.md)
+    * [Route - Générer une URL par le nom](boost/route.md)
+    * [La barre de debug et le profiler](boost/debug-bar.md)
 * [Migrer](migrate/major.md)
     * [Migrer de la version 1.0 à la version 2.0](migrate/migration-1_2-2_0.md)
 * [Contribuer](contributor/index.md)

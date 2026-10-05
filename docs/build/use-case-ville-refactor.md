@@ -40,7 +40,12 @@ villedelete:
 Et... aussi les appeler par leur nom ! En effet, vous pouvez dynamiquement les appeler par leur nom plutôt
 que par leur uri. 
 
-Le nom est affiché dans le fichier `app\Config\routes.yaml`
+Le nom est affiché dans le fichier `app/Config/routes.yaml`
+
+!!! info "Pour aller plus loin"
+
+    La génération d'URL par le nom de la route est détaillée dans la documentation de la classe
+    [Route](../boost/route.md) (routes avec paramètres, gestion des erreurs, ...).
 
 Dans le fichier VilleCreateController.php, vous devez ajouter :
 

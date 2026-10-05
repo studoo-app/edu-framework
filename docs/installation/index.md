@@ -15,6 +15,7 @@ Pour installer le framework, vous devez suivre les instructions suivantes :
           * [ ] OpenSSL extension
           * [ ] mbstring extension
           * [ ] pdo_mysql extension
+          * [ ] pdo_sqlite extension
       - [ ] [:simple-composer: Gestionnaire de dépendance](prerequis.md#gestionnaire-de-dependance)
       - [ ] [:simple-curl: Commande CURL](prerequis.md#commande-curl)
       - [ ] [:simple-docker: Environnement local](prerequis.md#environnement-local)
@@ -23,11 +24,12 @@ Pour installer le framework, vous devez suivre les instructions suivantes :
       - [ ] [Création du projet](installation.md#creation-du-projet)
       - [ ] [Initialiser votre projet](installation.md#initialiser-votre-projet)
 - [ ] [Start/Stop l'application](start-application.md)
-      - [ ] [Démarrer l'application](start-application.md#demarrer-lapplication)
-      - [ ] [Arrêter l'application](start-application.md#arreter-lapplication)
+      - [ ] [Démarrer l'application](start-application.md#demarrez-lapplication)
+      - [ ] [Les options de la commande start](start-application.md#les-options-de-la-commande-start)
+      - [ ] [Arrêter l'application](start-application.md#arretez-lapplication)
       - [ ] [Problème de démarrage](start-application.md#probleme-de-demarrage)
 - [ ] [La commande bin/edu](command-edu.md)
-- [ ] [Démarrer les services](#)
+- [ ] [Démarrer les services](start-services.md)
 - [ ] [Comment versionner son projet](versionning.md)
 
 

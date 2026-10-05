@@ -20,6 +20,11 @@ L'arborescence du projet est la structure de votre projet. Elle est composée de
 │   └── edu (Ligne de commande)
 ├── public
 │   └── index.php
+├── var
+│   ├── dbdata (Données du service MySQL)
+│   ├── dbgate (Configuration du service dbgate)
+│   ├── logs (Base SQLite des logs du serveur)
+│   └── sqlite (Bases SQLite de l'application)
 ├── vendor
 │   └── [...] (Librairies)
 ├── .env
@@ -52,6 +57,10 @@ Voici le détail de l'arborescence du projet :
 | **bin/edu**                                   | Dossier de la ligne de commande Edu                                    |
 | **public**                                    | Dossier contenant les fichiers publics                                 |
 | **public/index.php**                          | Fichier de démarrage de l'application (Endpoint)                       |
+| **var**                                       | Dossier contenant les données variables (bases, logs, configuration)   |
+| **var/dbdata**                                | Données du service MySQL (volume Docker)                               |
+| **var/logs**                                  | Base SQLite `core_logs.sqlite` des logs du serveur de développement    |
+| **var/sqlite**                                | Bases SQLite de l'application                                          |
 | **vendor**                                    | Dossier contenant les librairies                                       |
 | **.env**                                      | Fichier de configuration de l'application                              |
 | **.env.example**                              | Fichier d'exemple de configuration de l'application                    |
