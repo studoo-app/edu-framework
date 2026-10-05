@@ -34,6 +34,9 @@ class HttpError405Controller implements ControllerInterface
      */
     public function execute(Request $request): string
     {
+        if (headers_sent() === false) {
+            http_response_code(405);
+        }
         return TwigCore::getEnvironment()->render(
             'error/http-405.html.twig',
             []

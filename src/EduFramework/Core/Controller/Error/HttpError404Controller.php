@@ -34,6 +34,9 @@ class HttpError404Controller implements ControllerInterface
      */
     public function execute(Request $request): string
     {
+        if (headers_sent() === false) {
+            http_response_code(404);
+        }
         return TwigCore::getEnvironment()->render(
             'error/http-404.html.twig',
             []

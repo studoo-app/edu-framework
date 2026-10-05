@@ -78,10 +78,15 @@ class TwigCore
     public function render(string|TemplateWrapper $name, array $context = []): string
     {
         $response = self::$twig->render($name, $context);
-        if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev') {
+        if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev'
+            && ConfigCore::getRequest()->getRoute() !== '/_debug/profiler') {
             $debugBar = new studooBarreDebug();
-            $response .= $debugBar->generateCssGlobal();
-            $response .= $debugBar->generateBarDebug();
+            $toolbar = $debugBar->generateCssGlobal() . $debugBar->generateBarDebug();
+            // La barre est insérée avant </body> pour produire un HTML valide
+            $bodyEnd = strripos($response, '</body>');
+            $response = ($bodyEnd === false)
+                ? $response . $toolbar
+                : substr($response, 0, $bodyEnd) . $toolbar . substr($response, $bodyEnd);
         }
         return $response;
     }

@@ -88,6 +88,15 @@ class Request
     }
 
     /**
+     * Indique si un controller est associé à la requête HTTP
+     * @return bool
+     */
+    public function hasHander(): bool
+    {
+        return isset($this->hander);
+    }
+
+    /**
      * Permet de définir le nom et instancier le controller qui est associé à la requête HTTP
      * @param string $hander Le nom de la classe du controller
      * @return Request

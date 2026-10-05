@@ -1,12 +1,13 @@
 # Managed by Composer
-vendor/
-var/
+/vendor/
+/var/
 # Composer
-composer.phar
+/composer.phar
 
 # IDE configuration
-.idea/**
-.vscode/**
+/.idea/**
+/.vscode/**
+.DS_Store
 
 # Testing @ QA
 .php-cs-fixer.cache
@@ -15,8 +16,9 @@ composer.phar
 .codacy/logs/
 
 # Environment
-.env
-clover.xml
+/.env
+/clover.xml
+/.codacy
 
 # Documentation
 venv/**

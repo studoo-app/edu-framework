@@ -15,6 +15,8 @@ use Studoo\EduFramework\Commands\Extends\CkeckStack;
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Formatter\BufferToServer;
+use Studoo\EduFramework\Core\Logs\LogsService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +40,8 @@ use Symfony\Component\Process\Process;
 )]
 class StartCommand extends CommandManage
 {
+    private static string $lineBuffer = '';
+
     /**
      * Configure la commande en ajoutant les options nécessaires.
      *
@@ -104,8 +108,6 @@ class StartCommand extends CommandManage
         $check = new CkeckStack(self::$outPut, self::$stdOutput);
         $check->render();
 
-        //self::$stdOutput->info();
-
         self::$stdOutput->writeln([
             '',
             CommandBanner::getDoc(),
@@ -128,11 +130,34 @@ class StartCommand extends CommandManage
         }
 
         $process = new Process(['php', '-S', 'localhost:' . $port, '-t', 'public']);
+        $process->setTimeout(null);
         $process->run(function ($type, $buffer): void {
-            if (Process::ERR === $type) {
-                echo 'ERR > '.$buffer;
-            } else {
-                echo 'OUT > '.$buffer;
+            self::$lineBuffer .= $buffer;
+            $lines = explode("\n", self::$lineBuffer);
+            // Keep the last incomplete line in the buffer
+            self::$lineBuffer = $lines[count($lines) - 1];
+            
+            // Process all complete lines
+            for ($i = 0; $i < count($lines) - 1; $i++) {
+                $line = $lines[$i];
+                if (!str_contains($line, 'Accepted') && !str_contains($line, 'Closing')) {
+                    self::$stdOutput->write($line . "\n");
+
+                    $log = (new BufferToServer($line))->getFormatBuffer();
+                    if ($log['path'] !== null
+                        && (str_starts_with($log['path'], '/edu-logs') || str_starts_with($log['path'], '/_debug/'))) {
+                        // Les requêtes du profiler et de la barre de debug ne sont pas journalisées
+                        continue;
+                    }
+                    $logJson = json_encode($log);
+                    if ($logJson !== false) {
+                        try {
+                            LogsService::addLog($logJson);
+                        } catch (\Exception $e) {
+                            error_log('[EduFramework Logs] ' . $e->getMessage());
+                        }
+                    }
+                }
             }
         });
 
