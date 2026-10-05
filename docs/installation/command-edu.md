@@ -38,6 +38,10 @@ Voici les commandes disponibles par version :
 | make:api        | génération d'un controller type json API      | v2.0                   |
 | make:command    | génération d'un commande line                 | v2.0                   |
 
+!!! info "Pour aller plus loin"
+
+    Vous pouvez consulter la page [Construire une API](../build/controller-edu-api.md) pour plus de détails sur la commande `make:api`.
+
 ### Les options de la commande start
 
 La commande `start` accepte des options pour adapter le démarrage à vos besoins (à partir de la version v2.3.0) :
