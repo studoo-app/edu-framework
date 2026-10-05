@@ -2,10 +2,15 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## v2.3.0 - 10/04/2025
+## v2.3.0 - 05/10/2026
 
 **new features**
 
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Implement SQLite logging service for server request logs @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add BufferFormat and BufferToServer classes for log formatting @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Add logs navigation in the debug bar @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Replace in-bar logs panel with a Symfony-style profiler page @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Enhance filtering capabilities and add status family counting @bfoujols
 - [#69](https://github.com/studoo-app/edu-framework/issues/69) Add custom listening socket (#69) Thanks @CapelleGab
 - [#122](https://github.com/studoo-app/edu-framework/issues/122) Add Manage DB by dbgate @bfoujols
 - [#120](https://github.com/studoo-app/edu-framework/issues/120) Add MailPit Service @bfoujols
@@ -13,12 +18,18 @@
 
 **bug Fixes**
 
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Make SQLite logging non-blocking and resilient @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Send proper HTTP status codes from error controllers @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Gate debug routes on SQLite availability to prevent PDOException @bfoujols
+- [#136](https://github.com/studoo-app/edu-framework/issues/136) Buffer stream chunks into complete lines to preserve adjacent request logs @bfoujols
 - [#130](https://github.com/studoo-app/edu-framework/issues/130) github action E: Package 'netcat' has no installation candidate @bfoujols
 - [#129](https://github.com/studoo-app/edu-framework/issues/129) run command taskfile before-commit @bfoujols
+- Fix CI failure on profiler page and logs endpoint @bfoujols
+- Fix CI failure on debug toolbar (missing semicolon) and deprecated dynamic property @bfoujols
 
-> Release notes for v2.3.0
+> Release notes for v2.4.0
 >
-> [https://github.com/studoo-app/edu-framework/milestone/v2.3.0](https://github.com/studoo-app/edu-framework/milestone/19)
+> [https://github.com/studoo-app/edu-framework/milestone/v2.4.0](https://github.com/studoo-app/edu-framework/milestone/20)
 
 <br>
 
