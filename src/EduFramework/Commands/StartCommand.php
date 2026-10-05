@@ -80,12 +80,19 @@ class StartCommand extends CommandManage
         $noCheck = $input->getOption('no-start');
 
         if ($noCheck === false) {
+            // Calcule le nombre de lignes de la bannière (ajuste si nécessaire)
+            $bannerLines = count(explode("\n", CommandBanner::getBanner(0)));
             for ($slash = 0; $slash <= 5; $slash++) {
+                if ($slash > 0) {
+                    // Efface uniquement les lignes de la bannière précédente
+                    for ($i = 0; $i < $bannerLines; $i++) {
+                        $output->write("\033[1A\033[2K"); // Remonte d'une ligne et efface
+                    }
+                }
                 $output->writeln([
                     CommandBanner::getBanner($slash)
                 ]);
                 usleep(500000); // (0.5 seconde)
-                // Note : clear() n'est pas disponible sans section(), donc on ne l'utilise pas ici
             }
         }
 
