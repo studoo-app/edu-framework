@@ -46,7 +46,7 @@ class CreateApiCommand extends Command
 
     protected function configure(): void
     {
-        $this->AddArgument('controller-name', InputArgument::REQUIRED, 'Controller name');
+        $this->addArgument('controller-name', InputArgument::REQUIRED, 'Controller name');
     }
 
     /**
