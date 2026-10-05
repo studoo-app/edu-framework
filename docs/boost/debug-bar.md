@@ -6,9 +6,9 @@ Ces outils sont disponibles à partir de la version **v2.3.0**.
 
 ## Prérequis
 
-La barre de debug et le profiler sont actifs uniquement si les deux conditions suivantes sont remplies :
+La barre de debug est active lorsque `APP_ENV=dev`. Le profiler et l'enregistrement des requêtes nécessitent en plus l'extension PHP `pdo_sqlite`.
 
-- la variable d'environnement `APP_ENV` est définie à `dev` dans le fichier `.env` ;
+Pour activer le mode dev :
 
 ```dotenv
 ## << Config application
