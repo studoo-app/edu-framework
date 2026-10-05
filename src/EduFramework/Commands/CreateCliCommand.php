@@ -44,7 +44,7 @@ class CreateCliCommand extends Command
 
     protected function configure(): void
     {
-        $this->AddArgument('command-name', InputArgument::REQUIRED, 'Commande name');
+        $this->addArgument('command-name', InputArgument::REQUIRED, 'Commande name');
     }
 
     /**

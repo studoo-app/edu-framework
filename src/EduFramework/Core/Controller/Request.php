@@ -36,7 +36,7 @@ class Request
      * Nom de la classe du controller
      * @var string $hander
      */
-    private string $hander;
+    private string $hander = '';
 
     /**
      * Les variables de la requête HTTP

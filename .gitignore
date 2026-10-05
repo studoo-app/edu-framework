@@ -10,9 +10,10 @@
 .DS_Store
 
 # Testing @ QA
-/.php-cs-fixer.cache
-/.php-cs-fixer.php
-/.phpunit.result.cache
+.php-cs-fixer.cache
+.php-cs-fixer.php
+.phpunit.result.cache
+.codacy/logs/
 
 # Environment
 /.env
@@ -20,7 +21,7 @@
 /.codacy
 
 # Documentation
-/venv/**
-/.cache/**
-/site
-
+venv/**
+.cache/**
+site/**
+.DS_Store
