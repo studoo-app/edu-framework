@@ -2,6 +2,18 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.3.1 - 05/10/2026
+
+**bug Fixes**
+
+- [#143](https://github.com/studoo-app/edu-framework/issues/143) Mettre à jour les chemins de sqlite et des logs pour utiliser des chemins relatifs @bfoujols
+
+> Release notes for v2.3.1
+>
+> [https://github.com/studoo-app/edu-framework/milestone/v2.3.1](https://github.com/studoo-app/edu-framework/milestone/20)
+
+<br>
+
 ## v2.3.0 - 05/10/2026
 
 **new features**
