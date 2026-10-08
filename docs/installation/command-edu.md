@@ -37,6 +37,7 @@ Voici les commandes disponibles par version :
 | make:controller | génération d'un controller                    | v1.0                   |
 | make:api        | génération d'un controller type json API      | v2.0                   |
 | make:command    | génération d'un commande line                 | v2.0                   |
+| cache:clear     | suppression du cache de l'application        | v2.4.0                 |
 
 !!! info "Pour aller plus loin"
 
@@ -58,6 +59,28 @@ php bin/edu start --no-start
 !!! info "Pour aller plus loin"
 
     Vous pouvez consulter la page [Start/Stop l'application](start-application.md) pour plus de détails sur la commande `start`.
+
+### La commande cache:clear
+
+Les templates Twig sont compilés puis mis en cache dans le dossier `var/cache/twig` (à partir de la version v2.4.0).
+Pour supprimer le cache de l'application, vous pouvez taper la commande suivante :
+
+```bash
+php bin/edu cache:clear
+```
+
+| Élément                | Détail                                              |
+|------------------------|-----------------------------------------------------|
+| Dossier concerné       | `var/cache` (configurable via la clé `cache_path`)  |
+| Contenu supprimé       | tout le contenu du dossier (Exemple: le cache TWIG) |
+| Le dossier lui-même    | conservé                                            |
+
+Si le dossier `var/cache` n'existe pas, un message vous indique qu'il n'y a aucun cache à supprimer.
+
+!!! info "Recompilation automatique"
+
+    Les templates modifiés sont automatiquement recompilés (option `auto_reload` de Twig).
+    La commande `cache:clear` reste utile pour repartir d'un cache vierge, par exemple après un déploiement.
 
 ___
 

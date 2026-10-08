@@ -22,3 +22,15 @@ userName:
     uri: /user/{id:\d+}[/{name}]
     controller: Controller\UserController
     httpMethod: [GET,POST]
+medecin:
+    uri: /medecin
+    controller: Controller\MedecinController::index
+    httpMethod: [GET]
+medecin_new:
+    uri: /medecin/new
+    controller: Controller\MedecinController::new
+    httpMethod: [GET,POST]
+medecin_import:
+    uri: /medecin/import
+    controller: Controller\MedecinController::import
+    httpMethod: [GET,POST]

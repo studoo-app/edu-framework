@@ -128,6 +128,79 @@ Si nous allons de nouveau sur l'url [http://localhost:8042/hello](http://localho
 Pour rappel, l'erreur `HTTP 404 signifie que la ressource demandée (route) n'existe pas ou plus.
 
 
+## Un controller, plusieurs routes (plusieurs méthodes)
+
+Jusqu'à présent, une route était associée à un controller possédant une seule méthode `execute()`.
+Il est possible de regrouper plusieurs routes dans un même controller, chacune pointant vers une méthode différente.
+Ce fonctionnement est disponible à partir de la version **v2.4.0**.
+
+Pour cela, on ajoute le nom de la méthode à appeler après le nom du controller, séparé par `::` dans le fichier "app/Config/routes.yaml" :
+
+```yaml
+medecin:
+  uri: /medecin
+  controller: Controller\MedecinController::index
+  httpMethod: [GET]
+medecin_new:
+  uri: /medecin/new
+  controller: Controller\MedecinController::new
+  httpMethod: [GET, POST]
+```
+
+La route `/medecin` appelle la méthode `index()` et la route `/medecin/new` appelle la méthode `new()` du controller `MedecinController` :
+
+```php
+<?php
+
+namespace Controller;
+
+use Studoo\EduFramework\Core\Controller\Request;
+use Studoo\EduFramework\Core\View\TwigCore;
+
+class MedecinController
+{
+    public function index(Request $request): string|null
+    {
+        return TwigCore::getEnvironment()->render('medecin/index.html.twig',
+            [
+                "titre"   => 'Liste des médecins',
+                "request" => $request
+            ]
+        );
+    }
+
+    public function new(Request $request): string|null
+    {
+        return TwigCore::getEnvironment()->render('medecin/new.html.twig',
+            [
+                "titre"   => 'Créer un médecin',
+                "request" => $request
+            ]
+        );
+    }
+}
+```
+
+!!! info "La méthode new() est-elle valide ?"
+
+    `new` est un mot réservé du langage PHP, mais il est autorisé comme nom de méthode depuis PHP 7.
+
+### Les règles à respecter
+
+Une méthode appelée par une route doit :
+
+- être **publique** et **non statique**,
+- avoir un paramètre de type [Request](../boost/resquet.md),
+- retourner une chaine de caractères (`string`) ou `null`.
+
+Si une de ces règles n'est pas respectée, une exception `ErrorControllerException` est levée avec un message explicite.
+
+!!! info "Et l'interface ControllerInterface ?"
+
+    - Sans méthode explicite (`Controller\MedecinController`), le controller doit toujours implémenter l'interface `ControllerInterface` et c'est sa méthode `execute()` qui est appelée. Ce comportement reste inchangé : toutes vos routes existantes continuent de fonctionner.
+    - Avec une méthode explicite (`Controller\MedecinController::index`), l'interface n'est plus requise : le framework vérifie directement la méthode appelée.
+
+
 ## Schema pour mieux comprendre le fonctionnement
 
 <figure markdown="span">

@@ -1,18 +1,18 @@
 services:
   database:
     container_name: edu-web-database
-    image: mysql:8.0
-    command: mysqld --sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
-    platform: linux/amd64
+    image: mariadb:latest
     ports:
       - "3306:3306"
     restart: always
     environment:
       MYSQL_DATABASE: app_db
-      MYSQL_ROOT_PASSWORD: studoo # Si tu changes le mot de passe root, change aussi le mot de passe dans le fichier .env et dans la config du service dbgate
-      #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_USER: app_db_user
-      MYSQL_PASSWORD: app_db_password
+      MYSQL_ROOT_PASSWORD: studoo
+      MYSQL_USER: stud
+      MYSQL_PASSWORD: studoo
+      # Si tu changes le mot de passe root ou stud, change aussi le mot de passe dans le fichier .env et dans la config du service dbgate
+#      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      TZ: Europe/Paris
     volumes:
       - ./var/dbdata:/var/lib/mysql
   mailer:
@@ -32,7 +32,7 @@ services:
       - 8082:3000
     volumes:
       - ./var/dbgate:/root/.dbgate
-      - ./var/sqlite:/home/jan
+      - ./var/logs:/home/jan
     environment:
       CONNECTIONS: con1,con2
 
@@ -44,7 +44,7 @@ services:
       ENGINE_con1: mysql@dbgate-plugin-mysql
 
       LABEL_con2: SQLite
-      FILE_con2: /home/jan/app_db.sqlite
+      FILE_con2: /home/jan/core_logs.sqlite
       ENGINE_con2: sqlite@dbgate-plugin-sqlite
 
   phpmyadmin:

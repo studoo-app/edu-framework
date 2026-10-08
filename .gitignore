@@ -2,11 +2,11 @@
 /vendor/
 /var/
 # Composer
-/composer.phar
+composer.phar
 
 # IDE configuration
-/.idea/**
-/.vscode/**
+.idea/**
+.vscode/**
 .DS_Store
 
 # Testing @ QA
@@ -16,12 +16,12 @@
 .codacy/logs/
 
 # Environment
-/.env
-/clover.xml
-/.codacy
+.env
+clover.xml
+.codacy
 
 # Documentation
-venv/**
+/venv/**
 .cache/**
 site/**
 .DS_Store

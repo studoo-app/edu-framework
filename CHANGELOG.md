@@ -2,6 +2,21 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.4.0 - 08/10/2026
+
+**new features**
+
+- Un controller peut maintenant gérer plusieurs routes via plusieurs méthodes : la clé `controller` du fichier "app/Config/routes.yaml" accepte la syntaxe `Controller\VilleController::index`. Sans méthode explicite, la méthode `execute()` est appelée comme avant (100 % rétro-compatible)
+- La méthode appelée est validée par le framework (publique, non statique, paramètre de type Request, retour string|null) et lève une `ErrorControllerException` avec un message explicite en cas d'erreur
+- [#75](https://github.com/studoo-app/edu-framework/issues/75) Gestion des fichiers téléversés (`$_FILES`) dans `Request` : normalisation automatique de la structure (champ simple et multi-fichiers), méthodes `hasFile()`, `getFile()`, `getFiles()`, `isValid()`, `getExtension()` et `move()`, démo applicative `/medecin/import` et documentation complète
+- [#64](https://github.com/studoo-app/edu-framework/issues/64) Activation du cache TWIG : les templates compilés sont stockés dans `var/cache/twig` (nouvelle clé de configuration `cache_path`), recompilation automatique des templates modifiés (`auto_reload`)
+- [#65](https://github.com/studoo-app/edu-framework/issues/65) Nouvelle commande `php bin/edu cache:clear` pour supprimer le cache de l'application (dossier `var/cache`)
+- Documentation : nouvelle section "Un controller, plusieurs routes" dans [docs/build/controller-edu.md](docs/build/controller-edu.md)
+
+**bug Fixes**
+
+- Le fichier de configuration des routes est vérifié avant lecture : une exception `ErrorRouteConfigNotExistException` avec un message explicite (chemin attendu, configuration `route_config_path`, sensibilité à la casse sur Linux) remplace le fatal error du composant Yaml quand "routes.yaml" est introuvable
+
 ## v2.3.2 - 05/10/2026
 
 **new features**
