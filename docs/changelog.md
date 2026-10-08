@@ -10,6 +10,10 @@
 - [#150](https://github.com/studoo-app/edu-framework/issues/150) Les paramètres d'identité du framework (name, version, date_version, php_version) sont personnalisables via le fichier `eduframe.yml` à la racine du framework (lu depuis `vendor/` dans les projets) — plus besoin de modifier `ConfigCore.php`, exception `ErrorConfigException` explicite si le fichier est invalide @bfoujols
 - [#76](https://github.com/studoo-app/edu-framework/issues/76) Pages d'erreur HTTP mises en forme (404, 405, 403, 500) : templates autonomes et stylés dans `app/Template/error/`, nouveau `HttpError403Controller`, la classe `ErrorHttpStatusException` permet de lever une erreur HTTP depuis un controller (Exemple : accès interdit 403), toute exception non gérée affiche la page 500 avec le message de l'exception en mode développement (masqué en production). Le template `http-Default.html.twig` devient `http-500.html.twig`. Le nom du framework n'est plus affiché sur les pages d'erreur (titre et pied de page) @bfoujols
 
+**bug Fixes**
+
+- [#76](https://github.com/studoo-app/edu-framework/issues/76) Correction de l'affichage de la barre de debug : les styles globaux de la page hôte (ex: `a { margin-top: 1.5rem; }`) ne cassent plus l'alignement des blocs de la barre — reset CSS sur les liens de la toolbar, immunisée contre les feuilles de style de l'application @bfoujols
+
 **documentation**
 
 - new [La commande make:entity](installation/command-edu.md) : génération d'une entité et de son repository
