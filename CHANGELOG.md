@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.5.0 - 08/10/2026
+
+**new features**
+
+- [#149](https://github.com/studoo-app/edu-framework/issues/149) Nouvelle commande `php bin/edu make:entity` : génération de l'entité (`app/Entity`) et de son repository (`app/Repository`) — mode interactif ou option `--fields`, getters et setters fluides camelCase typés, hydratation avec casts dans le repository
+
 ## v2.4.0 - 08/10/2026
 
 **new features**
