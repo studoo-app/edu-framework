@@ -13,9 +13,16 @@ namespace Studoo\EduFramework\Core;
 
 use Dotenv\Dotenv;
 use PDO;
+use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
+use Studoo\EduFramework\Core\Controller\Error\HttpError403Controller;
+use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
+use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
+use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Controller\Request;
+use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
@@ -51,20 +58,46 @@ class LoadCouchCore
 
         // Gestion des routes
         $route = new FastRouteCore();
-        // LoadCouchCore des routes depuis le fichier de configuration
-        $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
-
-        // Route interne de la barre de debug (uniquement en mode dev)
-        if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev' && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
-            $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
-            $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
-        }
 
         try {
+            // LoadCouchCore des routes depuis le fichier de configuration
+            $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
+
+            // Route interne de la barre de debug (uniquement en mode dev)
+            if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev'
+                && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+                $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
+                $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
+            }
+
             // Récupération de la route à appeler
             echo $route->getRoute();
-        } catch (\Twig\Error\LoaderError | \Twig\Error\RuntimeError | \Twig\Error\SyntaxError $e) {
-            echo $e->getMessage();
+        } catch (ErrorHttpStatusException $exception) {
+            // Une erreur HTTP a été levée par un controller (Exemple: accès interdit 403)
+            // On affiche la page d'erreur correspondant au code HTTP de l'exception
+            echo match ($exception->getCode()) {
+                403 => (new HttpError403Controller($exception))->execute($this->getRequest()),
+                404 => (new HttpError404Controller($exception))->execute($this->getRequest()),
+                405 => (new HttpError405Controller($exception))->execute($this->getRequest()),
+                default => (new HttpErrorDefaultController($exception))->execute($this->getRequest()),
+            };
+        } catch (\Throwable $exception) {
+            // Toute autre erreur non gérée (y compris les erreurs de configuration)
+            // affiche la page d'erreur 500 avec le message de l'exception en mode développement
+            echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         }
+    }
+
+    /**
+     * Renvoi la requête HTTP en cours
+     * Si la requête n'est pas encore renseignée (erreur avant le dispatch), une requête par défaut est créée
+     * @return Request
+     */
+    private function getRequest(): Request
+    {
+        if (ConfigCore::hasRequest() === true) {
+            return ConfigCore::getRequest();
+        }
+        return new Request('/', 'GET');
     }
 }

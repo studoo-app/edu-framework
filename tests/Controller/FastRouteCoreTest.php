@@ -49,7 +49,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('87564c80a8cc960d03fbca933aca2ad64d7db9ad1e61add6b1eb73941ea56a59', hash('sha256', $route->getRoute()));
+        $this->assertEquals('7f45399c1ecff199069b02b15d54610c6c3b0cfa3c381386e80936b705791c8e', hash('sha256', $route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionMethodNotAllowed()
@@ -59,7 +59,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('a9acd5c197406f715176da90614cc9998d47683d2c9b0235d472aef972b36089', hash('sha256', $route->getRoute()));
+        $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionMethodNotAllowedAndNotFound()
@@ -69,7 +69,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('87564c80a8cc960d03fbca933aca2ad64d7db9ad1e61add6b1eb73941ea56a59', hash('sha256', $route->getRoute()));
+        $this->assertEquals('7f45399c1ecff199069b02b15d54610c6c3b0cfa3c381386e80936b705791c8e', hash('sha256', $route->getRoute()));
     }
 
     public function testLoadRoutesMatchSuccess()
@@ -97,7 +97,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/test';
-        $this->assertEquals('87564c80a8cc960d03fbca933aca2ad64d7db9ad1e61add6b1eb73941ea56a59', hash('sha256', $route->getRoute()));
+        $this->assertEquals('7f45399c1ecff199069b02b15d54610c6c3b0cfa3c381386e80936b705791c8e', hash('sha256', $route->getRoute()));
     }
 
     public function testLoadRoutesMatchSuccessWithExceptionMethodNotAllowedAndNotFound()
@@ -107,7 +107,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('a9acd5c197406f715176da90614cc9998d47683d2c9b0235d472aef972b36089', hash('sha256', $route->getRoute()));
+        $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
     }
 
     public function testLinkToGetnametopathInTwig()

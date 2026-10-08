@@ -31,8 +31,8 @@
 <body>
 <main>
     <p class="code">{{ code }}</p>
-    <h1>Méthode non autorisée</h1>
-    <p>La méthode HTTP utilisée n'est pas autorisée pour cette page (Exemple : POST au lieu de GET).</p>
+    <h1>Accès interdit</h1>
+    <p>Vous n'avez pas les droits nécessaires pour accéder à cette page.</p>
 
     {% if exception_message %}
         <p class="exception">{{ exception_message }}</p>

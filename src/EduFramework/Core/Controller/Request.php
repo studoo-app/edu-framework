@@ -11,8 +11,6 @@
 
 namespace Studoo\EduFramework\Core\Controller;
 
-use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
-
 /**
  * Class Request
  * Elle permet de définir une requête HTTP

@@ -19,13 +19,15 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * Class HttpError404Controller
- * Classe Controller pour les erreurs HTTP
+ * Class HttpError405Controller
+ * Classe Controller pour les erreurs HTTP 405 (méthode non autorisée)
  */
 class HttpError405Controller implements ControllerInterface
 {
+    use ErrorPageTrait;
+
     /**
-     * Si y a pas de route valide alors j'affiche la page 404
+     * Si la méthode HTTP n'est pas autorisée alors j'affiche la page 405
      * @param Request $request Objet de la requête
      * @return string
      * @throws SyntaxError
@@ -39,7 +41,10 @@ class HttpError405Controller implements ControllerInterface
         }
         return TwigCore::getEnvironment()->render(
             'error/http-405.html.twig',
-            []
+            [
+                'code' => 405,
+                'exception_message' => $this->getExceptionMessage()
+            ]
         );
     }
 }

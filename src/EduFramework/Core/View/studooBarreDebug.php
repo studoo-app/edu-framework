@@ -39,7 +39,11 @@ class studooBarreDebug
     background: #222; color: #ddd; border-top: 1px solid #444;
     font: 12px/36px 'Open Sans', Helvetica, Arial, sans-serif; text-align: left;
 }
-#edu-tb a { color: inherit; text-decoration: none; }
+#edu-tb a {
+    color: inherit; text-decoration: none; display: block;
+    margin: 0; padding: 0 12px; background: none; border: 0; border-radius: 0;
+    font-size: inherit; line-height: inherit;
+}
 #edu-tb .edu-tb-group { display: flex; min-width: 0; }
 #edu-tb .edu-tb-block { position: relative; padding: 0 12px; border-right: 1px solid #333; white-space: nowrap; cursor: default; }
 #edu-tb .edu-tb-group.right .edu-tb-block { border-right: 0; border-left: 1px solid #333; }

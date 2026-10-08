@@ -19,16 +19,17 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * Class HttpErrorDefaultController
- * Classe Controller pour les erreurs HTTP 500 (erreur interne du serveur)
- * Elle est utilisée pour toute erreur non gérée par le framework
+ * Class HttpError403Controller
+ * Classe Controller pour les erreurs HTTP 403 (accès interdit)
+ * Exemple d'utilisation dans un controller :
+ *     throw new ErrorHttpStatusException('Accès interdit', 403);
  */
-class HttpErrorDefaultController implements ControllerInterface
+class HttpError403Controller implements ControllerInterface
 {
     use ErrorPageTrait;
 
     /**
-     * Si une erreur inattendue est survenue alors j'affiche la page 500
+     * Si l'accès à la page est interdit alors j'affiche la page 403
      * @param Request $request Objet de la requête
      * @return string
      * @throws SyntaxError
@@ -38,12 +39,12 @@ class HttpErrorDefaultController implements ControllerInterface
     public function execute(Request $request): string
     {
         if (headers_sent() === false) {
-            http_response_code(500);
+            http_response_code(403);
         }
         return TwigCore::getEnvironment()->render(
-            'error/http-500.html.twig',
+            'error/http-403.html.twig',
             [
-                'code' => 500,
+                'code' => 403,
                 'exception_message' => $this->getExceptionMessage()
             ]
         );

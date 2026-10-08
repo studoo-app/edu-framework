@@ -42,4 +42,20 @@ class StudooBarreDebugTest extends TestCase
 
         $this->assertStringContainsString('aucun', (new studooBarreDebug())->generateBarDebug());
     }
+
+    /**
+     * Issue #76 : les styles globaux de la page hôte (ex: a { margin-top: 1.5rem; })
+     * ne doivent pas casser l'affichage de la barre de debug, dont certains blocs sont des <a>.
+     */
+    public function testToolbarCssResetsHostPageAnchorStyles(): void
+    {
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $css = (new studooBarreDebug())->generateCssGlobal();
+
+        $this->assertStringContainsString('#edu-tb a {', $css);
+        $this->assertStringContainsString('margin: 0;', $css);
+        $this->assertStringContainsString('display: block;', $css);
+        $this->assertStringContainsString('background: none;', $css);
+    }
 }

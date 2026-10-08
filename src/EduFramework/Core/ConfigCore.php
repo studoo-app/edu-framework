@@ -172,4 +172,13 @@ class ConfigCore
     {
         return self::$resquest;
     }
+
+    /**
+     * Indique si les informations de la requête HTTP sont renseignées
+     * @return bool
+     */
+    public static function hasRequest(): bool
+    {
+        return isset(self::$resquest);
+    }
 }
