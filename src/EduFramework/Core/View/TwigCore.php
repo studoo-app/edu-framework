@@ -43,9 +43,15 @@ class TwigCore
         // Gestion du moteur de template
         $loader = new FilesystemLoader($path);
         // création de l'objet $twig
+        // Le cache des templates compilés est stocké dans le dossier var/cache/twig (cache TWIG)
+        // auto_reload permet de recompiler automatiquement les templates modifiés
         self::$twig = new Environment(
             $loader,
-            ['cache' => false, 'debug' => true]
+            [
+                'cache' => ConfigCore::getConfig('cache_path') . 'twig',
+                'auto_reload' => true,
+                'debug' => true,
+            ]
         );
         // Ajoutez l'extension Debug
         self::$twig->addExtension(new DebugExtension());
