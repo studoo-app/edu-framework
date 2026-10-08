@@ -2,6 +2,51 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.5.0 - 08/10/2026
+
+**new features**
+
+- [#149](https://github.com/studoo-app/edu-framework/issues/149) Nouvelle commande `php bin/edu make:entity` : génération de l'entité (`app/Entity`) et de son repository (`app/Repository`) — mode interactif ou option `--fields`, getters et setters fluides camelCase typés, hydratation avec casts dans le repository @bfoujols
+
+**documentation**
+
+- new [La commande make:entity](installation/command-edu.md) : génération d'une entité et de son repository
+- update [Construire le CRUD](build/dataservice-select.md) : note sur la génération des fichiers avec `make:entity`
+
+> Release notes for v2.5.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/22](https://github.com/studoo-app/edu-framework/milestone/22)
+
+  <br>
+
+## v2.4.0 - 08/10/2026
+
+**new features**
+
+- [#147](https://github.com/studoo-app/edu-framework/issues/147) Un controller peut maintenant gérer plusieurs routes via plusieurs méthodes : la clé `controller` du fichier "app/Config/routes.yaml" accepte la syntaxe `Controller\VilleController::index`. Sans méthode explicite, la méthode `execute()` est appelée comme avant (100 % rétro-compatible) @bfoujols
+- La méthode appelée est validée par le framework (publique, non statique, paramètre de type Request, retour string|null) et lève une `ErrorControllerException` avec un message explicite en cas d'erreur @bfoujols
+- [#75](https://github.com/studoo-app/edu-framework/issues/75) Gestion des fichiers téléversés (`$_FILES`) dans `Request` : normalisation automatique de la structure (champ simple et multi-fichiers), méthodes `hasFile()`, `getFile()`, `getFiles()`, `isValid()`, `getExtension()` et `move()`, démo applicative `/medecin/import` @bfoujols
+- [#64](https://github.com/studoo-app/edu-framework/issues/64) Activation du cache TWIG : les templates compilés sont stockés dans `var/cache/twig` (nouvelle clé de configuration `cache_path`), recompilation automatique des templates modifiés (`auto_reload`) @bfoujols
+- [#65](https://github.com/studoo-app/edu-framework/issues/65) Nouvelle commande `php bin/edu cache:clear` pour supprimer le cache de l'application (dossier `var/cache`) @bfoujols
+
+**bug Fixes**
+
+- [#86](https://github.com/studoo-app/edu-framework/issues/86) Le fichier de configuration des routes est vérifié avant lecture : une exception `ErrorRouteConfigNotExistException` avec un message explicite (chemin attendu, configuration `route_config_path`, sensibilité à la casse sur Linux) remplace le fatal error du composant Yaml quand "routes.yaml" est introuvable @bfoujols
+
+**documentation**
+
+- new [Un controller, plusieurs routes](build/controller-edu.md) : la syntaxe `Controller\Class::method` dans le fichier des routes
+- new [Gestion des fichiers (upload)](boost/resquet.md) : téléversement de fichiers dans Request
+- update [La commande bin/edu](installation/command-edu.md) : commande `cache:clear`
+- update [Installation](installation/installation.md) : erreur sur le fichier des routes et sensibilité à la casse sur Linux
+- update [Route](boost/route.md) : note sur la syntaxe `Controller\Class::method`
+
+> Release notes for v2.4.0
+>
+> [https://github.com/studoo-app/edu-framework/milestone/21](https://github.com/studoo-app/edu-framework/milestone/21)
+
+  <br>
+
 ## v2.3.2 - 05/10/2026
 
 **new features**
