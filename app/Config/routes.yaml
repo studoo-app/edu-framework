@@ -30,3 +30,7 @@ medecin_new:
     uri: /medecin/new
     controller: Controller\MedecinController::new
     httpMethod: [GET,POST]
+medecin_import:
+    uri: /medecin/import
+    controller: Controller\MedecinController::import
+    httpMethod: [GET,POST]

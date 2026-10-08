@@ -20,6 +20,9 @@ class FastRouteCoreTest extends TestCase
         // de la barre de debug dans le rendu et casserait les hashs ci-dessous.
         unset($_ENV['APP_ENV'], $_SERVER['APP_ENV']);
 
+        // Neutralise les fichiers téléversés pour isoler chaque test
+        $_FILES = [];
+
         (new ConfigCore([
             'twig_path' => __DIR__ . '/../../app/Template',
             'route_config_path' => __DIR__ . "/../Config/"
@@ -174,5 +177,39 @@ class FastRouteCoreTest extends TestCase
 
         $this->expectException(ErrorControllerException::class);
         $route->getRoute();
+    }
+
+    public function testRouteImportWithFileInvalid()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/medecin/import';
+        $_FILES = [
+            'fichier' => [
+                'name' => 'medecins.csv',
+                'type' => 'text/csv',
+                'size' => 123,
+                'tmp_name' => '/tmp/phpXYZ',
+                'error' => UPLOAD_ERR_INI_SIZE,
+            ],
+        ];
+
+        // Le fichier téléversé est en erreur : la vue affiche la branche "fichier invalide"
+        $this->assertEquals('c3a41ed55dbc9d7f5798e52b5140f32adb704b37859824845ad92b82c54d9794', hash('sha256', $route->getRoute()));
+    }
+
+    public function testRouteImportWithoutFile()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/medecin/import';
+        $_FILES = [];
+
+        // Aucun fichier envoyé : la vue affiche la branche "aucun fichier"
+        $this->assertEquals('b619f84de911fb72a6459e15946fbe934a00a63fcf3a7d6d23c9bd0506c3137a', hash('sha256', $route->getRoute()));
     }
 }

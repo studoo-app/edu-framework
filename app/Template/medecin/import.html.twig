@@ -1,0 +1,19 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titre }}{% endblock %}
+
+{% block content %}
+<h1>{{ titre }}</h1>
+
+{% if message %}
+    <p style="color: green;">{{ message }}</p>
+{% endif %}
+{% if erreur %}
+    <p style="color: red;">{{ erreur }}</p>
+{% endif %}
+
+<form action="{{ getNameToPath('medecin_import') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="fichier">
+    <input type="submit" value="Importer">
+</form>
+{% endblock %}

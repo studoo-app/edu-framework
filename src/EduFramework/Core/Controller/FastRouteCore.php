@@ -173,6 +173,8 @@ class FastRouteCore
                 $request->setVars($_GET);
                 $request->setVars($_POST);
                 $request->setVars($routeInfo[2]);
+                // Les fichiers téléversés via un formulaire multipart/form-data
+                $request->setFiles($_FILES);
 
                 if ($action === null) {
                     // Sans méthode explicite dans la route, le controller doit implémenter l'interface ControllerInterface
