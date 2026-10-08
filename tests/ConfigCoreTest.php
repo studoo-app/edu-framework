@@ -132,7 +132,7 @@ class ConfigCoreTest extends TestCase
             (new ConfigCore([]));
 
             $this->assertEquals('EduFramework', ConfigCore::getConfig('name'));
-            $this->assertEquals('v2.5.0@alpha', ConfigCore::getConfig('version'));
+            $this->assertEquals('v2.5.0', ConfigCore::getConfig('version'));
         } finally {
             // Restauration du fichier original
             rename($pathBackup, $pathEduframe);
@@ -152,7 +152,7 @@ class ConfigCoreTest extends TestCase
             (new ConfigCore([]));
 
             $this->assertEquals('Mon Framework', ConfigCore::getConfig('name'));
-            $this->assertEquals('v2.5.0@alpha', ConfigCore::getConfig('version'));
+            $this->assertEquals('v2.5.0', ConfigCore::getConfig('version'));
         } finally {
             rename($pathBackup, $pathEduframe);
         }
