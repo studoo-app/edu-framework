@@ -139,6 +139,27 @@ Fatal error: Uncaught Dotenv\Exception\InvalidPathException:
 Unable to read any of the environment file(s) at [...]
 ````
 
+### Erreur sur le fichier des routes
+
+Si le fichier des routes **"app/Config/routes.yaml"** est introuvable, le framework lève une exception `ErrorRouteConfigNotExistException` :
+
+````Bash
+Fatal error: Uncaught Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException: 
+Le fichier de configuration des routes <.../app/config/routes.yaml> n'existe pas. 
+Vérifiez la configuration 'route_config_path' et la casse du dossier 
+(Exemple: app/Config et non app/config, les systèmes de fichiers Linux sont sensibles à la casse)
+````
+
+Les causes possibles :
+
+- la configuration `route_config_path` dans "public/index.php" ne pointe pas vers le bon dossier,
+- **la casse du dossier est incorrecte** : le dossier doit s'appeler `app/Config` (C majuscule) et non `app/config`.
+
+!!! warning "Sensibilité à la casse"
+
+    Sur macOS et Windows, la casse des noms de fichiers et de dossiers est ignorée : un projet avec `app/config` fonctionne en local.
+    En revanche, sur Linux (GitHub Codespaces, devcontainer, serveur de production), le système de fichiers est **sensible à la casse** : `app/config` et `app/Config` sont deux dossiers différents.
+
 ### Erreur d'installation des dépendances
 
 Au moment de la commande "composer create-project studoo/edu-framework-skeleton ...", vous pouvez rencontrer des erreurs d'installation des dépendances. 

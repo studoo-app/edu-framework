@@ -10,6 +10,10 @@
 - La méthode appelée est validée par le framework (publique, non statique, paramètre de type Request, retour string|null) et lève une `ErrorControllerException` avec un message explicite en cas d'erreur
 - Documentation : nouvelle section "Un controller, plusieurs routes" dans [docs/build/controller-edu.md](docs/build/controller-edu.md)
 
+**bug Fixes**
+
+- Le fichier de configuration des routes est vérifié avant lecture : une exception `ErrorRouteConfigNotExistException` avec un message explicite (chemin attendu, configuration `route_config_path`, sensibilité à la casse sur Linux) remplace le fatal error du composant Yaml quand "routes.yaml" est introuvable
+
 ## v2.3.2 - 05/10/2026
 
 **new features**

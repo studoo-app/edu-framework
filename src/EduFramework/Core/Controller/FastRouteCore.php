@@ -16,6 +16,7 @@ use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
+use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -51,9 +52,20 @@ class FastRouteCore
      * Methode pour charger les routes depuis un fichier de configuration (Config/route.yaml)
      * @param string $pathConfigFile Chemin vers le fichier de configuration
      * @return $this
+     * @throws ErrorRouteConfigNotExistException
      */
     public function loadRouteConfig(string $pathConfigFile): self
     {
+        // On vérifie que le fichier de configuration des routes existe
+        // pour renvoyer une erreur explicite plutôt qu'une exception du composant Yaml
+        if (is_file($pathConfigFile . 'routes.yaml') === false) {
+            throw new ErrorRouteConfigNotExistException(
+                "Le fichier de configuration des routes <" . $pathConfigFile . "routes.yaml> n'existe pas. "
+                . "Vérifiez la configuration 'route_config_path' et la casse du dossier "
+                . "(Exemple: app/Config et non app/config, les systèmes de fichiers Linux sont sensibles à la casse)"
+            );
+        }
+
         $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
         if (is_array($fileData)) {
             foreach ($fileData as $routeConfig) {

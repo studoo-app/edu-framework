@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Exception\ErrorControllerException;
+use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use Studoo\EduFramework\Core\View\TwigCore;
 
 class FastRouteCoreTest extends TestCase
@@ -76,6 +77,14 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
         $this->assertEquals('a2bd992a139c4ec5c9a3cac42e646dfc4a8e026c719d37924f193e7ff06fe520', hash('sha256', $route->getRoute()));
+    }
+
+    public function testLoadRouteConfigWithFileNotExist()
+    {
+        $route = new FastRouteCore();
+
+        $this->expectException(ErrorRouteConfigNotExistException::class);
+        $route->loadRouteConfig(__DIR__ . '/../ConfigNotExist/');
     }
 
     public function testLoadRoutesMatchSuccessWithExceptionNotFound()

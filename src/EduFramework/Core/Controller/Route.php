@@ -14,6 +14,7 @@ namespace Studoo\EduFramework\Core\Controller;
 use FastRoute\RouteParser\Std;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Exception\BadRouteException;
+use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -76,11 +77,24 @@ class Route
 
     /**
      * Récupération du fichier config/routes.yaml
-     * @return array<mixed>|bool Tableau des routes ou false si le fichier n'existe pas
+     * @return array<mixed>|bool Tableau des routes ou false si le fichier ne contient pas de routes
+     * @throws ErrorRouteConfigNotExistException
      */
     public function loadRoute(): array|bool
     {
-        $fileData = Yaml::parseFile(ConfigCore::getConfig("route_config_path") . 'routes.yaml');
+        $pathFile = ConfigCore::getConfig("route_config_path") . 'routes.yaml';
+
+        // On vérifie que le fichier de configuration des routes existe
+        // pour renvoyer une erreur explicite plutôt qu'une exception du composant Yaml
+        if (is_file($pathFile) === false) {
+            throw new ErrorRouteConfigNotExistException(
+                "Le fichier de configuration des routes <" . $pathFile . "> n'existe pas. "
+                . "Vérifiez la configuration 'route_config_path' et la casse du dossier "
+                . "(Exemple: app/Config et non app/config, les systèmes de fichiers Linux sont sensibles à la casse)"
+            );
+        }
+
+        $fileData = Yaml::parseFile($pathFile);
         if (is_array($fileData)) {
             return $fileData;
         }

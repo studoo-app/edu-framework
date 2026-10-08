@@ -3,6 +3,7 @@
 namespace Controller;
 
 use Studoo\EduFramework\Core\Exception\BadRouteException;
+use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Route;
@@ -88,5 +89,18 @@ class RouteTest extends TestCase
         $route->getRouteInfo(__DIR__ . "/../Config/");
         $this->expectException(BadRouteException::class);
         $this->assertEquals('/user/1', $route->getNameToPath('userNameError', ['id' => 2]));
+    }
+
+    public function testLoadRouteWithFileNotExist()
+    {
+        (new ConfigCore([
+            'twig_path' => __DIR__ . '/../../app/Template',
+            'route_config_path' => __DIR__ . "/../ConfigNotExist/"
+        ]));
+
+        $route = new Route();
+
+        $this->expectException(ErrorRouteConfigNotExistException::class);
+        $route->getRouteInfo();
     }
 }
