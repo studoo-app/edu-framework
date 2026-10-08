@@ -39,6 +39,13 @@ class Request
     private string $hander = '';
 
     /**
+     * La méthode du controller à appeler
+     * Par défaut, c'est la méthode execute() du controller
+     * @var string $action
+     */
+    private string $action = 'execute';
+
+    /**
      * Les variables de la requête HTTP
      * @var array<mixed> $vars
      */
@@ -104,6 +111,29 @@ class Request
     public function setHander(string $hander): Request
     {
         $this->hander = $hander;
+        return $this;
+    }
+
+    /**
+     * Renvoi la méthode du controller qui est associée à la requête HTTP
+     * Par défaut, c'est la méthode execute() du controller
+     * @return string
+     */
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    /**
+     * Permet de définir la méthode du controller à appeler
+     * La méthode est définie dans le fichier de configuration des routes (Config/routes.yaml)
+     * Exemple: Controller\MedecinController::index
+     * @param string $action Le nom de la méthode du controller
+     * @return Request
+     */
+    public function setAction(string $action): Request
+    {
+        $this->action = $action;
         return $this;
     }
 

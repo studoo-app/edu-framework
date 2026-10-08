@@ -70,7 +70,10 @@ class FastRouteCore
      * Cette route peut avoir des méthodes HTTP associées (GET, POST, PUT, DELETE, ...)
      * @param string|array<mixed> $httpMethod (GET, POST, PUT, DELETE, ...)
      * @param string              $uri La route à appeler
-     * @param string              $controller Nom du controller à appeler
+     * @param string              $controller Nom du controller à appeler.
+     *        Deux formes possibles :
+     *          - "Controller\MedecinController" : appel de la méthode execute() par défaut
+     *          - "Controller\MedecinController::index" : appel de la méthode index()
      * @return $this
      */
     public function addRoute(string|array $httpMethod, string $uri, string $controller): self
@@ -92,6 +95,7 @@ class FastRouteCore
     /**
      * Methode pour récupérer la classe controller à appeler
      * Elle retourne le résultat de la méthode execute() du controller
+     * ou de la méthode définie dans la route Exemple: Controller\MedecinController::index
      * @return string|null
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
@@ -146,15 +150,30 @@ class FastRouteCore
                 break;
                 // Si la route est trouvée alors j'appelle le controller correspondant
             case Dispatcher::FOUND:
+                // Le handler peut être de deux formes :
+                //     - "Controller\MedecinController" : la méthode execute() sera appelée par défaut
+                //     - "Controller\MedecinController::index" : la méthode index() sera appelée
+                [$controller, $action] = $this->resolveHandler($routeInfo[1]);
+
                 // J'ajoute le nom de la classe controller à appeler
                 // et les paramètres de la route à l'objet requête HTTP
-                $request->setHander($routeInfo[1])->setVars($_GET);
-                $request->setHander($routeInfo[1])->setVars($_POST);
-                $request->setHander($routeInfo[1])->setVars($routeInfo[2]);
+                $request->setHander($controller);
+                $request->setVars($_GET);
+                $request->setVars($_POST);
+                $request->setVars($routeInfo[2]);
 
-                // J'appelle la méthode execute() du controller
-                // et je récupère la vue à afficher
-                $returnView = $this->buildController($request->getHander())->execute($request);
+                if ($action === null) {
+                    // Sans méthode explicite dans la route, le controller doit implémenter l'interface ControllerInterface
+                    // J'appelle la méthode execute() du controller
+                    // et je récupère la vue à afficher
+                    $returnView = $this->buildController($request->getHander())->execute($request);
+                } else {
+                    // Une méthode explicite est définie dans la route Exemple: Controller\MedecinController::index
+                    // La validation de la méthode est faite dans la méthode callAction()
+                    // J'appelle la méthode du controller et je récupère la vue à afficher
+                    $request->setAction($action);
+                    $returnView = $this->callAction($request);
+                }
                 break;
             default:
                 $returnView = (new HttpErrorDefaultController())->execute($request);

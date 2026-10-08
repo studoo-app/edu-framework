@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Exception\ErrorControllerException;
 use Studoo\EduFramework\Core\View\TwigCore;
 
 class FastRouteCoreTest extends TestCase
@@ -117,5 +118,52 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/user/21';
 
         $this->assertEquals('ab2550a7609a2997e9aaef4b49a12388d8978d5507d970cb45fa96fec99e768b', hash('sha256', $route->getRoute()));
+    }
+
+    public function testRouteWithMethodExplicitIndex()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/medecin';
+
+        $this->assertEquals('ed13c9c6c5ed3833bd1af6bea040089eff6e48baefcc219a9a04f382f2532931', hash('sha256', $route->getRoute()));
+    }
+
+    public function testRouteWithMethodExplicitNew()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/medecin/new';
+
+        $this->assertEquals('e2f7b9a3c530c751e475fca16a4e46e95e249ceca802a947adc17e50bfb96a91', hash('sha256', $route->getRoute()));
+    }
+
+    public function testRouteWithMethodNotExist()
+    {
+        $route = new FastRouteCore();
+        $route->addRoute('GET', '/medecin/error', "Controller\MedecinController::inconnue");
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/medecin/error';
+
+        $this->expectException(ErrorControllerException::class);
+        $this->expectExceptionMessage("La méthode <inconnue> n'existe pas dans le controller <Controller\MedecinController>");
+        $route->getRoute();
+    }
+
+    public function testRouteWithMethodNotPublic()
+    {
+        $route = new FastRouteCore();
+        $route->addRoute('GET', '/medecin/error', "Controller\MedecinController::testPrivate");
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/medecin/error';
+
+        $this->expectException(ErrorControllerException::class);
+        $route->getRoute();
     }
 }

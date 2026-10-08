@@ -2,6 +2,14 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.4.0 - 08/10/2026
+
+**new features**
+
+- Un controller peut maintenant gérer plusieurs routes via plusieurs méthodes : la clé `controller` du fichier "app/Config/routes.yaml" accepte la syntaxe `Controller\VilleController::index`. Sans méthode explicite, la méthode `execute()` est appelée comme avant (100 % rétro-compatible)
+- La méthode appelée est validée par le framework (publique, non statique, paramètre de type Request, retour string|null) et lève une `ErrorControllerException` avec un message explicite en cas d'erreur
+- Documentation : nouvelle section "Un controller, plusieurs routes" dans [docs/build/controller-edu.md](docs/build/controller-edu.md)
+
 ## v2.3.2 - 05/10/2026
 
 **new features**

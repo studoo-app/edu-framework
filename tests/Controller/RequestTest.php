@@ -66,4 +66,25 @@ class RequestTest extends TestCase
         $request->setHander("Controller\HomeController");
         $this->assertEquals("Controller\HomeController", $request->getHander());
     }
+
+    public function testGetActionDefault()
+    {
+        $request = new Request("/test", "GET");
+        $this->assertEquals("execute", $request->getAction());
+    }
+
+    public function testSetAction()
+    {
+        $request = new Request("/test", "GET");
+        $request->setAction("index");
+        $this->assertEquals("index", $request->getAction());
+    }
+
+    public function testSetActionAndHander()
+    {
+        $request = new Request("/test", "GET");
+        $request->setHander("Controller\MedecinController")->setAction("index");
+        $this->assertEquals("Controller\MedecinController", $request->getHander());
+        $this->assertEquals("index", $request->getAction());
+    }
 }
