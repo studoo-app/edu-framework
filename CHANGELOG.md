@@ -7,6 +7,7 @@
 **new features**
 
 - [#149](https://github.com/studoo-app/edu-framework/issues/149) Nouvelle commande `php bin/edu make:entity` : génération de l'entité (`app/Entity`) et de son repository (`app/Repository`) — mode interactif ou option `--fields`, getters et setters fluides camelCase typés, hydratation avec casts dans le repository
+- [#150](https://github.com/studoo-app/edu-framework/issues/150) Les paramètres d'identité du framework (name, version, date_version, php_version) sont personnalisables via le fichier `eduframe.yml` à la racine du framework (lu depuis `vendor/` dans les projets) — plus besoin de modifier `ConfigCore.php`, exception `ErrorConfigException` explicite si le fichier est invalide
 
 ## v2.4.0 - 08/10/2026
 

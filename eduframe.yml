@@ -1,0 +1,18 @@
+# Paramètres du framework Edu Framework
+# Ce fichier contient les paramètres d'identité du framework.
+# Ils sont affichés dans la console bin/edu et dans la barre de debug.
+# Les valeurs doivent être quotées (des chaines de caractères)
+#     php_version: 8.4      # ❌ interprété comme le nombre décimal 8.4 -> erreur
+#     php_version: '8.4'    # ✓ interprété comme la chaine de caractères "8.4"
+
+# Le nom du framework
+name: 'EduFramework'
+
+# La version du framework
+version: 'v2.5.0@alpha'
+
+# La date de livraison de la version
+date_version: '2026-10-08'
+
+# La version minimale de PHP requise
+php_version: '8.4'
