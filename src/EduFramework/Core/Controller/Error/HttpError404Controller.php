@@ -20,10 +20,12 @@ use Twig\Error\SyntaxError;
 
 /**
  * Class HttpError404Controller
- * Classe Controller pour les erreurs HTTP
+ * Classe Controller pour les erreurs HTTP 404 (page introuvable)
  */
 class HttpError404Controller implements ControllerInterface
 {
+    use ErrorPageTrait;
+
     /**
      * Si y a pas de route valide alors j'affiche la page 404
      * @param Request $request Objet de la requête
@@ -39,7 +41,10 @@ class HttpError404Controller implements ControllerInterface
         }
         return TwigCore::getEnvironment()->render(
             'error/http-404.html.twig',
-            []
+            [
+                'code' => 404,
+                'exception_message' => $this->getExceptionMessage()
+            ]
         );
     }
 }

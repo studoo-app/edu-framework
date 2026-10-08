@@ -2,6 +2,14 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.5.0 - 08/10/2026
+
+**new features**
+
+- [#149](https://github.com/studoo-app/edu-framework/issues/149) Nouvelle commande `php bin/edu make:entity` : génération de l'entité (`app/Entity`) et de son repository (`app/Repository`) — mode interactif ou option `--fields`, getters et setters fluides camelCase typés, hydratation avec casts dans le repository
+- [#150](https://github.com/studoo-app/edu-framework/issues/150) Les paramètres d'identité du framework (name, version, date_version, php_version) sont personnalisables via le fichier `eduframe.yml` à la racine du framework (lu depuis `vendor/` dans les projets) — plus besoin de modifier `ConfigCore.php`, exception `ErrorConfigException` explicite si le fichier est invalide
+- [#76](https://github.com/studoo-app/edu-framework/issues/76) Pages d'erreur HTTP mises en forme (404, 405, 403, 500) : templates autonomes et stylés dans `app/Template/error/`, nouveau `HttpError403Controller`, la classe `ErrorHttpStatusException` permet de lever une erreur HTTP depuis un controller (Exemple : accès interdit 403), toute exception non gérée affiche la page 500 avec le message de l'exception en mode développement (masqué en production). Le template `http-Default.html.twig` devient `http-500.html.twig`. Le nom du framework n'est plus affiché sur les pages d'erreur (titre et pied de page)
+
 ## v2.4.0 - 08/10/2026
 
 **new features**

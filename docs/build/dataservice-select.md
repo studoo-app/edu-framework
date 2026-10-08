@@ -112,6 +112,17 @@ Nous allons ajouter deux dossiers dans le dossier `app` pour gérer les données
 
 Selon le schéma de la base de données, nous allons créer une entité `Ville` et un repository `VilleRepository`.
 
+!!! tip "Générer les deux fichiers avec la commande make:entity"
+
+    À partir de la version v2.5.0, les deux fichiers peuvent être générés automatiquement :
+
+    ```Shell
+    php bin/edu make:entity Ville --fields "nom:string,code_postal:string,nombre_habitant:int"
+    ```
+
+    La commande crée `app/Entity/Ville.php` et `app/Repository/VilleRepository.php` avec les getters, les setters et l'hydratation.
+    Vous pouvez ensuite adapter le code généré. Pour plus de détails, consultez la documentation de la commande [make:entity](../installation/command-edu.md#la-commande-makeentity).
+
 ### Création de l'entité Ville
 
 Nous allons créer une entité `Ville` dans le dossier `app/Entity`.

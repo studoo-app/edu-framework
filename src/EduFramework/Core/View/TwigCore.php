@@ -84,7 +84,10 @@ class TwigCore
     public function render(string|TemplateWrapper $name, array $context = []): string
     {
         $response = self::$twig->render($name, $context);
+        // La barre de debug n'est pas injectée si la requête n'est pas encore renseignée
+        // (Exemple: une erreur est survenue avant le dispatch de la route)
         if (ConfigCore::existEnv('APP_ENV') && ConfigCore::getEnv('APP_ENV') === 'dev'
+            && ConfigCore::hasRequest() === true
             && ConfigCore::getRequest()->getRoute() !== '/_debug/profiler') {
             $debugBar = new studooBarreDebug();
             $toolbar = $debugBar->generateCssGlobal() . $debugBar->generateBarDebug();

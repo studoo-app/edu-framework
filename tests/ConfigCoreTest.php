@@ -93,4 +93,107 @@ class ConfigCoreTest extends TestCase
     {
         $this->assertFalse(ConfigCore::existEnv('DB_HOSTABLE'));
     }
+
+    public function testEduframeYmlFileExist()
+    {
+        // Le fichier eduframe.yml se trouve à la racine du framework
+        $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
+        $pathBackup = $pathEduframe . '.bak';
+
+        // Sauvegarde du fichier original puis écriture d'une version personnalisée
+        copy($pathEduframe, $pathBackup);
+        file_put_contents(
+            $pathEduframe,
+            "name: 'Mon Framework'\nversion: 'v1.0.0@stable'\ndate_version: '2026-10-08'\nphp_version: '8.4'\n"
+        );
+
+        try {
+            (new ConfigCore([]));
+
+            $this->assertEquals('Mon Framework', ConfigCore::getConfig('name'));
+            $this->assertEquals('v1.0.0@stable', ConfigCore::getConfig('version'));
+            $this->assertEquals('2026-10-08', ConfigCore::getConfig('date_version'));
+            $this->assertEquals('8.4', ConfigCore::getConfig('php_version'));
+        } finally {
+            // Restauration du fichier original
+            rename($pathBackup, $pathEduframe);
+        }
+    }
+
+    public function testEduframeYmlFileNotExist()
+    {
+        // Sans le fichier eduframe.yml, les valeurs par défaut du framework sont conservées
+        $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
+        $pathBackup = $pathEduframe . '.bak';
+
+        rename($pathEduframe, $pathBackup);
+
+        try {
+            (new ConfigCore([]));
+
+            $this->assertEquals('EduFramework', ConfigCore::getConfig('name'));
+            $this->assertEquals('v2.5.0', ConfigCore::getConfig('version'));
+        } finally {
+            // Restauration du fichier original
+            rename($pathBackup, $pathEduframe);
+        }
+    }
+
+    public function testEduframeYmlPartiel()
+    {
+        // Un fichier avec un seul paramètre : seules les clés présentes sont surchargées
+        $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
+        $pathBackup = $pathEduframe . '.bak';
+
+        copy($pathEduframe, $pathBackup);
+        file_put_contents($pathEduframe, "name: 'Mon Framework'\n");
+
+        try {
+            (new ConfigCore([]));
+
+            $this->assertEquals('Mon Framework', ConfigCore::getConfig('name'));
+            $this->assertEquals('v2.5.0', ConfigCore::getConfig('version'));
+        } finally {
+            rename($pathBackup, $pathEduframe);
+        }
+    }
+
+    public function testEduframeYmlInvalide()
+    {
+        $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
+        $pathBackup = $pathEduframe . '.bak';
+
+        copy($pathEduframe, $pathBackup);
+        file_put_contents($pathEduframe, "name: 'unclosed\n");
+
+        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
+        $this->expectExceptionMessage('est invalide');
+
+        try {
+            new ConfigCore([]);
+        } finally {
+            // Le bloc finally restaure le fichier original même si l'exception est levée
+            rename($pathBackup, $pathEduframe);
+        }
+    }
+
+    public function testEduframeYmlParamNotString()
+    {
+        // Piège classique du YAML : php_version: 8.4 est parsé en float et non en chaine
+        $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
+        $pathBackup = $pathEduframe . '.bak';
+
+        copy($pathEduframe, $pathBackup);
+        file_put_contents($pathEduframe, "php_version: 8.4\n");
+
+        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
+        $this->expectExceptionMessage('doit être une chaine de caractères');
+
+        try {
+            new ConfigCore([]);
+        } finally {
+            // Le bloc finally restaure le fichier original même si l'exception est levée
+            rename($pathBackup, $pathEduframe);
+        }
+    }
 }

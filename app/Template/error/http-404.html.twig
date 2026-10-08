@@ -1,8 +1,44 @@
-{% extends "base.html.twig" %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Erreur {{ code }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: #f2f8f6; color: #353535;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        main { text-align: center; padding: 2rem; max-width: 640px; }
+        .code { font-size: 6rem; font-weight: 800; color: #36B393; line-height: 1; }
+        h1 { font-size: 1.5rem; margin: 1rem 0 .5rem; }
+        p { color: #55635d; }
+        .exception {
+            margin: 1.5rem 0 0; padding: .75rem 1rem; text-align: left;
+            background: #f9ecec; border-left: 4px solid #b0413e;
+            font-family: ui-monospace, "SF Mono", monospace; font-size: .85rem; color: #7a2d2b;
+            word-break: break-word;
+        }
+        main a {
+            display: inline-block; margin-top: 1.5rem; padding: .5rem 1.25rem;
+            background: #353535; color: #fff; text-decoration: none; border-radius: 5px;
+        }
+        main a:hover { background: #36B393; }
+    </style>
+</head>
+<body>
+<main>
+    <p class="code">{{ code }}</p>
+    <h1>Page introuvable</h1>
+    <p>La page que vous demandez n'existe pas ou a été déplacée.</p>
 
-{% block title %}Error{% endblock %}
+    {% if exception_message %}
+        <p class="exception">{{ exception_message }}</p>
+    {% endif %}
 
-{% block content %}
-    <h1>Error 404 - NOT_FOUND</h1>
-{% endblock %}
-
+    <a href="/">Retour à l'accueil</a>
+</main>
+</body>
+</html>

@@ -47,6 +47,7 @@ class AppCommand extends Application
         $this->add(new \Studoo\EduFramework\Commands\StartCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateCliCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateApiCommand());
+        $this->add(new \Studoo\EduFramework\Commands\CreateEntityCommand());
         $this->add(new \Studoo\EduFramework\Commands\ClearCacheCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {

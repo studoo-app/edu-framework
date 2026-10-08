@@ -37,6 +37,7 @@ Voici les commandes disponibles par version :
 | make:controller | génération d'un controller                    | v1.0                   |
 | make:api        | génération d'un controller type json API      | v2.0                   |
 | make:command    | génération d'un commande line                 | v2.0                   |
+| make:entity     | génération d'une entité et son repository     | v2.5.0                 |
 | cache:clear     | suppression du cache de l'application        | v2.4.0                 |
 
 !!! info "Pour aller plus loin"
@@ -81,6 +82,58 @@ Si le dossier `var/cache` n'existe pas, un message vous indique qu'il n'y a aucu
 
     Les templates modifiés sont automatiquement recompilés (option `auto_reload` de Twig).
     La commande `cache:clear` reste utile pour repartir d'un cache vierge, par exemple après un déploiement.
+
+### La commande make:entity
+
+La commande `make:entity` génère les **deux fichiers du modèle** pour une table de votre base de données (à partir de la version v2.5.0) :
+
+- `app/Entity/Ville.php` : l'entité, représentation logique d'une table en classe
+- `app/Repository/VilleRepository.php` : le repository, qui regroupe tous les traitements sur la table
+
+```Shell
+php bin/edu make:entity Ville
+```
+
+La commande demande alors les champs de la table un par un : le nom du champ (une valeur vide met fin à la saisie) puis son type (`string`, `int`, `float`, `bool`, `string` par défaut).
+
+Vous pouvez aussi passer les champs directement avec l'option `--fields` :
+
+```Shell
+php bin/edu make:entity Ville --fields "nom:string,code_postal:string,nombre_habitant:int"
+```
+
+#### Ce que la commande génère
+
+L'entité possède un identifiant `id` (entier), un constructeur qui hydrate tous les champs, des getters et des setters fluides :
+
+```php
+class Ville
+{
+	private int $id;
+	private string $nom;
+	// ...
+
+	public function __construct(int $id, string $nom, string $code_postal, int $nombre_habitant) { /* ... */ }
+
+	public function getId(): int { /* ... */ }
+	public function getNom(): string { /* ... */ }
+	public function setNom(string $nom): self { /* ... */ return $this; }
+	// ...
+}
+```
+
+!!! info "Pas de setId()"
+
+    Il n'y a pas de setter pour l'identifiant : c'est la base de données qui l'attribue (auto-incrément). Pour créer une entité, on utilise l'identifiant `0` : `new Ville(0, 'Paris', '75000', 2200000)`.
+
+Le repository possède la méthode de lecture `getVilles()` : la requête `SELECT * FROM ville` et l'hydratation de l'entité sont déjà écrites.
+
+!!! info "La table doit exister"
+
+    La commande génère le code PHP, mais ne crée pas la table dans la base de données.
+    Vous devez créer la table au préalable (voir le [schéma de la base de données](../build/dataservice-select.md)).
+
+Si l'entité ou le repository existe déjà, une exception `EntityAlreadyExistsException` est levée.
 
 ___
 
