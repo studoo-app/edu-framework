@@ -12,16 +12,26 @@ Comme le navigateur envoie automatiquement le cookie de session avec cette requ�
 le serveur croit reconnaître l'utilisateur légitime et exécute l'action demandée
 (Exemple : changer son email, supprimer des données, faire un virement ...).
 
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur (session active)
-    participant S as Votre site
-    participant M as Site malveillant
-    U->>S: 1. Connexion (cookie de session)
-    U->>M: 2. Visite du site malveillant
-    M->>S: 3. Requête forgée (le cookie est envoyé automatiquement !)
-    Note over S: Sans protection : la requête est exécutée
-    Note over S: Avec un jeton CSRF : la requête est rejetée (403)
+```
+┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
+│   Utilisateur        │       │   Votre site          │       │   Site malveillant    │
+│ (session active)     │       │                       │       │                       │
+└───────────┬───────────┘       └───────────┬───────────┘       └───────────┬───────────┘
+            │                                   │                               │
+            │ 1. Connexion (cookie de session) │                               │
+            │ ───────────────────────────────▶ │                               │
+            │                                   │                               │
+            │ 2. Visite du site malveillant   │                               │
+            │ ───────────────────────────────────────────────────────▶ │
+            │                                   │                               │
+            │ 3. Requête forgée                │                               │
+            │    (le cookie est envoyé automatiquement !)            │
+            │ ◀─────────────────────────────── │                               │
+            │                                   │                               │
+            ▼                                   ▼                               ▼
+
+Sans protection : la requête est exécutée
+Avec un jeton CSRF : la requête est rejetée (403)
 ```
 
 ## Le principe de protection : le Synchronizer Token
