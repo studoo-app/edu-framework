@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.0 - 14/10/2026
+
+**new features**
+
+- Nouveau service `CsrfService` pour protéger les formulaires contre les attaques CSRF (Cross-Site Request Forgery) selon le pattern "Synchronizer Token" : jeton aléatoire (CSPRNG) cloisonné par nom de route, comparaison protégée contre les attaques temporelles (`hash_equals`), rotation du jeton après chaque validation réussie. Nouvelle fonction Twig `csrf_token('nom_route')` pour générer le champ caché du formulaire et méthode `Request::isCsrfTokenValid('nom_route')` pour la validation dans le controller (le jeton peut aussi être transmis dans l'en-tête HTTP `X-CSRF-TOKEN` pour les appels AJAX). Démo applicative sur la route `/medecin/import` et documentation complète [docs/build/csrf.md](docs/build/csrf.md)
+
 ## v2.5.0 - 08/10/2026
 
 **new features**

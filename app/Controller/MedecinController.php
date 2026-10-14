@@ -4,6 +4,7 @@ namespace Controller;
 
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Request;
+use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\View\TwigCore;
 
 class MedecinController
@@ -39,6 +40,11 @@ class MedecinController
 		$erreur  = null;
 
 		if ($request->getHttpMethod() === "POST") {
+			// Sécurité : le jeton CSRF du formulaire doit être valide (voir docs/build/csrf.md)
+			if ($request->isCsrfTokenValid('medecin_import') === false) {
+				throw new ErrorHttpStatusException("Jeton CSRF invalide ou expiré", 403);
+			}
+
 			if ($request->hasFile('fichier') === false) {
 				$erreur = "Aucun fichier n'a été envoyé";
 			} elseif ($request->isValid('fichier') === false) {

@@ -11,6 +11,8 @@
 
 namespace Studoo\EduFramework\Core\Controller;
 
+use Studoo\EduFramework\Core\Security\CsrfService;
+
 /**
  * Class Request
  * Elle permet de définir une requête HTTP
@@ -364,5 +366,48 @@ class Request
     public function getBody(): false|string
     {
         return file_get_contents('php://input');
+    }
+
+    /**
+     * Vérifie que le jeton CSRF reçu avec la requête est valide pour ce nom de route
+     * Le jeton est recherché dans les variables de la requête (champ de formulaire _csrf_token)
+     * puis dans l'en-tête HTTP X-CSRF-TOKEN (Exemple: un appel AJAX)
+     * Le jeton est renouvelé (rotation) après chaque validation réussie
+     * @param string $routeName Le nom de la route définie dans le fichier Config/routes.yaml
+     *                        Exemple: medecin_import
+     * @return bool true si le jeton est valide, false sinon
+     */
+    public function isCsrfTokenValid(string $routeName): bool
+    {
+        $token = $this->get(CsrfService::TOKEN_FIELD_NAME);
+
+        if ($token === null) {
+            $token = $this->getTokenFromHeader();
+        }
+
+        return CsrfService::validate($routeName, $token);
+    }
+
+    /**
+     * Récupère le jeton CSRF dans l'en-tête HTTP X-CSRF-TOKEN
+     * Le nom de l'en-tête n'est pas sensible à la casse
+     * (Exemple: X-CSRF-TOKEN, X-Csrf-Token)
+     * @return string|null Le jeton ou null si l'en-tête n'existe pas
+     */
+    private function getTokenFromHeader(): string|null
+    {
+        $headers = $this->getHearder();
+
+        if (is_array($headers) === false) {
+            return null;
+        }
+
+        foreach ($headers as $name => $value) {
+            if (is_string($name) === true && strcasecmp($name, CsrfService::TOKEN_HEADER_NAME) === 0) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

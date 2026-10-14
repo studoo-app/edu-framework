@@ -57,6 +57,7 @@ class TwigCore
         self::$twig->addExtension(new DebugExtension());
         self::$twig->addExtension(new StudooDebugExtension());
         self::$twig->addExtension(new StudooGetPathRouteExtension());
+        self::$twig->addExtension(new StudooCsrfExtension());
     }
 
     /**

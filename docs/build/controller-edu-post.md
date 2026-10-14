@@ -180,3 +180,6 @@ Nous allons implémenter la fonction `getNameToPath('NOM_ROUTE')` dans le fichie
 
     Pour comprendre comment gérer les requêtes HTTP, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md).
 
+    Pour sécuriser votre formulaire contre les attaques CSRF, vous pouvez lire la documentation
+    [Protéger un formulaire (CSRF)](csrf.md).
+

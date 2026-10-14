@@ -7,7 +7,9 @@ use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Exception\ErrorControllerException;
+use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
+use Studoo\EduFramework\Core\Security\CsrfService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
 class FastRouteCoreTest extends TestCase
@@ -22,6 +24,10 @@ class FastRouteCoreTest extends TestCase
 
         // Neutralise les fichiers téléversés pour isoler chaque test
         $_FILES = [];
+
+        // Neutralise les données POST et les jetons CSRF en session pour isoler chaque test
+        $_POST = [];
+        $_SESSION = [];
 
         (new ConfigCore([
             'twig_path' => __DIR__ . '/../../app/Template',
@@ -186,6 +192,10 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/medecin/import';
+        // Le jeton CSRF du formulaire est fourni pour passer la protection
+        $_POST = [
+            CsrfService::TOKEN_FIELD_NAME => CsrfService::getToken('medecin_import'),
+        ];
         $_FILES = [
             'fichier' => [
                 'name' => 'medecins.csv',
@@ -197,7 +207,16 @@ class FastRouteCoreTest extends TestCase
         ];
 
         // Le fichier téléversé est en erreur : la vue affiche la branche "fichier invalide"
-        $this->assertEquals('c3a41ed55dbc9d7f5798e52b5140f32adb704b37859824845ad92b82c54d9794', hash('sha256', $route->getRoute()));
+        // Le jeton CSRF renouvelé (aléatoire) est présent dans la page :
+        // le rendu n'est donc plus comparable par un hash de page complète
+        // (l'apostrophe du message est échappée par Twig en &#039;)
+        $html = $route->getRoute();
+        $this->assertStringContainsString(
+            "Le fichier n&#039;est pas valide (taille trop grande ou téléversement interrompu)",
+            $html
+        );
+        // Le formulaire contient le champ caché du jeton CSRF
+        $this->assertStringContainsString('name="_csrf_token"', $html);
     }
 
     public function testRouteImportWithoutFile()
@@ -207,9 +226,33 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/medecin/import';
+        // Le jeton CSRF du formulaire est fourni pour passer la protection
+        $_POST = [
+            CsrfService::TOKEN_FIELD_NAME => CsrfService::getToken('medecin_import'),
+        ];
         $_FILES = [];
 
         // Aucun fichier envoyé : la vue affiche la branche "aucun fichier"
-        $this->assertEquals('b619f84de911fb72a6459e15946fbe934a00a63fcf3a7d6d23c9bd0506c3137a', hash('sha256', $route->getRoute()));
+        // (l'apostrophe du message est échappée par Twig en &#039;)
+        $html = $route->getRoute();
+        $this->assertStringContainsString("Aucun fichier n&#039;a été envoyé", $html);
+        // Le formulaire contient le champ caché du jeton CSRF
+        $this->assertStringContainsString('name="_csrf_token"', $html);
+    }
+
+    public function testRouteImportWithCsrfTokenInvalid()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/medecin/import';
+        // Aucun jeton CSRF fourni : la soumission est refusée (403)
+        $_POST = [];
+        $_FILES = [];
+
+        $this->expectException(ErrorHttpStatusException::class);
+        $this->expectExceptionMessage("Jeton CSRF invalide ou expiré");
+        $route->getRoute();
     }
 }
