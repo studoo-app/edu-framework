@@ -13,6 +13,7 @@
 {% endif %}
 
 <form action="{{ getNameToPath('medecin_import') }}" method="post" enctype="multipart/form-data">
+    {{ csrf_token('medecin_import') | raw }}
     <input type="file" name="fichier">
     <input type="submit" value="Importer">
 </form>

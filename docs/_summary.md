@@ -12,6 +12,7 @@
     * [Arborescence](build/arborescence.md)
     * [Construire une page](build/controller-edu.md)
     * [Construire un formulaire](build/controller-edu-post.md)
+    * [Protéger un formulaire (CSRF)](build/csrf.md)
     * [Construire une API](build/controller-edu-api.md)
     * [Construire le CRUD](build/dataservice-select.md)
     * [Construire une commande CLI](build/new-command-edu.md)
