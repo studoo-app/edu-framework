@@ -12,26 +12,27 @@ Comme le navigateur envoie automatiquement le cookie de session avec cette requ�
 le serveur croit reconnaître l'utilisateur légitime et exécute l'action demandée
 (Exemple : changer son email, supprimer des données, faire un virement ...).
 
-```
-┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
-│   Utilisateur        │       │   Votre site          │       │   Site malveillant    │
-│ (session active)     │       │                       │       │                       │
-└───────────┬───────────┘       └───────────┬───────────┘       └───────────┬───────────┘
-            │                                   │                               │
-            │ 1. Connexion (cookie de session) │                               │
-            │ ───────────────────────────────▶ │                               │
-            │                                   │                               │
-            │ 2. Visite du site malveillant   │                               │
-            │ ───────────────────────────────────────────────────────▶ │
-            │                                   │                               │
-            │ 3. Requête forgée                │                               │
-            │    (le cookie est envoyé automatiquement !)            │
-            │ ◀─────────────────────────────── │                               │
-            │                                   │                               │
-            ▼                                   ▼                               ▼
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Utilisateur
+    participant S as Votre site
+    participant M as Site malveillant
 
-Sans protection : la requête est exécutée
-Avec un jeton CSRF : la requête est rejetée (403)
+    U->>S: Connexion
+    Note over U,S: Le navigateur enregistre le cookie de session
+
+    U->>M: Visite du site malveillant
+    M-->>U: Page piégée (image cachée, auto-submit en JS)
+
+    M->>S: Requête forgée
+    Note over M,S: Le cookie de session est envoyé automatiquement !
+
+    alt Sans protection CSRF
+        S-->>M: La requête est exécutée
+    else Avec un jeton CSRF
+        S-->>M: 403 - Requête rejetée
+    end
 ```
 
 ## Le principe de protection : le Synchronizer Token
