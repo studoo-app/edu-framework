@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.2 - 15/10/2026
+
+**new features**
+
+- Documentation : support Mermaid (thème clair/sombre automatique) et 9 schémas fidèles au code du framework — le schéma CSRF devient un diagramme de séquence (remplace l'ASCII), nouveaux flowcharts : cycle d'une requête MVC, cycle de vie d'un controller, pipeline des erreurs HTTP, flux des logs vers le profiler, génération d'URL par nom de route ; nouveaux diagrammes de classes : CRUD (VilleController / VilleRepository / Ville / DatabaseService) et connexion DatabaseService (adaptateurs mysql, mariadb, sqlite) ; diagramme de séquence du pattern PRG (Post/Redirect/Get). Les schémas statiques controller.png/svg sont supprimés (source .excalidraw conservée)
+
 ## v2.6.1 - 15/10/2026
 
 **new features**

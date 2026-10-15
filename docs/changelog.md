@@ -2,6 +2,37 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.2 - 15/10/2026
+
+**documentation**
+
+- new Support [Mermaid](https://mermaid.js.org){:target="_blank"} dans la documentation : les schémas s'adaptent automatiquement au thème clair/sombre et se chargent uniquement sur les pages qui en contiennent
+- update [Protéger un formulaire (CSRF)](build/csrf.md) : le schéma ASCII devient un diagramme de séquence Mermaid
+- new [Le MVC, c'est quoi ?](build/concept-mvc.md) : flowchart du cycle d'une requête avec les classes réelles (FastRouteCore, Controller, Repository, TwigCore)
+- update [Comment faire un controller ?](build/controller-edu.md) : le schéma statique est remplacé par un flowchart du cycle de vie de HelloController
+- new [Construire le CRUD](build/dataservice-select.md) : diagramme de classes VilleController / VilleRepository / Ville / DatabaseService
+- new [Les erreurs HTTP](boost/http-error.md) : flowchart du pipeline d'erreurs avec les branches dev/production
+- update [Comment faire un formulaire ?](build/controller-edu-post.md) : diagramme de séquence du pattern PRG (Post/Redirect/Get)
+- new [DatabaseService : La gestion des données](boost/dataservice.md) : diagramme de classes de la connexion (adaptateurs mysql, mariadb, sqlite)
+- new [La barre de debug et le profiler](boost/debug-bar.md) : flowchart du flux des logs vers le profiler
+- new [Route : générer une URL à partir du nom d'une route](boost/route.md) : flowchart de la génération d'URL et de la BadRouteException
+
+## v2.6.1 - 15/10/2026
+
+**new features**
+
+- Migration de MkDocs vers [ProperDocs](https://github.com/ProperDocs/properdocs){:target="_blank"}, le fork maintenu de MkDocs 1.x — MkDocs n'est plus maintenu depuis août 2024 et son dépôt est fermé aux contributions extérieures. ProperDocs est un remplacement direct (drop-in) : le thème Material et tous les plugins restent inchangés, la configuration devient `properdocs.yml` et les commandes `mkdocs build`/`mkdocs serve` deviennent `properdocs build`/`properdocs serve`
+
+**bug Fixes**
+
+- Les cartes sociales (og:image) sont de nouveau générées : le logo du plugin social est résolu via le logo du thème (préfixé par le dossier de documentation)
+
+**documentation**
+
+- new [Use case "VILLE" : STEP 1](build/use-case-ville.md) et [Refactoring du use case "VILLE"](build/use-case-ville-refactor.md) : ajout à la navigation
+- update [Contribuer pour la docs](contributor/documentation.md) : installation et lancement avec ProperDocs
+- suppression de la page obsolète `dataservice-insert.md` (contenu intégré à [Construire le CRUD](build/dataservice-select.md))
+
 ## v2.6.0 - 14/10/2026
 
 **new features**
