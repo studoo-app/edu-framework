@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.3 - 15/10/2026
+
+**bug Fixes**
+
+- Mise à jour de `zircote/swagger-php` (4.x-dev → 5.8.*) : la version embarquée n'était pas compatible avec PHP 8.4 et supérieur — la commande `vendor/bin/openapi` affichait l'erreur `Constant E_STRICT is deprecated`, suivie de nombreux avertissements `SplObjectStorage` sous PHP 8.5, et imposait un script PHP de contournement pour générer la spécification. La génération (CLI et programmatique) fonctionne désormais sans erreur ni avertissement. Aucun impact sur le code applicatif : les attributs `OpenApi\Attributes` (`Get`, `Post`, `Response`, `Parameter`, `Info`) et la classe `OpenApi\Generator` restent identiques, le code généré par `make:api` est inchangé
+
 ## v2.6.2 - 15/10/2026
 
 **new features**
