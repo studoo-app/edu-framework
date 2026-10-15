@@ -2,6 +2,16 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.3 - 15/10/2026
+
+**bug Fixes**
+
+- Mise à jour de `zircote/swagger-php` (4.x-dev → 5.8.*) : la librairie n'était pas compatible avec PHP 8.4 et supérieur — la commande `vendor/bin/openapi` affichait l'erreur `Constant E_STRICT is deprecated` et produisait un fichier incomplet
+
+**documentation**
+
+- update [Construire une API](build/controller-edu-api.md) : suppression de la note de contournement (script `generate-openapi.php`), la commande `vendor/bin/openapi` est de nouveau fonctionnelle avec PHP 8.4 et supérieur
+
 ## v2.6.2 - 15/10/2026
 
 **documentation**
