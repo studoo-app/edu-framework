@@ -29,7 +29,7 @@
 
 **documentation**
 
-- new [Use case "VILLE" : STEP 1 et Refactoring](build/dataservice-select.md) : ajout à la navigation (contenus désormais fusionnés dans la page Construire le CRUD)
+- new Use case "VILLE" : STEP 1 et Refactoring : ajout à la navigation (contenus retirés depuis)
 - update [Contribuer pour la docs](contributor/documentation.md) : installation et lancement avec ProperDocs
 - suppression de la page obsolète `dataservice-insert.md` (contenu intégré à [Construire le CRUD](build/dataservice-select.md))
 
