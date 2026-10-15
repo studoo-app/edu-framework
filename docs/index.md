@@ -8,6 +8,8 @@ Le projet "Edu Framework" vise à répondre à une problématique récurrente id
 
 L'objectif principal "Edu Framework" est de fournir un ensemble d'outils, de guides et de ressources pédagogiques permettant aux développeurs, qu'ils soient novices ou expérimentés, de faciliter la transition vers un framework comme Symfony. Ce projet visera à couvrir les aspects fondamentaux, en mettant l'accent sur les meilleures pratiques de développement.
 
+Edu Framework est également utilisé dans des travaux pratiques (TP) de cybersécurité : volontairement simple et transparent, il permet d'aborder les failles de sécurité web de façon pédagogique, tout en proposant les solutions et les bonnes pratiques pour s'en prémunir — requêtes préparées contre l'injection SQL, protection [CSRF](build/csrf.md), messages d'erreur masqués en production.
+
 !!! warning "Information importante"
 
     **Ce framework n'est pas adapté à une utilisation en production. Il est destiné à des fins pédagogiques.**
