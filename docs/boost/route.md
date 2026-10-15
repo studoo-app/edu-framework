@@ -27,6 +27,17 @@ Cette fonctionnalité est disponible à partir de la version **v2.1.0**.
 
     Cela ne change rien pour `getNameToPath()` : la génération d'URL se base uniquement sur le **nom** et l'`uri` de la route.
 
+## Comment l'URL est-elle construite ?
+
+```mermaid
+flowchart LR
+    Y["routes.yaml<br/>villeupdate : /ville/{id}/update"] --> L["Route<br/>chargement et analyse des URI"]
+    L --> G["getNameToPath('villeupdate', {id: 42})"]
+    G --> S["Substitution du paramètre {id}"]
+    S --> O["/ville/42/update"]
+    G -.->|"Nom inconnu ou paramètre manquant"| ERR["BadRouteException"]
+```
+
 ## Utilisation dans un template Twig
 
 `getNameToPath` est une fonction Twig disponible dans tous vos templates :

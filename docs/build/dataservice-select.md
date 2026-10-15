@@ -112,6 +112,38 @@ Nous allons ajouter deux dossiers dans le dossier `app` pour gérer les données
 
 Selon le schéma de la base de données, nous allons créer une entité `Ville` et un repository `VilleRepository`.
 
+Le diagramme de classes ci-dessous présente les relations entre les classes que nous allons construire :
+
+```mermaid
+classDiagram
+    class VilleController {
+        +execute(request) string
+    }
+    class VilleRepository {
+        +getVilles() array
+        +createVille(ville) int
+        +getVille(id) Ville
+        +updateVille(ville) bool
+        +deleteVille(id) bool
+    }
+    class Ville {
+        -int id
+        -string nom
+        -string code_postal
+        -int nombre_habitant
+        +getId() int
+        +getNom() string
+        +getCodePostal() string
+        +getNombreHabitant() int
+    }
+    class DatabaseService {
+        +getConnect() PDO$
+    }
+    VilleController --> VilleRepository : appelle
+    VilleRepository --> DatabaseService : requêtes SQL
+    VilleRepository ..> Ville : hydrate
+```
+
 !!! tip "Générer les deux fichiers avec la commande make:entity"
 
     À partir de la version v2.5.0, les deux fichiers peuvent être générés automatiquement :

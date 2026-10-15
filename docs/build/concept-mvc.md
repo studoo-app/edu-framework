@@ -8,6 +8,19 @@ Il sépare les préoccupations en trois composants - le modèle contient les don
 
 MVC facilite la maintenance du code en découplant l'interface utilisateur de la logique métier.
 
+## Le cycle d'une requête dans Edu Framework
+
+```mermaid
+flowchart LR
+    N(["Navigateur"]) -->|"Requête HTTP"| F["FastRouteCore<br/>(routes.yaml)"]
+    F --> C["Controller<br/>execute()"]
+    C --> M["Model / Repository"]
+    M <--> B[("Base de données<br/>via PDO")]
+    C --> V["Vue Twig<br/>TwigCore::render()"]
+    V -->|"Réponse HTML"| N
+    F -.->|"Route inconnue"| E["Erreur HTTP 404"]
+```
+
 ## Contrôleur (Controller)
 
 Le contrôleur est l'intermédiaire entre le modèle et la vue. Il gère les événements utilisateur, effectue les traitements nécessaires et coordonne les mises à jour entre le modèle et la vue.

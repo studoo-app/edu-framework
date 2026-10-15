@@ -11,6 +11,27 @@ Le framework affiche une page d'erreur mise en forme pour les principales erreur
 
 Chaque page affiche le code de l'erreur, un message explicatif, le message de l'exception **en mode développement uniquement** et un lien de retour à l'accueil.
 
+Le parcours d'une erreur, de sa cause jusqu'à la page affichée :
+
+```mermaid
+flowchart TD
+    E(["Erreur pendant le traitement"]) --> Q{"Origine de l'erreur"}
+    Q -->|"Route introuvable"| A404["404"]
+    Q -->|"Méthode HTTP non autorisée"| A405["405"]
+    Q -->|"ErrorHttpStatusException"| A403{"Code supporté ?"}
+    Q -->|"Exception non gérée"| A500["500"]
+    A403 -->|"403, 404, 405"| T
+    A403 -->|"Autre code"| A500
+    A404 --> T["Template error/http-CODE.html.twig<br/>(autonome)"]
+    A405 --> T
+    A500 --> T
+    T --> ENV{"APP_ENV"}
+    ENV -->|"dev"| MSG["exception_message affichée"]
+    ENV -->|"production"| MASQ["exception_message masquée"]
+    MSG --> R(["Page d'erreur"])
+    MASQ --> R
+```
+
 ## Personnaliser les pages d'erreur
 
 Les pages d'erreur sont des templates Twig situés dans le dossier `app/Template/error/` de **votre projet** :

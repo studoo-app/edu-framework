@@ -126,6 +126,27 @@ Dans cet exemple, on récupère la ville du formulaire dans le controller avec l
 <source src="../assets/screen-form-simple.mp4" type="video/mp4">
 </video>
 
+Voici le cycle d'une soumission de formulaire, comparé au pattern **PRG** (Post/Redirect/Get) recommandé après un traitement :
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Navigateur
+    participant C as VilleController
+    U->>C: GET /ville
+    C-->>U: Formulaire HTML (ville.html.twig)
+    U->>C: POST /ville (nom_ville)
+    C->>C: request.get("nom_ville")
+    alt Sans redirection
+        C-->>U: Page HTML avec add_ville
+        Note over U,C: F5 renvoie le POST :<br/>la ville est soumise deux fois
+    else Avec le pattern PRG
+        C-->>U: 302 Location /ville (redirection)
+        U->>C: GET /ville
+        C-->>U: Page HTML (le POST n'est plus dans l'historique)
+    end
+```
+
 ### En cas de changement de route dans le formulaire
 
 Si vous avez changé la route dans le fichier de configuration des routes, il faut modifier l'action du formulaire dans le fichier twig. Dur dur si vous avez plusieurs routes à gérer.
