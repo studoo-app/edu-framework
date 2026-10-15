@@ -1,4 +1,4 @@
-mkdocs
+properdocs
 mkdocs-material
 markdown-callouts
 mkdocs-literate-nav

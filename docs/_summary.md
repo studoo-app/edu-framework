@@ -15,6 +15,8 @@
     * [Protéger un formulaire (CSRF)](build/csrf.md)
     * [Construire une API](build/controller-edu-api.md)
     * [Construire le CRUD](build/dataservice-select.md)
+    * [Use case "VILLE" : STEP 1](build/use-case-ville.md)
+    * [Refactoring du use case "VILLE"](build/use-case-ville-refactor.md)
     * [Construire une commande CLI](build/new-command-edu.md)
 * [Consolider](boost/index.md)
     * [Request - La gestion des requêtes HTTP](boost/resquet.md)

@@ -112,7 +112,6 @@ plugins:
       cards_layout_options:
         title: Light Education PHP framework
         description: "Documentation Edu Framework PHP Light Education"
-        logo: assets/studoo-edu.svg
   - offline
   - search
   - literate-nav:

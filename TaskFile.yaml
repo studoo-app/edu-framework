@@ -241,4 +241,4 @@ tasks:
     cmds:
       - |
         source venv/bin/activate
-        mkdocs serve
+        properdocs serve

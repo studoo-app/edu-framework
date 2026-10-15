@@ -22,32 +22,28 @@ concurrency:
 
 jobs:
   build:
-    name: Build documentation website with MkDocs
+    name: Build documentation website with ProperDocs
     runs-on: ubuntu-latest
     steps:
-      - name: Configure Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install mkdocs
-        run: |
-          pip install mkdocs mkdocs-material
-          pip install markdown-callouts
-          pip install mkdocs-literate-nav
-          pip install mkdocs-git-revision-date-localized-plugin
-          pip install mkdocs-git-committers-plugin-2
-          pip install pillow 
-          pip install cairosvg
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install ProperDocs
+        run: pip install -r requirements.txt
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      - name: Build with mkdocs
-        run: mkdocs build
+      - name: Build with ProperDocs
+        run: properdocs build
+        env:
+          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

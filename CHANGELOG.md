@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.6.1 - 15/10/2026
+
+**new features**
+
+- Documentation : migration de MkDocs vers [ProperDocs](https://github.com/ProperDocs/properdocs), le fork maintenu de MkDocs 1.x — MkDocs n'est plus maintenu depuis août 2024 et son dépôt est fermé aux contributions extérieures. ProperDocs est un remplacement direct (drop-in) : le thème Material et tous les plugins (literate-nav, git-committers, git-revision-date-localized, social, offline, search) restent inchangés. Les commandes `mkdocs build`/`mkdocs serve` deviennent `properdocs build`/`properdocs serve` (CI GitHub Pages, tâche `start-doc` du TaskFile, instructions contributeurs) et la dépendance `mkdocs` devient `properdocs` dans requirements.txt
+
 ## v2.6.0 - 14/10/2026
 
 **new features**
