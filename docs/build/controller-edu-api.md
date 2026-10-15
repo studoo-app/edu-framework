@@ -608,27 +608,6 @@ paths:
 
 Ce fichier peut ensuite être visualisé dans des outils comme [Swagger Editor](https://editor-next.swagger.io/){:target="_blank"}, ou servi à des outils de génération de client.
 
-!!! bug "Incompatibilité connue avec PHP 8.4+"
-
-    La version de swagger-php actuellement embarquée par Edu Framework (4.x-dev) n'est pas compatible avec PHP 8.4 et supérieur : la commande `vendor/bin/openapi` affiche l'erreur `Constant E_STRICT is deprecated` et produit un fichier incomplet.
-
-    En attendant la mise à jour de cette dépendance, vous pouvez générer la spécification via un petit script PHP :
-
-    ```php
-    <?php
-    // Par exemple dans un fichier generate-openapi.php à la racine du projet
-    require 'vendor/autoload.php';
-
-    $spec = (new OpenApi\Generator())->generate([__DIR__ . '/app/Controller/api']);
-    file_put_contents(__DIR__ . '/public/openapi.yaml', $spec->toYaml());
-    ```
-
-    ```Shell
-    php generate-openapi.php
-    ```
-
-    Des messages d'avertissement (deprecated) peuvent s'afficher : ils n'empêchent pas la génération du fichier "public/openapi.yaml".
-
 # Les erreurs possibles de la commande
 
 | Message affiché                                        | Cause                                                                                                       | Solution                                                                                             |
