@@ -22,16 +22,16 @@ concurrency:
 
 jobs:
   build:
-    name: Build documentation website with MkDocs
+    name: Build documentation website with ProperDocs
     runs-on: ubuntu-latest
     steps:
       - name: Configure Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install mkdocs
+      - name: Install ProperDocs
         run: |
-          pip install mkdocs mkdocs-material
+          pip install properdocs mkdocs-material
           pip install markdown-callouts
           pip install mkdocs-literate-nav
           pip install mkdocs-git-revision-date-localized-plugin
@@ -46,8 +46,8 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      - name: Build with mkdocs
-        run: mkdocs build
+      - name: Build with ProperDocs
+        run: properdocs build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

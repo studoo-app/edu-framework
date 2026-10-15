@@ -1,12 +1,12 @@
 # Contributing Documentation
 
-Pour ce projet, nous utilisons MKdocs pour la documentation. Voici quelques informations pour vous aider à contribuer à la documentation.
+Pour ce projet, nous utilisons ProperDocs, le fork maintenu de MkDocs, pour la documentation. Voici quelques informations pour vous aider à contribuer à la documentation.
 
 !!! abstract "Prérequis"
 
-    Nous vous recommandons d'installer l'environnement virtuel Python pour installer MKdocs.
+    Nous vous recommandons d'installer l'environnement virtuel Python pour installer ProperDocs.
 
-    Python 3.6 ou supérieur est requis pour l'installation de MKdocs.
+    Python 3.6 ou supérieur est requis pour l'installation de ProperDocs.
 
 
 ## Installation de l'environnement Python
@@ -85,10 +85,10 @@ Pour activer l'environnement virtuel Python, ouvrez un terminal et tapez la comm
     source venv/bin/activate
     ```
 
-## Installation de MKdocs
+## Installation de ProperDocs
 
-Pour installer MKdocs, tapez la commande suivante :
-Cette commande va installer MKdocs et les dépendances nécessaires.
+Pour installer ProperDocs, tapez la commande suivante :
+Cette commande va installer ProperDocs et les dépendances nécessaires.
 
 ```bash
 python -m pip install -r requirements.txt
@@ -99,13 +99,17 @@ python -m pip install -r requirements.txt
 
     Pour plus d'informations, visitez le site [https://squidfunk.github.io/mkdocs-material/](https://squidfunk.github.io/mkdocs-material/){:target="_blank"}
 
-## Lancement de MKdocs
+    ProperDocs est le fork maintenu de MkDocs, le projet original n'étant plus maintenu depuis août 2024.
+
+    Pour plus d'informations, visitez le site [https://properdocs.org/](https://properdocs.org/){:target="_blank"}
+
+## Lancement de ProperDocs
 
 ```bash
-mkdocs serve
+properdocs serve
 ```
 
-MKdocs va lancer un serveur local pour visualiser la documentation. 
+ProperDocs va lancer un serveur local pour visualiser la documentation. 
 
 Ouvrez un navigateur et tapez l'adresse [https://127.0.0.1:8000/edu-framework/](https://127.0.0.1:8000/edu-framework/){:target="_blank"}
 
@@ -114,5 +118,5 @@ Ouvrez un navigateur et tapez l'adresse [https://127.0.0.1:8000/edu-framework/](
     Une fois installé, vous pouvez contribuer à la documentation en modifiant les fichiers Markdown dans le dossier "docs" du projet.
     N'oubliez pas de travailler sur la branche "main" pour vos modifications et de faire une pull request pour les valider.
     
-    Si vous avez fermé le terminal, n'oubliez pas d'activer l'environnement virtuel Python avant de lancer MKdocs.
+    Si vous avez fermé le terminal, n'oubliez pas d'activer l'environnement virtuel Python avant de lancer ProperDocs.
     
