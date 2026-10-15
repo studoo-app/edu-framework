@@ -254,7 +254,7 @@ Le controller généré contient des données d'exemple (`$listTest`). Les secti
 **Prérequis :**
 
 - Votre base de données doit être démarrée : [Démarrer les services](../installation/start-services.md)
-- La table `ville` doit exister dans votre base. Si ce n'est pas le cas, exécutez les requêtes SQL du [use case VILLE](use-case-ville.md#creation-de-la-table) :
+- La table `ville` doit exister dans votre base. Si ce n'est pas le cas, exécutez les requêtes SQL du [CRUD de ville](dataservice-select.md#schema-de-la-base-de-donnees) :
 
 ```sql
 CREATE TABLE ville (
@@ -411,7 +411,7 @@ class VilleDetailController implements ControllerInterface
 
 Explications :
 
-- Le paramètre dynamique `{id}` de la route est récupéré avec la méthode `get()` de la classe [Request](../boost/resquet.md), comme dans le [use case VILLE](use-case-ville.md).
+- Le paramètre dynamique `{id}` de la route est récupéré avec la méthode `get()` de la classe [Request](../boost/resquet.md), comme dans le [CRUD de ville](dataservice-select.md).
 - La requête utilise une requête préparée avec le paramètre `:id` pour éviter l'injection SQL.
 - La fonction native `http_response_code(404)` permet de renvoyer un code HTTP d'erreur avec un corps JSON explicite.
 - L'attribut `#[Attributes\Parameter(...)]` documente le paramètre de chemin pour OpenAPI.
@@ -647,6 +647,6 @@ Ce fichier peut ensuite être visualisé dans des outils comme [Swagger Editor](
 - [Request - La gestion des requêtes HTTP](../boost/resquet.md)
 - [Route - Générer une URL par le nom](../boost/route.md)
 - [DatabaseService - La gestion des données](../boost/dataservice.md)
-- [Le use case "VILLE" complet (CRUD)](use-case-ville.md)
+- [Le CRUD de "VILLE" complet](dataservice-select.md)
 - [La documentation de swagger-php](https://github.com/zircote/swagger-php){:target="_blank"}
 - [La spécification OpenAPI](https://swagger.io/specification/){:target="_blank"}
