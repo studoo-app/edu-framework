@@ -201,8 +201,13 @@ Si une de ces règles n'est pas respectée, une exception `ErrorControllerExcept
     - Avec une méthode explicite (`Controller\MedecinController::index`), l'interface n'est plus requise : le framework vérifie directement la méthode appelée.
 
 
-## Schema pour mieux comprendre le fonctionnement
+## Schéma pour mieux comprendre le fonctionnement
 
-<figure markdown="span">
-![Controller Process](../assets/controller.png)
-</figure>
+```mermaid
+flowchart TD
+    A(["Navigateur<br/>GET /hello"]) --> B{"FastRouteCore<br/>lit routes.yaml"}
+    B -->|"Route hello trouvée"| C["HelloController::execute(request)"]
+    B -->|"Route inconnue"| ERR["Erreur HTTP 404"]
+    C --> D["TwigCore::render('hello/hello.html.twig')<br/>variables : titre, request"]
+    D -->|"Réponse HTML"| A
+```

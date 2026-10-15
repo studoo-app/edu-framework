@@ -133,6 +133,15 @@ Les requêtes HTTP sont journalisées par la commande `php bin/edu start` : le f
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
 
+```mermaid
+flowchart LR
+    S["php bin/edu start<br/>(serveur PHP intégré)"] --> BF["BufferFormat<br/>(analyse la ligne de log)"]
+    BF --> BS["BufferToServer<br/>(enregistre le log)"]
+    BS --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
+    DB --> API["endpoint /edu-logs<br/>(JSON)"]
+    API --> P["Profiler<br/>(filtres, pagination)"]
+```
+
 !!! info
 
     Les requêtes du profiler et de la barre de debug (`/_debug/...` et `/edu-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.

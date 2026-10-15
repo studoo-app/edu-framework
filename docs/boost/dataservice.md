@@ -5,6 +5,28 @@ DatabaseService est une classe qui permet de gérer les données de la base de d
 Cette classe est de type Singleton, ce qui signifie qu'il n'y a qu'une seule instance de cette classe dans l'application.
 Elle est instanciée automatiquement dans le framework et est accessible dans les controllers.
 
+```mermaid
+classDiagram
+    class DatabaseService {
+        <<Singleton>>
+        -PDO $dbConnect$
+        +getConnect() PDO$
+    }
+    class DatabaseInterface {
+        <<interface>>
+        +getManager() PDO
+    }
+    class DatabaseMysql
+    class DatabaseMariadb
+    class DatabaseSqlite
+    DatabaseMysql ..|> DatabaseInterface
+    DatabaseMariadb ..|> DatabaseInterface
+    DatabaseSqlite ..|> DatabaseInterface
+    DatabaseService ..> DatabaseInterface : selon DB_TYPE
+    DatabaseInterface ..> PDO : getManager()
+    DatabaseService --> PDO : getConnect()
+```
+
 DatabaseService implémente l'interface de [PHP Data Objects (PDO)](https://www.php.net/manual/fr/book.pdo.php){:target="_blank"} pour autoriser l'accès de PHP aux bases de données
 
 !!! info "Pour aller plus loin"
