@@ -1,0 +1,26 @@
+# Dépendances installées autrement (réinstallées dans l'image ou montées par compose)
+vendor/
+venv/
+node_modules/
+
+# Git, IDE, CI, caches
+.git/
+.github/
+.idea/
+.cache/
+.codacy/
+.DS_Store
+.php-cs-fixer.cache
+.phpunit.result.cache
+
+# Données d'exécution (montées en volumes par compose.yaml)
+var/
+
+# Environnement local : fourni par le volume compose ou par --env-file,
+# jamais figé dans l'image
+.env
+
+# Docs et site statique (inutiles à l'exécution)
+site/
+docs/
+*.md
