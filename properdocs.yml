@@ -66,7 +66,7 @@ theme:
 
 extra:
   version:
-    default: stable
+    default: v2.7.0
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/studoo-app
