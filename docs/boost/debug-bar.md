@@ -34,9 +34,8 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 | :material-map-marker-radius: **Route**         | Chemin appelé, controller exécuté et paramètres de la route               |
 | :material-timer: **Temps d'exécution**    | Durée totale de la requête en millisecondes                                |
 | :material-memory: **Mémoire**             | Pic d'utilisation mémoire et limite PHP (`memory_limit`)                    |
-| :material-database: **Base de données**   | Type, hôte et nom de la base (visible uniquement si `DB_HOST_STATUS=true`) |
-| :material-text-box-outline: **Logs**      | Lien vers la page du [profiler](#le-profiler)                              |
-| :material-application-brackets: **PHP**   | Version de PHP et SAPI utilisée                                            |
+| :material-text-box-outline: **DevTool**         | Lien vers la page du [profiler](#le-profiler) |
+| :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`)                                            |
 | :material-package-variant: **Edu Framework** | Version du framework, date de livraison et lien vers la documentation  |
 
 !!! tip "Réduire la barre"

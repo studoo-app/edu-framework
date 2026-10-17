@@ -16,7 +16,7 @@ use Studoo\EduFramework\Core\ConfigCore;
 /**
  * Class studooBarreDebug
  * Barre de debug affichée en bas des pages en mode dev (style Web Debug Toolbar de Symfony) :
- * un bloc par information (statut HTTP, route, temps, mémoire, base de données, logs),
+ * un bloc par information (statut HTTP, route, temps, mémoire, DEV),
  * le détail s'affiche au survol et la barre peut être réduite.
  *
  * @package Studoo\EduFramework\Core\View
@@ -134,10 +134,9 @@ HTML;
                 'Mémoire',
                 ['Pic d\'utilisation' => number_format($peak, 2, ',', ' ') . ' Mo', 'Limite PHP' => (string) ini_get('memory_limit')]
             ),
-            $this->databaseBlock(),
             $this->block(
-                'Logs',
-                'Logs',
+                '<span class="edu-tb-env' . ($envName === 'dev' ? '' : ' prod') . '">DevTool</span>',
+                'DEV',
                 ['Profiler' => 'Ouvrir la liste des requêtes'],
                 '',
                 '/_debug/profiler#logs'
@@ -148,12 +147,7 @@ HTML;
             $this->block(
                 '<span class="edu-tb-env' . ($envName === 'dev' ? '' : ' prod') . '">' . $this->escape($envName) . '</span>',
                 'Environnement',
-                ['APP_ENV' => $envName]
-            ),
-            $this->block(
-                'PHP <b>' . PHP_VERSION . '</b>',
-                'PHP',
-                ['Version' => PHP_VERSION, 'SAPI' => PHP_SAPI]
+                array_merge(['APP_ENV' => $envName], ['PHP' => PHP_VERSION, 'SAPI' => PHP_SAPI], $this->databaseDetails())
             ),
             $this->block(
                 '<img src="' . $logo . '" alt="">' . $this->escape((string) ConfigCore::getConfig('version')),
@@ -178,21 +172,25 @@ HTML;
     }
 
     /**
-     * Bloc d'information sur la base de données (affiché uniquement si elle est activée)
+     * Détails sur la base de données (affichés dans le panneau de survol du bloc DEV, uniquement si elle est activée)
+     *
+     * @return array<string, string> Lignes du panneau (libellé => valeur)
      */
-    private function databaseBlock(): string
+    private function databaseDetails(): array
     {
         if (ConfigCore::existEnv('DB_HOST_STATUS') === false || ConfigCore::getEnv('DB_HOST_STATUS') !== 'true') {
-            return '';
+            return [];
         }
 
         $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
 
-        return $this->block(
-            '<b>' . $this->escape($get('DB_TYPE')) . '</b>',
-            'Base de données',
-            ['Type' => $get('DB_TYPE'), 'Hôte' => $get('DB_HOST') . ':' . $get('DB_SOCKET'), 'Base' => $get('DB_NAME')]
-        );
+        return [
+            '------------' => "--------",
+            'DB_HOST_STATUS' => $get('DB_HOST_STATUS') ? "on" : "off",
+            'DB_TYPE' => $get('DB_TYPE'),
+            'DB_HOST' => $get('DB_HOST') . ':' . $get('DB_SOCKET'),
+            'DB_NAME' => $get('DB_NAME'),
+        ];
     }
 
     /**
