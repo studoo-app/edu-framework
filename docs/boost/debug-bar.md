@@ -35,8 +35,16 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 | :material-timer: **Temps d'exécution**    | Durée totale de la requête en millisecondes                                |
 | :material-memory: **Mémoire**             | Pic d'utilisation mémoire et limite PHP (`memory_limit`)                    |
 | :material-text-box-outline: **DevTool**         | **Token de la requête en cours** et lien vers son [descriptif dans le profiler](#le-profiler) (`#request/{token}`) ; si la requête n'est pas journalisée, lien vers la liste des requêtes |
-| :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`)                                            |
+| :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`) ; **services de développement** au survol : application (HTTP/HTTPS), MariaDB, Mailpit (interface web et SMTP), DbGate et phpMyAdmin — les URLs des interfaces web sont **cliquables** (ouverture dans un nouvel onglet), les ports sont lus dans le `.env` (`HTTP_PORT`, `HTTPS_PORT`, `DB_HOST`/`DB_SOCKET`, `MAILER_UI_PORT`, `MAILER_SMTP_PORT`, `DBGATE_PORT`, `PMA_PORT`) avec les valeurs par défaut du `compose.yaml` en cas d'absence |
 | :material-package-variant: **Edu Framework** | Version du framework, date de livraison et lien vers la documentation  |
+
+!!! tip "Accès aux services Docker depuis la barre"
+
+    Le panneau du bloc DEV liste les services de développement publiés sur l'hôte avec leurs URLs :
+    l'application (`http://localhost:80` et `https://localhost:443`), MariaDB, Mailpit
+    (`http://localhost:8025`, SMTP `localhost:1025`), DbGate (`http://localhost:8082`) et
+    phpMyAdmin (`http://localhost:8081`). Les ports personnalisés dans le `.env` sont
+    automatiquement pris en compte (voir [« L'application dans Docker »](../installation/docker.md)).
 
 !!! tip "Réduire la barre"
 

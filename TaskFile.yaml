@@ -64,6 +64,7 @@ tasks:
       - echo " 📦 ESSENTIAL TASK ---------------------------------------------------------"
       - echo "* start               Start project exemple"
       - echo "* stop                Stop project exemple"
+      - echo "* docker-status       Check if Docker is up and show services with ports"
       - echo "* before-commit       Analyse project before commit"
       - echo " ";
       - echo " 🎛️ OTHER TASK ----------------------------------------------------------"
@@ -90,6 +91,66 @@ tasks:
     desc: "Stop and reset on your environment"
     cmds:
       - "{{.DOCKER_COMPOSE}} down -v"
+
+  docker-status:
+    desc: "Vérifie que Docker est UP et affiche les services et leurs ports"
+    cmds:
+      - |
+        # Docker est-il installé et démarré ?
+        if ! command -v {{.DOCKER}} >/dev/null 2>&1; then
+          echo " ❌ Docker n'est pas installé (commande « {{.DOCKER}} » introuvable)"
+          exit 1
+        fi
+        if ! {{.DOCKER}} info >/dev/null 2>&1; then
+          echo " ❌ Docker ne répond pas (daemon arrêté ?)"
+          echo "    → Démarre Docker Desktop ou « colima start », puis relance « task docker-status »"
+          exit 1
+        fi
+        echo " ✅ Docker est UP"
+
+        # Services du projet (compose.yaml) en cours d'exécution
+        RUNNING=$({{.DOCKER_COMPOSE}} ps --services)
+        if [ -z "$RUNNING" ]; then
+          echo " ⚠️  Aucun service du projet n'est démarré"
+          echo "    → « task docker-up » pour les lancer"
+          exit 0
+        fi
+
+        echo ""
+        echo " 🐋 Services en cours :"
+        {{.DOCKER_COMPOSE}} ps
+
+        # Services définis mais arrêtés
+        STOPPED=""
+        for s in $({{.DOCKER_COMPOSE}} config --services); do
+          echo "$RUNNING" | grep -qx "$s" || STOPPED="$STOPPED $s"
+        done
+        if [ -n "$STOPPED" ]; then
+          echo ""
+          echo " 💤 Services non démarrés :$STOPPED"
+        fi
+
+        # Urls d'accès (ports publiés sur l'hôte, cf. .env)
+        port() { v="$(grep -E "^$1=" .env 2>/dev/null | head -n1 | cut -d= -f2-)"; v="${v:-$2}"; echo "${v#:}"; }
+        up() { echo "$RUNNING" | grep -qx "$1"; }
+
+        echo ""
+        echo " 🔗 Accès aux services :"
+        if up frankenphp; then
+          echo "    🌐 Application : http://localhost:$(port HTTP_PORT 80) | https://localhost:$(port HTTPS_PORT 443)"
+        fi
+        if up database; then
+          echo "    🗄️  MariaDB     : localhost:$(port DB_SOCKET 3306)"
+        fi
+        if up mailer; then
+          echo "    📧 Mailpit     : http://localhost:$(port MAILER_UI_PORT 8025) (SMTP : localhost:$(port MAILER_SMTP_PORT 1025))"
+        fi
+        if up dbgate; then
+          echo "    🧭 DbGate      : http://localhost:$(port DBGATE_PORT 8082)"
+        fi
+        if up phpmyadmin; then
+          echo "    🐘 phpMyAdmin  : http://localhost:$(port PMA_PORT 8081)"
+        fi
 
   ## === 📦  COMPOSER ==============================================
 

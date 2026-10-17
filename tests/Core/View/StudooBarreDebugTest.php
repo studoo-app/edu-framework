@@ -11,6 +11,13 @@ use Studoo\EduFramework\Core\View\studooBarreDebug;
 
 class StudooBarreDebugTest extends TestCase
 {
+    /**
+     * Sauvegarde des variables d'environnement modifiées par un test
+     * (une valeur null signifie que la variable était absente de $_ENV)
+     * @var array<string, string|null>
+     */
+    private array $envBackup = [];
+
     protected function setUp(): void
     {
         new ConfigCore([]);
@@ -20,6 +27,32 @@ class StudooBarreDebugTest extends TestCase
     {
         // Réinitialisation de l'identifiant de requête statique entre les tests
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
+        // Restauration des variables d'environnement modifiées par les tests
+        foreach ($this->envBackup as $key => $value) {
+            if ($value === null) {
+                unset($_ENV[$key]);
+            } else {
+                $_ENV[$key] = $value;
+            }
+        }
+        $this->envBackup = [];
+    }
+
+    /**
+     * Modifie des variables d'environnement pour un test
+     * (une valeur null retire la variable de $_ENV)
+     * @param array<string, string|null> $values
+     */
+    private function setEnv(array $values): void
+    {
+        foreach ($values as $key => $value) {
+            $this->envBackup[$key] = $_ENV[$key] ?? null;
+            if ($value === null) {
+                unset($_ENV[$key]);
+            } else {
+                $_ENV[$key] = $value;
+            }
+        }
     }
 
     public function testToolbarDisplaysMethodRouteAndController(): void
@@ -91,5 +124,82 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('margin: 0;', $css);
         $this->assertStringContainsString('display: block;', $css);
         $this->assertStringContainsString('background: none;', $css);
+    }
+
+    /**
+     * Le panneau du bloc DEV liste les services de développement avec les valeurs
+     * par défaut du compose.yaml quand les variables d'environnement sont absentes.
+     */
+    public function testDevBlockListsTheDevelopmentServicesWithDefaultPorts(): void
+    {
+        $this->setEnv([
+            'HTTP_PORT' => null, 'HTTPS_PORT' => null, 'PMA_PORT' => null, 'DBGATE_PORT' => null,
+            'MAILER_UI_PORT' => null, 'MAILER_SMTP_PORT' => null, 'DB_HOST' => null, 'DB_SOCKET' => null,
+        ]);
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        // Les interfaces web sont des liens cliquables ouverts dans un nouvel onglet
+        $this->assertStringContainsString(
+            '<span>Application (http)</span><em><a href="http://localhost:80" target="_blank" rel="noopener">http://localhost:80</a></em>',
+            $html
+        );
+        $this->assertStringContainsString(
+            '<span>Application (https)</span><em><a href="https://localhost:443" target="_blank" rel="noopener">https://localhost:443</a></em>',
+            $html
+        );
+        $this->assertStringContainsString(
+            '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">http://localhost:8025</a></em>',
+            $html
+        );
+        $this->assertStringContainsString(
+            '<span>DbGate</span><em><a href="http://localhost:8082" target="_blank" rel="noopener">http://localhost:8082</a></em>',
+            $html
+        );
+        $this->assertStringContainsString(
+            '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">http://localhost:8081</a></em>',
+            $html
+        );
+        // MariaDB et le SMTP de Mailpit sont des services TCP : simple texte
+        $this->assertStringContainsString('<span>MariaDB</span><em>localhost:3306</em>', $html);
+        $this->assertStringContainsString('<span>Mailpit SMTP</span><em>localhost:1025</em>', $html);
+    }
+
+    /**
+     * Les URLs des services utilisent les ports personnalisés du .env
+     * (mêmes variables que compose.yaml).
+     */
+    public function testDevBlockServicesUseThePortsFromTheEnvironment(): void
+    {
+        $this->setEnv([
+            'HTTP_PORT' => '8000', 'HTTPS_PORT' => '8443', 'PMA_PORT' => '9081', 'DBGATE_PORT' => '9082',
+            'MAILER_UI_PORT' => '9025', 'MAILER_SMTP_PORT' => '9026', 'DB_HOST' => '127.0.0.1', 'DB_SOCKET' => '3307',
+        ]);
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('href="http://localhost:8000"', $html);
+        $this->assertStringContainsString('href="https://localhost:8443"', $html);
+        $this->assertStringContainsString('<span>MariaDB</span><em>127.0.0.1:3307</em>', $html);
+        $this->assertStringContainsString('href="http://localhost:9025"', $html);
+        $this->assertStringContainsString('<span>Mailpit SMTP</span><em>localhost:9026</em>', $html);
+        $this->assertStringContainsString('href="http://localhost:9082"', $html);
+        $this->assertStringContainsString('href="http://localhost:9081"', $html);
+    }
+
+    /**
+     * Les URLs des services sont échappées comme le reste du panneau.
+     */
+    public function testDevBlockEscapesTheServiceUrls(): void
+    {
+        $this->setEnv(['DBGATE_PORT' => '8082"&port=9090']);
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringNotContainsString('"&port=9090"', $html);
+        $this->assertStringContainsString('&quot;&amp;port=9090', $html);
     }
 }

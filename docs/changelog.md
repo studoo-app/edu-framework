@@ -6,6 +6,7 @@
 
 **new features**
 
+- Barre de debug : le bloc **DEV** liste les services de développement avec leurs URLs cliquables (application HTTP/HTTPS, MariaDB, Mailpit et son SMTP, DbGate, phpMyAdmin) — ports lus dans le `.env` (défauts du `compose.yaml`), variables transmises au conteneur `frankenphp`
 - Exécution de l'application dans Docker via [FrankenPHP](https://frankenphp.dev){:target="_blank"} : nouveau service web `frankenphp` dans le `compose.yaml` (PHP 8.4, HTTPS et HTTP/3), `Dockerfile` avec les extensions requises par le framework, `Caddyfile` pilotable par `SERVER_NAME`, variables du `.env` transmises au conteneur (surcharges réseau `DB_HOST`, `DB_SOCKET`, `MAILER_DSN`), conteneurs préfixés par `APP_NAME`, ports et `SERVER_NAME` paramétrables dans le `.env` (mode HTTPS local : `SERVER_NAME=localhost`), healthcheck MariaDB — le flux classique `php bin/edu start` reste inchangé
 
 **bug Fixes**
@@ -16,7 +17,7 @@
 
 - new [L'application dans Docker](installation/docker.md) : architecture, démarrage/arrêt, variables d'environnement, ports et coexistence de plusieurs projets, mode HTTPS local (certificat auto-signé, limitation `https://127.0.0.1`), vérification des prérequis dans le conteneur, dépannage
 - update [Démarrer les services](installation/start-services.md) : MySQL devient MariaDB, service FrankenPHP dans le tableau des ports, commandes par version, corrections de liens
-- update [La barre de debug et le profiler](boost/debug-bar.md) : collecte de toutes les requêtes par `HttpRequestLogger` quel que soit le serveur (clé `sapi`, temps d'exécution et mémoire par requête), token de la requête dans le bloc DevTool, nouvelle page descriptif d'une requête (`#request/{token}`), profiler disponible sur les deux serveurs (`http://localhost:8042/_debug/profiler` et `https://localhost/_debug/profiler`), limitations (fichiers statiques non journalisés, IP du réseau Docker, mode worker FrankenPHP)
+- update [La barre de debug et le profiler](boost/debug-bar.md) : collecte de toutes les requêtes par `HttpRequestLogger` quel que soit le serveur (clé `sapi`, temps d'exécution et mémoire par requête), token de la requête dans le bloc DevTool, nouvelle page descriptif d'une requête (`#request/{token}`), profiler disponible sur les deux serveurs (`http://localhost:8042/_debug/profiler` et `https://localhost/_debug/profiler`), limitations (fichiers statiques non journalisés, IP du réseau Docker, mode worker FrankenPHP) ; liste des services de développement (URLs cliquables) dans le bloc DEV
 
 ## v2.6.3 - 15/10/2026
 

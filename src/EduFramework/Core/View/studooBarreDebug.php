@@ -70,6 +70,9 @@ class studooBarreDebug
 #edu-tb .edu-tb-panel div { display: flex; justify-content: space-between; gap: 18px; }
 #edu-tb .edu-tb-panel span { color: #aaa; }
 #edu-tb .edu-tb-panel em { font-style: normal; color: #fff; word-break: break-all; text-align: right; }
+#edu-tb .edu-tb-panel em a { color: #9fc6ff; }
+#edu-tb .edu-tb-panel em a:hover { color: #c3d9ff; text-decoration: underline; }
+#edu-tb .edu-tb-panel a { display: inline; padding: 0; margin: 0; }
 #edu-tb .edu-tb-close { cursor: pointer; background: none; border: 0; color: #aaa; font: inherit; padding: 0 12px; }
 #edu-tb .edu-tb-close:hover { color: #fff; background: #444; }
 #edu-tb img { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
@@ -143,7 +146,12 @@ HTML;
             $this->block(
                 '<span class="edu-tb-env' . ($envName === 'dev' ? '' : ' prod') . '">' . $this->escape($envName) . '</span>',
                 'Environnement',
-                array_merge(['APP_ENV' => $envName], ['PHP' => PHP_VERSION, 'SAPI' => PHP_SAPI], $this->databaseDetails())
+                array_merge(
+                    ['APP_ENV' => $envName],
+                    ['PHP' => PHP_VERSION, 'SAPI' => PHP_SAPI],
+                    $this->databaseDetails(),
+                    $this->devServicesDetails()
+                )
             ),
             $this->block(
                 '<img src="' . $logo . '" alt="">' . $this->escape((string) ConfigCore::getConfig('version')),
@@ -217,7 +225,7 @@ HTML;
         $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
 
         return [
-            '------------' => "--------",
+            '---- database ----' => "--------",
             'DB_HOST_STATUS' => $get('DB_HOST_STATUS') ? "on" : "off",
             'DB_TYPE' => $get('DB_TYPE'),
             'DB_HOST' => $get('DB_HOST') . ':' . $get('DB_SOCKET'),
@@ -226,11 +234,35 @@ HTML;
     }
 
     /**
+     * Services de développement publiés sur l'hôte (affichés dans le panneau de survol du bloc DEV) :
+     * application servie par FrankenPHP, base MariaDB, Mailpit, DbGate et phpMyAdmin.
+     * Les URLs sont construites à partir du .env (mêmes variables que compose.yaml),
+     * avec les valeurs par défaut du compose si une variable est absente.
+     *
+     * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
+     */
+    private function devServicesDetails(): array
+    {
+        $env = static fn (string $key, string $default): string
+            => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
+        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
+
+        return [
+            '---- services ----' => "--------",
+            'Mailpit' => $link('http://localhost:' . $env('MAILER_UI_PORT', '8025')),
+            'Mailpit SMTP' => 'localhost:' . $env('MAILER_SMTP_PORT', '1025'),
+            'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
+            'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
+        ];
+    }
+
+    /**
      * Génère un bloc de la barre : contenu visible + panneau de détail au survol
      *
      * @param string $html Contenu HTML déjà échappé du bloc
      * @param string $title Titre du panneau de détail
-     * @param array<string, string> $details Lignes du panneau (libellé => valeur), échappées ici
+     * @param array<string, string|array{text: string, href: string}> $details Lignes du panneau
+     *        (libellé => valeur, ou libellé => lien sous la forme ['text' => ..., 'href' => ...]), échappées ici
      * @param string $class Classes CSS supplémentaires
      * @param string|null $href Lien (le bloc s'ouvre dans un nouvel onglet)
      */
@@ -238,7 +270,11 @@ HTML;
     {
         $rows = '';
         foreach ($details as $label => $value) {
-            $rows .= '<div><span>' . $this->escape($label) . '</span><em>' . $this->escape($value) . '</em></div>';
+            $content = is_array($value)
+                ? '<a href="' . $this->escape($value['href']) . '" target="_blank" rel="noopener">'
+                    . $this->escape($value['text']) . '</a>'
+                : $this->escape($value);
+            $rows .= '<div><span>' . $this->escape($label) . '</span><em>' . $content . '</em></div>';
         }
 
         $inner = $html . '<div class="edu-tb-panel"><h4>' . $this->escape($title) . '</h4>' . $rows . '</div>';
