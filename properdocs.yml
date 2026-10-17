@@ -1,7 +1,7 @@
 site_name: Light Education PHP framework
 site_url: https://studoo-app.github.io/edu-framework/
 repo_url: https://github.com/studoo-app/edu-framework
-copyright: 'Copyright © 2022 - 2024 Collectif Studoo'
+copyright: 'Copyright © 2022 - 2026 Collectif Studoo'
 edit_uri: edit/main/docs/
 docs_dir: docs
 
@@ -66,7 +66,7 @@ theme:
 
 extra:
   version:
-    default: v2.7.0
+    default: v2.7.1
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/studoo-app

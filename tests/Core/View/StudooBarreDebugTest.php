@@ -135,7 +135,7 @@ class StudooBarreDebugTest extends TestCase
 
         $css = (new studooBarreDebug())->generateCssGlobal();
 
-        $this->assertStringContainsString('#edu-tb a {', $css);
+        $this->assertStringContainsString('#edu-tb a, #edu-tb button {', $css);
         $this->assertStringContainsString('margin: 0;', $css);
         $this->assertStringContainsString('display: block;', $css);
         $this->assertStringContainsString('background: none;', $css);
