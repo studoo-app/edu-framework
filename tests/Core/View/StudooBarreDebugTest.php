@@ -148,7 +148,10 @@ class StudooBarreDebugTest extends TestCase
     public function testDevBlockListsTheDevelopmentServicesWithDefaultPorts(): void
     {
         $this->setEnv([
-            'HTTP_PORT' => null, 'HTTPS_PORT' => null, 'PMA_PORT' => null, 'DBGATE_PORT' => null,
+            // Les services de la base (MariaDB, DbGate, phpMyAdmin) ne s'affichent
+            // que si la base est active : le test fixe lui-même ses prérequis
+            'DB_HOST_STATUS' => 'true',
+            'PMA_PORT' => null, 'DBGATE_PORT' => null,
             'MAILER_UI_PORT' => null, 'MAILER_SMTP_PORT' => null, 'DB_HOST' => null, 'DB_SOCKET' => null,
         ]);
         ConfigCore::setRequest(new Request('/', 'GET'));
@@ -156,14 +159,6 @@ class StudooBarreDebugTest extends TestCase
         $html = (new studooBarreDebug())->generateBarDebug();
 
         // Les interfaces web sont des liens cliquables ouverts dans un nouvel onglet
-        $this->assertStringContainsString(
-            '<span>Application (http)</span><em><a href="http://localhost:80" target="_blank" rel="noopener">http://localhost:80</a></em>',
-            $html
-        );
-        $this->assertStringContainsString(
-            '<span>Application (https)</span><em><a href="https://localhost:443" target="_blank" rel="noopener">https://localhost:443</a></em>',
-            $html
-        );
         $this->assertStringContainsString(
             '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">http://localhost:8025</a></em>',
             $html
@@ -176,8 +171,8 @@ class StudooBarreDebugTest extends TestCase
             '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">http://localhost:8081</a></em>',
             $html
         );
-        // MariaDB et le SMTP de Mailpit sont des services TCP : simple texte
-        $this->assertStringContainsString('<span>MariaDB</span><em>localhost:3306</em>', $html);
+        // La base de données et le SMTP de Mailpit sont des services TCP : simple texte
+        $this->assertStringContainsString('<span>DB_HOST</span><em>localhost:3306</em>', $html);
         $this->assertStringContainsString('<span>Mailpit SMTP</span><em>localhost:1025</em>', $html);
     }
 
@@ -188,16 +183,15 @@ class StudooBarreDebugTest extends TestCase
     public function testDevBlockServicesUseThePortsFromTheEnvironment(): void
     {
         $this->setEnv([
-            'HTTP_PORT' => '8000', 'HTTPS_PORT' => '8443', 'PMA_PORT' => '9081', 'DBGATE_PORT' => '9082',
+            'DB_HOST_STATUS' => 'true',
+            'PMA_PORT' => '9081', 'DBGATE_PORT' => '9082',
             'MAILER_UI_PORT' => '9025', 'MAILER_SMTP_PORT' => '9026', 'DB_HOST' => '127.0.0.1', 'DB_SOCKET' => '3307',
         ]);
         ConfigCore::setRequest(new Request('/', 'GET'));
 
         $html = (new studooBarreDebug())->generateBarDebug();
 
-        $this->assertStringContainsString('href="http://localhost:8000"', $html);
-        $this->assertStringContainsString('href="https://localhost:8443"', $html);
-        $this->assertStringContainsString('<span>MariaDB</span><em>127.0.0.1:3307</em>', $html);
+        $this->assertStringContainsString('<span>DB_HOST</span><em>127.0.0.1:3307</em>', $html);
         $this->assertStringContainsString('href="http://localhost:9025"', $html);
         $this->assertStringContainsString('<span>Mailpit SMTP</span><em>localhost:9026</em>', $html);
         $this->assertStringContainsString('href="http://localhost:9082"', $html);
@@ -209,7 +203,7 @@ class StudooBarreDebugTest extends TestCase
      */
     public function testDevBlockEscapesTheServiceUrls(): void
     {
-        $this->setEnv(['DBGATE_PORT' => '8082"&port=9090']);
+        $this->setEnv(['DB_HOST_STATUS' => 'true', 'DBGATE_PORT' => '8082"&port=9090']);
         ConfigCore::setRequest(new Request('/', 'GET'));
 
         $html = (new studooBarreDebug())->generateBarDebug();

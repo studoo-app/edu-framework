@@ -255,9 +255,11 @@ HTML;
     }
 
     /**
-     * Détails sur la base de données (affichés dans le panneau de survol du bloc DEV, uniquement si elle est activée)
+     * Détails sur la base de données (affichés dans le panneau de survol du bloc DEV,
+     * uniquement si elle est activée via DB_HOST_STATUS=true) : type, hôte (avec les
+     * valeurs par défaut localhost:3306), nom de la base et liens vers DbGate et phpMyAdmin
      *
-     * @return array<string, string> Lignes du panneau (libellé => valeur)
+     * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
      */
     private function databaseDetails(): array
     {
@@ -277,7 +279,7 @@ HTML;
             '---- database ----' => "--------",
             'DB_HOST_STATUS' => $get('DB_HOST_STATUS') ? "on" : "off",
             'DB_TYPE' => $get('DB_TYPE'),
-            'DB_HOST' => $get('DB_HOST') . ':' . $get('DB_SOCKET'),
+            'DB_HOST' => $env('DB_HOST', 'localhost') . ':' . $env('DB_SOCKET', '3306'),
             'DB_NAME' => $get('DB_NAME'),
             'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
             'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
@@ -285,10 +287,10 @@ HTML;
     }
 
     /**
-     * Services de développement publiés sur l'hôte (affichés dans le panneau de survol du bloc DEV) :
-     * application servie par FrankenPHP, base MariaDB, Mailpit, DbGate et phpMyAdmin.
-     * Les URLs sont construites à partir du .env (mêmes variables que compose.yaml),
-     * avec les valeurs par défaut du compose si une variable est absente.
+     * Services de messagerie publiés sur l'hôte (affichés dans le panneau de survol du bloc DEV) :
+     * interface web et SMTP de Mailpit. Les URLs sont construites à partir du .env
+     * (mêmes variables que compose.yaml), avec les valeurs par défaut du compose
+     * si une variable est absente.
      *
      * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
      */
