@@ -2,6 +2,17 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.7.0 - 17/10/2026
+
+**new features**
+
+- Exécution de l'application dans Docker via [FrankenPHP](https://frankenphp.dev){:target="_blank"} : le fichier `compose.yaml` inclut un service web `frankenphp` (image `dunglas/frankenphp:php8.4`) qui sert l'application sur le port 80. Le nouveau `Dockerfile` déclare les extensions requises par le framework (`pdo_sqlite`, `pdo_mysql`, `mbstring`, `openssl`, `zip`, `intl`, `opcache`) et le nouveau `Caddyfile` pilote le serveur (HTTP en développement, HTTPS automatique via la variable `SERVER_NAME`). Les variables du `.env` sont transmises au conteneur avec trois surcharges réseau (`DB_HOST=database`, `DB_SOCKET=3306`, `MAILER_DSN=smtp://mailer:1025`), les noms de conteneurs sont préfixés par `APP_NAME` et les ports publiés sont paramétrables (`HTTP_PORT`, `HTTPS_PORT`, `SERVER_NAME`, `DB_SOCKET`, `PMA_PORT`, `DBGATE_PORT`, `MAILER_SMTP_PORT`, `MAILER_UI_PORT`) pour faire cohabiter plusieurs projets. Le mode HTTPS local s'active par `SERVER_NAME=localhost` (certificat auto-signé de l'autorité locale Caddy, `https://127.0.0.1` non supporté — limitation connue de Docker). Un healthcheck MariaDB conditionne le démarrage du serveur web. Le flux classique `php bin/edu start` reste inchangé (services seuls : `docker compose up -d database mailer dbgate phpmyadmin`)
+
+**documentation**
+
+- new [L'application dans Docker](docs/installation/docker.md) : architecture du stack (diagramme Mermaid), démarrage/arrêt, variables d'environnement, ports et coexistence de plusieurs projets, mode HTTPS local (certificat auto-signé, limitation `https://127.0.0.1`), vérification des prérequis dans le conteneur (`php bin/edu check:config`), dépannage
+- update [Démarrer les services](docs/installation/start-services.md) : passage de MySQL à MariaDB, nouveau service FrankenPHP dans le tableau des ports, commandes par version, correction du lien "Installer les services directement sur votre machine" et du chemin de la connexion SQLite de dbgate
+
 ## v2.6.3 - 15/10/2026
 
 **bug Fixes**

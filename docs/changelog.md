@@ -2,6 +2,17 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.7.0 - 17/10/2026
+
+**new features**
+
+- Exécution de l'application dans Docker via [FrankenPHP](https://frankenphp.dev){:target="_blank"} : nouveau service web `frankenphp` dans le `compose.yaml` (PHP 8.4, HTTPS et HTTP/3), `Dockerfile` avec les extensions requises par le framework, `Caddyfile` pilotable par `SERVER_NAME`, variables du `.env` transmises au conteneur (surcharges réseau `DB_HOST`, `DB_SOCKET`, `MAILER_DSN`), conteneurs préfixés par `APP_NAME`, ports et `SERVER_NAME` paramétrables dans le `.env` (mode HTTPS local : `SERVER_NAME=localhost`), healthcheck MariaDB — le flux classique `php bin/edu start` reste inchangé
+
+**documentation**
+
+- new [L'application dans Docker](installation/docker.md) : architecture, démarrage/arrêt, variables d'environnement, ports et coexistence de plusieurs projets, mode HTTPS local (certificat auto-signé, limitation `https://127.0.0.1`), vérification des prérequis dans le conteneur, dépannage
+- update [Démarrer les services](installation/start-services.md) : MySQL devient MariaDB, service FrankenPHP dans le tableau des ports, commandes par version, corrections de liens
+
 ## v2.6.3 - 15/10/2026
 
 **bug Fixes**
