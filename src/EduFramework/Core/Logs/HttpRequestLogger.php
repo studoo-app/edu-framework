@@ -22,7 +22,8 @@ use Studoo\EduFramework\Core\ConfigCore;
  * - start() réserve la ligne en début de requête : son identifiant (token) est alors
  *   disponible pour la barre de debug, qui fait le lien vers le descriptif de la requête ;
  * - finish() complète la ligne en fin de requête avec le statut final, le temps
- *   d'exécution (execution_time_ms) et la mémoire utilisée (memory_mb).
+ *   d'exécution (execution_time_ms), la mémoire utilisée (memory_mb) et, le cas
+ *   échéant, le message de l'erreur à l'origine de la réponse (error_message).
  * Les événements produits ont exactement le même format que ceux issus de
  * l'analyse de la sortie du serveur intégré (BufferToServer), afin que le
  * profiler affiche et filtre les requêtes de tous les serveurs de la même façon.
@@ -37,6 +38,14 @@ class HttpRequestLogger
      * @var int|null
      */
     private static ?int $currentLogId = null;
+
+    /**
+     * Description de l'erreur à l'origine de la requête en cours (message, fichier
+     * et ligne de l'exception attrapée par le framework), null si la requête s'est
+     * déroulée sans erreur. Elle est ajoutée au log par finish() puis réinitialisée.
+     * @var string|null
+     */
+    private static ?string $errorMessage = null;
 
     /**
      * Réserve la ligne de log de la requête HTTP en cours dans la base des logs.
@@ -76,7 +85,8 @@ class HttpRequestLogger
 
     /**
      * Complète la ligne de log de la requête HTTP en cours (réservée par start())
-     * avec le statut final, le temps d'exécution et la mémoire utilisée.
+     * avec le statut final, le temps d'exécution, la mémoire utilisée et, si une
+     * erreur a été enregistrée par setError(), sa description.
      * Si la requête n'est pas journalisée, ne fait rien.
      *
      * @return void
@@ -85,6 +95,8 @@ class HttpRequestLogger
     {
         $logId = self::$currentLogId;
         self::$currentLogId = null;
+        $errorMessage = self::$errorMessage;
+        self::$errorMessage = null;
 
         if ($logId === null) {
             return;
@@ -102,11 +114,38 @@ class HttpRequestLogger
                 (int) (http_response_code() ?: 200),
                 PHP_SAPI,
                 $executionTimeMs,
-                $memoryMb
+                $memoryMb,
+                $errorMessage
             )));
         } catch (\Throwable $exception) {
             error_log('[EduFramework Logs] ' . $exception->getMessage());
         }
+    }
+
+    /**
+     * Enregistre l'exception à l'origine de l'erreur de la requête HTTP en cours
+     * (Exemple : un controller qui lève une erreur 500)
+     * La description de l'exception (message, fichier et ligne) est ajoutée au log
+     * de la requête par finish(), afin d'aider les développeurs à identifier
+     * et corriger l'erreur directement depuis les logs
+     *
+     * @param \Throwable|null $exception L'exception attrapée, null pour réinitialiser
+     * @return void
+     */
+    public static function setError(\Throwable|null $exception): void
+    {
+        if ($exception === null) {
+            self::$errorMessage = null;
+            return;
+        }
+
+        self::$errorMessage = sprintf(
+            '%s : %s (fichier %s, ligne %d)',
+            $exception::class,
+            $exception->getMessage(),
+            $exception->getFile(),
+            $exception->getLine()
+        );
     }
 
     /**
@@ -159,6 +198,9 @@ class HttpRequestLogger
      * (par défaut le SAPI courant : frankenphp, cli-server, ...)
      * Les indicateurs de performance `execution_time_ms` et `memory_mb`
      * sont ajoutés uniquement s'ils sont fournis
+     * La clé `error_message` est ajoutée uniquement si une erreur a été
+     * enregistrée par setError() : elle décrit l'exception à l'origine
+     * de la réponse (message, fichier et ligne)
      *
      * @param string $method Méthode HTTP (GET, POST, ...)
      * @param string $path Chemin de la requête (avec la chaîne de requête)
@@ -167,9 +209,11 @@ class HttpRequestLogger
      * @param string $sapi SAPI ayant servi la requête (PHP_SAPI par défaut)
      * @param float|null $executionTimeMs Temps d'exécution en millisecondes
      * @param float|null $memoryMb Mémoire utilisée en mégaoctets (pic)
+     * @param string|null $errorMessage Description de l'erreur à l'origine de la réponse
+     *     (message, fichier et ligne de l'exception)
      * @return array<string, string|float> Événement au format BufferToServer
      *        (clés raw, timestamp, ip_port, status_code, method, path, sapi,
-     *        et execution_time_ms / memory_mb si fournis)
+     *        et execution_time_ms / memory_mb / error_message si fournis)
      */
     public static function buildEvent(
         string $method,
@@ -178,7 +222,8 @@ class HttpRequestLogger
         int $status,
         string $sapi = PHP_SAPI,
         float|null $executionTimeMs = null,
-        float|null $memoryMb = null
+        float|null $memoryMb = null,
+        string|null $errorMessage = null
     ): array {
         $timestamp = date('D M ') . sprintf('%2d', (int) date('j')) . date(' H:i:s Y');
 
@@ -197,6 +242,9 @@ class HttpRequestLogger
         }
         if ($memoryMb !== null) {
             $event['memory_mb'] = round($memoryMb, 2);
+        }
+        if ($errorMessage !== null && $errorMessage !== '') {
+            $event['error_message'] = $errorMessage;
         }
 
         return $event;

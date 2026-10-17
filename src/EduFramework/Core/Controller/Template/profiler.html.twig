@@ -187,6 +187,11 @@
             font-family: 'SFMono-Regular', Consolas, monospace;
             color: #333;
         }
+        #requestBody pre.error-message {
+            background-color: #fbeceb;
+            border-color: #e6b5b3;
+            color: #b0413e;
+        }
 
         /* ===== Badges ===== */
         .m-GET, .m-POST, .m-PUT, .m-DELETE, .m-PATCH, .m-OTHER { font-weight: bold; font-size: 12px; padding: 1px 6px; border-radius: 3px; color: #000; background-color: #ddd; }
@@ -616,6 +621,9 @@
                 body.appendChild(requestRow('Serveur (SAPI)', sapiBadge(e.sapi)));
                 body.appendChild(requestRow('Dur\u00e9e', prettyDuration(e.execution_time_ms)));
                 body.appendChild(requestRow('M\u00e9moire', prettyMemory(e.memory_mb)));
+                if (e.error_message !== undefined) {
+                    body.appendChild(requestRow('Erreur', el('pre', 'error-message', e.error_message)));
+                }
                 body.appendChild(requestRow('Re\u00e7ue le', (e.timestamp === undefined ? log.event_date : e.timestamp)));
                 body.appendChild(requestRow('Ligne brute', el('pre', null, e.raw || '')));
             }

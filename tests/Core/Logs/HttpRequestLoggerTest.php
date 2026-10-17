@@ -37,6 +37,7 @@ class HttpRequestLoggerTest extends TestCase
         // Réinitialisation des états statiques pour isoler chaque test
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
+        (new ReflectionProperty(HttpRequestLogger::class, 'errorMessage'))->setValue(null, null);
 
         (new ConfigCore([
             'sqlite_logs_path' => self::$logsPath
@@ -114,6 +115,95 @@ class HttpRequestLoggerTest extends TestCase
         $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
         $this->assertArrayNotHasKey('execution_time_ms', $event);
         $this->assertArrayNotHasKey('memory_mb', $event);
+    }
+
+    public function testBuildEventIncludesErrorMessageWhenProvided(): void
+    {
+        $event = HttpRequestLogger::buildEvent(
+            'GET',
+            '/',
+            '127.0.0.1:65229',
+            500,
+            'cli-server',
+            null,
+            null,
+            'Error : Undefined constant "dede" (fichier HomeController.php, ligne 16)'
+        );
+
+        // L'erreur est visible dans l'événement et la ligne reste au format serveur
+        $this->assertSame(
+            'Error : Undefined constant "dede" (fichier HomeController.php, ligne 16)',
+            $event['error_message']
+        );
+        $this->assertStringNotContainsString('error_message', $event['raw']);
+
+        // Sans erreur fournie, la clé est absente
+        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
+        $this->assertArrayNotHasKey('error_message', $event);
+    }
+
+    public function testSetErrorFormatsExceptionMessageFileAndLine(): void
+    {
+        $exception = new \RuntimeException(
+            'Division par zéro',
+            0,
+            new \Exception('précédente') // Une exception précédente n'apparaît pas dans le log
+        );
+
+        HttpRequestLogger::setError($exception);
+
+        $expected = sprintf(
+            'RuntimeException : Division par zéro (fichier %s, ligne %d)',
+            $exception->getFile(),
+            $exception->getLine()
+        );
+        $this->assertSame($expected, (new ReflectionProperty(
+            HttpRequestLogger::class,
+            'errorMessage'
+        ))->getValue(null));
+    }
+
+    public function testFinishCompletesTheRequestWithTheErrorSetDuringTheRequest(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+
+        HttpRequestLogger::start();
+        $logId = HttpRequestLogger::getCurrentLogId();
+
+        // Une erreur survient dans le controller : le framework l'attrape
+        // et la transmet au logger avant d'afficher la page d'erreur
+        $exception = new \Error('Call to undefined function dede()');
+        HttpRequestLogger::setError($exception);
+
+        HttpRequestLogger::finish();
+
+        // Le log de la requête contient la description de l'erreur :
+        // classe, message, fichier et ligne de l'exception
+        $completed = LogsService::getLogs(1, 0, ['token' => (string) $logId]);
+        $event = $completed[0]['event'];
+        $this->assertArrayHasKey('error_message', $event);
+        $this->assertStringContainsString('Error : Call to undefined function dede()', $event['error_message']);
+        $this->assertStringContainsString($exception->getFile(), $event['error_message']);
+        $this->assertStringContainsString('ligne ' . $exception->getLine(), $event['error_message']);
+
+        // Le message d'erreur est réinitialisé pour la requête suivante
+        HttpRequestLogger::start();
+        HttpRequestLogger::finish();
+        $this->assertNull((new ReflectionProperty(HttpRequestLogger::class, 'errorMessage'))->getValue(null));
+    }
+
+    public function testFinishWithoutErrorDoesNotAddErrorMessageKey(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+
+        HttpRequestLogger::start();
+        $logId = HttpRequestLogger::getCurrentLogId();
+        HttpRequestLogger::finish();
+
+        $completed = LogsService::getLogs(1, 0, ['token' => (string) $logId]);
+        $this->assertArrayNotHasKey('error_message', $completed[0]['event']);
     }
 
     public function testStartReservesTheRequestAndFinishCompletesIt(): void

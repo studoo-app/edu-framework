@@ -132,7 +132,8 @@ Exemple de réponse :
                 "path": "/",
                 "sapi": "cli-server",
                 "execution_time_ms": 183.4,
-                "memory_mb": 14.0
+                "memory_mb": 14.0,
+                "error_message": "ParseError : syntax error, unexpected token \"return\" (fichier app/Controller/HomeController.php, ligne 17)"
             }
         }
     ]
@@ -148,6 +149,8 @@ Les requêtes HTTP traitées par le framework sont enregistrées dans une base *
 
 La collecte est assurée par la classe `HttpRequestLogger`, en deux temps comme le profiler de Symfony : la ligne de log est **réservée en début de requête** — son identifiant (le *token*) est alors disponible pour le bloc DevTool de la barre de debug, qui fait le lien vers le descriptif de la requête — puis **complétée en fin de requête** avec le statut final, le temps d'exécution et la mémoire. C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug — quel que soit le serveur qui la sert (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
 
+Si une erreur survient (exception attrapée par le framework : erreur 500, `ErrorHttpStatusException` levée par un controller, ...), le framework la transmet à `HttpRequestLogger::setError()` et le log de la requête porte une clé `error_message` décrivant la cause de l'erreur — message de l'exception, **fichier et ligne** où elle s'est produite. La description est visible dans le contexte du log (elle est filtrable par le champ **Recherche**) et sur la page descriptif de la requête, afin d'identifier et corriger l'erreur directement depuis les logs. Une requête qui s'est déroulée sans erreur ne porte pas la clé.
+
 Chaque événement porte les clés :
 
 | Clé | Description |
@@ -156,6 +159,7 @@ Chaque événement porte les clés :
 | `sapi` | serveur à l'origine de la requête (`cli-server`, `frankenphp`, ...) : affiché dans le profiler et filtrable (champ **SAPI**) |
 | `execution_time_ms` | temps d'exécution total de la requête en millisecondes |
 | `memory_mb` | pic de mémoire utilisée par la requête en mégaoctets |
+| `error_message` | description de l'erreur à l'origine de la réponse (classe, message, fichier et ligne de l'exception) : uniquement présente si une erreur a été interceptée |
 
 Les événements étant au même format pour tous les serveurs, le profiler affiche l'historique complet, même si les deux serveurs tournent simultanément. Pour éviter les erreurs de verrou SQLite entre le poste et le conteneur, la connexion attend jusqu'à 5 secondes la disponibilité de la base (`PRAGMA busy_timeout`).
 

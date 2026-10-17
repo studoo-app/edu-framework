@@ -91,7 +91,7 @@ Les codes supportés sont `403`, `404` et `405` ; tout autre code affiche la pag
 
 ## Le mode développement
 
-En mode développement (`APP_ENV=dev` dans le fichier ".env"), les pages d'erreur affichent le **message de l'exception** dans un encadré rouge : utile pour comprendre et corriger l'erreur.
+En mode développement (`APP_ENV=dev` dans le fichier ".env"), les pages d'erreur affichent le **message de l'exception** dans un encadré rouge : utile pour comprendre et corriger l'erreur. L'erreur est de plus **journalisée avec la requête** dans la base des logs (clé `error_message` : classe, message, fichier et ligne de l'exception) — voir [la barre de debug et le profiler](debug-bar.md) pour la lire et la rechercher.
 
 En production (ou si `APP_ENV` n'est pas défini), ce message est **masqué** : le visiteur ne voit qu'une page d'erreur générique. C'est une bonne pratique de sécurité : les messages d'erreur peuvent révéler des informations internes (chemins, requêtes, configuration).
 

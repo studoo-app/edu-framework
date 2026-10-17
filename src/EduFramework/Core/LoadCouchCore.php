@@ -81,7 +81,9 @@ class LoadCouchCore
             echo $route->getRoute();
         } catch (ErrorHttpStatusException $exception) {
             // Une erreur HTTP a été levée par un controller (Exemple: accès interdit 403)
-            // On affiche la page d'erreur correspondant au code HTTP de l'exception
+            // On journalise l'erreur pour aider les développeurs à l'identifier,
+            // puis on affiche la page d'erreur correspondant au code HTTP de l'exception
+            HttpRequestLogger::setError($exception);
             echo match ($exception->getCode()) {
                 403 => (new HttpError403Controller($exception))->execute($this->getRequest()),
                 404 => (new HttpError404Controller($exception))->execute($this->getRequest()),
@@ -90,7 +92,9 @@ class LoadCouchCore
             };
         } catch (\Throwable $exception) {
             // Toute autre erreur non gérée (y compris les erreurs de configuration)
-            // affiche la page d'erreur 500 avec le message de l'exception en mode développement
+            // On journalise l'erreur pour aider les développeurs à l'identifier,
+            // puis on affiche la page d'erreur 500 avec le message de l'exception en mode développement
+            HttpRequestLogger::setError($exception);
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         } finally {
             // Complète la ligne de log réservée en début de requête :
