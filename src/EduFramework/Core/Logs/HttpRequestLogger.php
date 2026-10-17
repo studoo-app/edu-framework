@@ -16,8 +16,10 @@ use Studoo\EduFramework\Core\ConfigCore;
 
 /**
  * Class HttpRequestLogger
- * Journalise les requêtes HTTP reçues lorsque l'application n'est pas servie
- * par le serveur PHP intégré (SAPI `cli-server`), par exemple sous FrankenPHP.
+ * Journalise chaque requête HTTP traitée par le framework, quel que soit le serveur
+ * qui la sert (serveur PHP intégré, FrankenPHP, FPM, ...). La journalisation se fait
+ * en fin de requête : c'est ce qui permet de mesurer le temps d'exécution
+ * (execution_time_ms) et la mémoire utilisée (memory_mb), comme la barre de debug.
  * Les événements produits ont exactement le même format que ceux issus de
  * l'analyse de la sortie du serveur intégré (BufferToServer), afin que le
  * profiler affiche et filtre les requêtes de tous les serveurs de la même façon.
@@ -30,8 +32,6 @@ class HttpRequestLogger
      * Journalise la requête HTTP en cours dans la base des logs du profiler.
      *
      * Ne fait rien :
-     * - en SAPI `cli-server` : ces requêtes sont déjà journalisées par la commande
-     *   `php bin/edu start` (analyse de la sortie du serveur), on évite un doublon ;
      * - sans requête HTTP en cours (exécution en ligne de commande) ;
      * - hors mode développement (`APP_ENV=dev`) ou sans l'extension `pdo_sqlite` ;
      * - pour les routes internes du profiler (`/_debug/...` et `/edu-logs`).
@@ -43,10 +43,6 @@ class HttpRequestLogger
      */
     public static function log(): void
     {
-        if (PHP_SAPI === 'cli-server') {
-            return;
-        }
-
         if (isset($_SERVER['REQUEST_METHOD']) === false) {
             return;
         }
@@ -61,11 +57,18 @@ class HttpRequestLogger
             return;
         }
 
+        // Temps d'exécution et mémoire utilisée, mesurés comme la barre de debug
+        $executionTimeMs = round((microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1);
+        $memoryMb = round(memory_get_peak_usage(true) / 1048576, 2);
+
         $event = json_encode(self::buildEvent(
             (string) $_SERVER['REQUEST_METHOD'],
             $path,
             self::clientIpPort(),
-            (int) (http_response_code() ?: 200)
+            (int) (http_response_code() ?: 200),
+            PHP_SAPI,
+            $executionTimeMs,
+            $memoryMb
         ));
 
         if (is_string($event) === true) {
@@ -82,21 +85,33 @@ class HttpRequestLogger
      * (analyse de la sortie du serveur PHP intégré), par exemple :
      * `[Mon Oct  5 12:34:56 2026] 127.0.0.1:65229 [200]: GET /`
      * La clé `sapi` identifie le serveur à l'origine de la requête
-     * (par défaut le SAPI courant : frankenphp, fpm-fcgi, ...)
+     * (par défaut le SAPI courant : frankenphp, cli-server, ...)
+     * Les indicateurs de performance `execution_time_ms` et `memory_mb`
+     * sont ajoutés uniquement s'ils sont fournis
      *
      * @param string $method Méthode HTTP (GET, POST, ...)
      * @param string $path Chemin de la requête (avec la chaîne de requête)
      * @param string $ipPort Adresse IP et port du client (ip:port)
      * @param int $status Code statut de la réponse HTTP
      * @param string $sapi SAPI ayant servi la requête (PHP_SAPI par défaut)
-     * @return array<string, string> Événement au format BufferToServer
-     *        (clés raw, timestamp, ip_port, status_code, method, path, sapi)
+     * @param float|null $executionTimeMs Temps d'exécution en millisecondes
+     * @param float|null $memoryMb Mémoire utilisée en mégaoctets (pic)
+     * @return array<string, string|float> Événement au format BufferToServer
+     *        (clés raw, timestamp, ip_port, status_code, method, path, sapi,
+     *        et execution_time_ms / memory_mb si fournis)
      */
-    public static function buildEvent(string $method, string $path, string $ipPort, int $status, string $sapi = PHP_SAPI): array
-    {
+    public static function buildEvent(
+        string $method,
+        string $path,
+        string $ipPort,
+        int $status,
+        string $sapi = PHP_SAPI,
+        float|null $executionTimeMs = null,
+        float|null $memoryMb = null
+    ): array {
         $timestamp = date('D M ') . sprintf('%2d', (int) date('j')) . date(' H:i:s Y');
 
-        return [
+        $event = [
             'raw' => sprintf('[%s] %s [%d]: %s %s', $timestamp, $ipPort, $status, $method, $path),
             'timestamp' => $timestamp,
             'ip_port' => $ipPort,
@@ -105,6 +120,15 @@ class HttpRequestLogger
             'path' => $path,
             'sapi' => $sapi,
         ];
+
+        if ($executionTimeMs !== null) {
+            $event['execution_time_ms'] = round($executionTimeMs, 1);
+        }
+        if ($memoryMb !== null) {
+            $event['memory_mb'] = round($memoryMb, 2);
+        }
+
+        return $event;
     }
 
     /**

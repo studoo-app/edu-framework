@@ -88,8 +88,9 @@ class LoadCouchCore
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         } finally {
             // Journalisation de la requête HTTP dans la base des logs du profiler.
-            // Uniquement pour les SAPI autres que le serveur PHP intégré (ex : FrankenPHP),
-            // dont les requêtes ne passent pas par la commande `php bin/edu start`
+            // Elle est faite par le framework (et non par la commande start, qui ne voit
+            // que la sortie console du serveur) afin de mesurer, quel que soit le SAPI,
+            // le temps d'exécution et la mémoire utilisée par la requête
             HttpRequestLogger::log();
         }
     }

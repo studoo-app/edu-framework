@@ -90,6 +90,20 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame(PHP_SAPI, $event['sapi']);
     }
 
+    public function testBuildEventIncludesExecutionTimeAndMemory(): void
+    {
+        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200, 'frankenphp', 42.56, 14.251);
+
+        // Les indicateurs de performance sont arrondis comme la barre de debug
+        $this->assertSame(42.6, $event['execution_time_ms']);
+        $this->assertSame(14.25, $event['memory_mb']);
+
+        // Sans indicateurs fournis (ex : logs personnalisés), les clés sont absentes
+        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
+        $this->assertArrayNotHasKey('execution_time_ms', $event);
+        $this->assertArrayNotHasKey('memory_mb', $event);
+    }
+
     public function testBuildEventPadsTheDayLikeTheBuiltInServer(): void
     {
         // Le serveur intégré écrit le jour sur 2 caractères complété par un espace (ex : "Oct  5")
@@ -124,6 +138,14 @@ class HttpRequestLoggerTest extends TestCase
         // http_response_code() renvoie false en ligne de commande : statut par défaut 200
         $this->assertSame('200', $event['status_code']);
         $this->assertSame(PHP_SAPI, $event['sapi']);
+
+        // Temps d'exécution et mémoire utilisée mesurés comme la barre de debug
+        // (note : le JSON normalise 10.0 en 10, le type exact peut être int ou float)
+        $this->assertIsNumeric($event['execution_time_ms']);
+        $this->assertGreaterThanOrEqual(0, $event['execution_time_ms']);
+        $this->assertIsNumeric($event['memory_mb']);
+        $this->assertGreaterThan(0, $event['memory_mb']);
+
         $this->assertSame(
             '[' . $event['timestamp'] . '] ' . $event['ip_port']
             . ' [' . $event['status_code'] . ']: ' . $event['method'] . ' ' . $event['path'],

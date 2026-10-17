@@ -223,6 +223,8 @@
             <span><b>Statut HTTP :</b> <span id="summaryStatus"></span></span>
             <span><b>IP :</b> <span id="summaryIp"></span></span>
             <span><b>Serveur (SAPI) :</b> <span id="summarySapi"></span></span>
+            <span><b>Dur&eacute;e :</b> <span id="summaryDuration"></span></span>
+            <span><b>M&eacute;moire :</b> <span id="summaryMemory"></span></span>
             <span><b>Re&ccedil;ue le :</b> <span id="summaryDate"></span></span>
             <span><b>Token :</b> <span id="summaryToken"></span></span>
         </div>
@@ -355,6 +357,17 @@
                 var known = ['cli-server', 'frankenphp'];
                 return el('span', 'sapi-badge' + (known.indexOf(sapi) === -1 ? '' : ' ' + sapi), sapi);
             }
+            function prettyNumber(value, decimals) {
+                return Number(value).toFixed(decimals).replace('.', ',');
+            }
+            function prettyDuration(executionTimeMs) {
+                return (executionTimeMs === undefined || executionTimeMs === null)
+                    ? '\u2014' : prettyNumber(executionTimeMs, 1) + ' ms';
+            }
+            function prettyMemory(memoryMb) {
+                return (memoryMb === undefined || memoryMb === null)
+                    ? '\u2014' : prettyNumber(memoryMb, 2) + ' Mo';
+            }
             function isHttp(log) { return log.event && log.event.method !== undefined && log.event.method !== null; }
             function timeOf(log) {
                 var match = /\d{2}:\d{2}:\d{2}/.exec((log.event && log.event.timestamp) || log.event_date || '');
@@ -382,7 +395,11 @@
 
             function buildContext(log) {
                 var context = contextOf(log);
-                var inline = Object.keys(context).map(function(key) { return key + ' => ' + context[key]; }).join(', ');
+                var inline = Object.keys(context).map(function(key) {
+                    if (key === 'execution_time_ms') { return key + ' => ' + prettyDuration(context[key]); }
+                    if (key === 'memory_mb') { return key + ' => ' + prettyMemory(context[key]); }
+                    return key + ' => ' + context[key];
+                }).join(', ');
                 var box = el('div', 'log-context');
                 box.appendChild(el('b', null, 'Contexte : '));
 
@@ -420,6 +437,8 @@
                 $('summaryStatus').textContent = log.event.status_code;
                 $('summaryIp').textContent = log.event.ip_port;
                 $('summarySapi').textContent = log.event.sapi || '\u2014';
+                $('summaryDuration').textContent = prettyDuration(log.event.execution_time_ms);
+                $('summaryMemory').textContent = prettyMemory(log.event.memory_mb);
                 $('summaryDate').textContent = log.event.timestamp;
                 $('summaryToken').textContent = '#' + log.id;
             }

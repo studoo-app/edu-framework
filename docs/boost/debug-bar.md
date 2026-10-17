@@ -129,7 +129,9 @@ Exemple de réponse :
                 "status_code": "200",
                 "method": "GET",
                 "path": "/",
-                "sapi": "cli-server"
+                "sapi": "cli-server",
+                "execution_time_ms": 183.4,
+                "memory_mb": 14.0
             }
         }
     ]
@@ -138,26 +140,28 @@ Exemple de réponse :
 
 ## Le stockage des logs
 
-Les requêtes HTTP sont enregistrées dans une base **SQLite** dédiée :
+Les requêtes HTTP traitées par le framework sont enregistrées dans une base **SQLite** dédiée :
 
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
 
-La collecte s'adapte au serveur qui sert l'application, afin de faire cohabiter les deux environnements :
+La collecte est assurée par la classe `HttpRequestLogger` : en fin de chaque requête (page, erreur HTTP, ...), le framework journalise lui-même la requête, **quel que soit le serveur qui la sert** (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug. La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
 
-| Serveur | SAPI | Collecte des requêtes |
-|---------|------|-----------------------|
-| `php bin/edu start` (serveur PHP intégré) | `cli-server` | la commande `start` analyse la sortie du serveur (classes `BufferFormat` et `BufferToServer`) et enregistre chaque ligne |
-| FrankenPHP (Docker, `https://localhost/`) | autre que `cli-server` | la classe `HttpRequestLogger` journalise chaque requête en fin d'exécution (`APP_ENV=dev` requis) |
+Chaque événement porte les clés :
 
-Les deux mécanismes produisent des événements **au même format** (même JSON, même ligne brute que le serveur intégré), dans la même base : le profiler affiche donc l'historique complet, même si les deux serveurs tournent simultanément. Chaque événement porte une clé `sapi` qui identifie le serveur à l'origine de la requête (`cli-server` pour le serveur PHP intégré, `frankenphp` pour FrankenPHP) : elle est affichée dans le profiler et filtrable (champ **SAPI** de l'API). Pour éviter les erreurs de verrou SQLite entre le poste et le conteneur, la connexion attend jusqu'à 5 secondes la disponibilité de la base (`PRAGMA busy_timeout`).
+| Clé | Description |
+|-----|-------------|
+| `raw`, `timestamp`, `ip_port`, `status_code`, `method`, `path` | même format que la sortie du serveur PHP intégré |
+| `sapi` | serveur à l'origine de la requête (`cli-server`, `frankenphp`, ...) : affiché dans le profiler et filtrable (champ **SAPI**) |
+| `execution_time_ms` | temps d'exécution total de la requête en millisecondes |
+| `memory_mb` | pic de mémoire utilisée par la requête en mégaoctets |
+
+Les événements étant au même format pour tous les serveurs, le profiler affiche l'historique complet, même si les deux serveurs tournent simultanément. Pour éviter les erreurs de verrou SQLite entre le poste et le conteneur, la connexion attend jusqu'à 5 secondes la disponibilité de la base (`PRAGMA busy_timeout`).
 
 ```mermaid
 flowchart LR
-    S["php bin/edu start<br/>(serveur PHP intégré)"] --> BF["BufferToServer<br/>(analyse la sortie du serveur)"]
-    FP["FrankenPHP<br/>(https://localhost/)"] --> HR["HttpRequestLogger<br/>(journalise la requête en fin d'exécution)"]
-    BF --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
-    HR --> DB
+    S["Requête HTTP<br/>(serveur PHP intégré ou FrankenPHP)"] --> HR["HttpRequestLogger<br/>(journalise la requête en fin d'exécution<br/>avec SAPI, temps et mémoire)"]
+    HR --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
     DB --> API["endpoint /edu-logs<br/>(JSON)"]
     API --> P["Profiler<br/>(filtres, pagination)"]
 ```
@@ -166,10 +170,11 @@ flowchart LR
 
     Les requêtes du profiler et de la barre de debug (`/_debug/...` et `/edu-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
 
-!!! note "Limitations sous FrankenPHP"
+!!! note "Limitations"
 
-    - les fichiers statiques servis directement par Caddy (CSS, JS, images, ...) ne passent pas par PHP : ils ne sont pas journalisés ;
-    - dans le conteneur Docker, l'IP du client est celle vue par FrankenPHP (réseau Docker) : le filtre IP du profiler donne l'IP du pont Docker, pas `127.0.0.1`.
+    - seules les requêtes **exécutées par PHP** sont journalisées : les fichiers statiques servis directement par le serveur web (assets de `public/upload/`, ...) ne le sont pas, que ce soit par le serveur intégré ou par Caddy ;
+    - dans le conteneur Docker, l'IP du client est celle vue par FrankenPHP (réseau Docker) : le filtre IP du profiler donne l'IP du pont Docker, pas `127.0.0.1` ;
+    - en mode worker de FrankenPHP (non activé par défaut), le pic de mémoire est cumulé sur la durée de vie du worker : `memory_mb` reflète alors le worker et non la seule requête.
 
 ## Ajouter ses propres logs
 
