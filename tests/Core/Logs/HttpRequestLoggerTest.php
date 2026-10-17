@@ -34,9 +34,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->serverBackup = $_SERVER;
         $this->envBackup = $_ENV;
 
-        // Réinitialisation de la connexion statique pour tester l'initialisation à chaque test
-        $reflection = new ReflectionProperty(LogsService::class, 'dbConnectLogs');
-        $reflection->setValue(null, null);
+        // Réinitialisation des états statiques pour isoler chaque test
+        (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
+        (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
 
         (new ConfigCore([
             'sqlite_logs_path' => self::$logsPath
@@ -82,6 +82,18 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame($event['sapi'], $parsed['sapi']);
     }
 
+    public function testBuildEventPadsTheDayLikeTheBuiltInServer(): void
+    {
+        // Le serveur intégré écrit le jour sur 2 caractères complété par un espace (ex : "Oct  5")
+        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
+
+        $this->assertMatchesRegularExpression(
+            '/^\[[A-Za-z]{3} [A-Za-z]{3} {1,2}\d{1,2} \d{2}:\d{2}:\d{2} \d{4}\] /',
+            $event['raw']
+        );
+        $this->assertStringStartsWith('[' . $event['timestamp'] . '] ', $event['raw']);
+    }
+
     public function testBuildEventDefaultsToTheCurrentSapi(): void
     {
         $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
@@ -104,34 +116,35 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertArrayNotHasKey('memory_mb', $event);
     }
 
-    public function testBuildEventPadsTheDayLikeTheBuiltInServer(): void
-    {
-        // Le serveur intégré écrit le jour sur 2 caractères complété par un espace (ex : "Oct  5")
-        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
-
-        $this->assertMatchesRegularExpression(
-            '/^\[[A-Za-z]{3} [A-Za-z]{3} {1,2}\d{1,2} \d{2}:\d{2}:\d{2} \d{4}\] /',
-            $event['raw']
-        );
-        $this->assertStringStartsWith('[' . $event['timestamp'] . '] ', $event['raw']);
-    }
-
-    public function testLogInsertsTheHttpRequestInDevMode(): void
+    public function testStartReservesTheRequestAndFinishCompletesIt(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/ville?nom=Nice';
         $_SERVER['REMOTE_ADDR'] = '10.1.2.3';
         $_SERVER['REMOTE_PORT'] = '4444';
 
-        $countBefore = $this->countLogs();
-        HttpRequestLogger::log();
+        HttpRequestLogger::start();
 
-        $this->assertSame($countBefore + 1, $this->countLogs());
+        // Pendant la requête : l'identifiant (token) est réservé pour la barre de debug,
+        // la ligne est visible dans la base mais sans indicateurs de performance
+        $logId = HttpRequestLogger::getCurrentLogId();
+        $this->assertNotNull($logId);
+        $this->assertIsInt($logId);
 
-        // Le log le plus récent (ORDER BY id DESC) est celui qui vient d'être enregistré
-        $logs = LogsService::getLogs(1, 0);
-        $event = $logs[0]['event'];
+        $reserved = LogsService::getLogs(1, 0, ['token' => (string) $logId]);
+        $this->assertSame('POST', $reserved[0]['event']['method']);
+        $this->assertSame('/ville?nom=Nice', $reserved[0]['event']['path']);
+        $this->assertArrayNotHasKey('execution_time_ms', $reserved[0]['event']);
+        $this->assertArrayNotHasKey('memory_mb', $reserved[0]['event']);
 
+        HttpRequestLogger::finish();
+
+        // Après la requête : l'identifiant courant est réinitialisé
+        $this->assertNull(HttpRequestLogger::getCurrentLogId());
+
+        // La ligne a été complétée : statut, SAPI et indicateurs de performance
+        $completed = LogsService::getLogs(1, 0, ['token' => (string) $logId]);
+        $event = $completed[0]['event'];
         $this->assertSame('POST', $event['method']);
         $this->assertSame('/ville?nom=Nice', $event['path']);
         $this->assertSame('10.1.2.3:4444', $event['ip_port']);
@@ -153,62 +166,66 @@ class HttpRequestLoggerTest extends TestCase
         );
     }
 
-    public function testLogsCanBeFilteredBySapi(): void
+    public function testFinishWithoutStartDoesNothing(): void
     {
-        foreach (['frankenphp', 'cli-server'] as $sapi) {
-            $_SERVER['REQUEST_METHOD'] = 'GET';
-            $_SERVER['REQUEST_URI'] = '/sapi-filter-' . $sapi;
-            HttpRequestLogger::log();
-
-            // Le log le plus récent porte le SAPI courant de la requête journalisée
-            $logs = LogsService::getLogs(1, 0, ['url' => '/sapi-filter-' . $sapi]);
-            $this->assertSame(PHP_SAPI, $logs[0]['event']['sapi']);
-        }
-
-        // Le filtre sapi ne retourne que les requêtes du serveur correspondant
-        LogsService::addLog((string) json_encode(
-            HttpRequestLogger::buildEvent('GET', '/sapi-filter-explicit', '127.0.0.1:1111', 200, 'frankenphp')
-        ));
-
-        $filtered = LogsService::getLogs(50, 0, ['sapi' => 'frankenphp', 'search' => '/sapi-filter-explicit']);
-        $this->assertCount(1, $filtered);
-        $this->assertSame('frankenphp', $filtered[0]['event']['sapi']);
-    }
-
-    public function testLogDoesNothingWithoutHttpRequest(): void
-    {
-        unset($_SERVER['REQUEST_METHOD']);
-
         $countBefore = $this->countLogs();
-        HttpRequestLogger::log();
+
+        HttpRequestLogger::finish();
 
         $this->assertSame($countBefore, $this->countLogs());
     }
 
-    public function testLogDoesNothingOutsideDevMode(): void
+    public function testStartDoesNothingWithoutHttpRequest(): void
+    {
+        unset($_SERVER['REQUEST_METHOD']);
+
+        HttpRequestLogger::start();
+        $this->assertNull(HttpRequestLogger::getCurrentLogId());
+
+        $countBefore = $this->countLogs();
+        HttpRequestLogger::finish();
+
+        $this->assertSame($countBefore, $this->countLogs());
+    }
+
+    public function testStartDoesNothingOutsideDevMode(): void
     {
         $_ENV['APP_ENV'] = 'prod';
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/prod-path';
 
+        HttpRequestLogger::start();
+        $this->assertNull(HttpRequestLogger::getCurrentLogId());
+
         $countBefore = $this->countLogs();
-        HttpRequestLogger::log();
+        HttpRequestLogger::finish();
 
         $this->assertSame($countBefore, $this->countLogs());
     }
 
-    public function testLogDoesNothingForTheProfilerAndLogsRoutes(): void
+    public function testStartDoesNothingForTheProfilerAndLogsRoutes(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
-        // Parité avec StartCommand : les routes internes ne sont pas journalisées
+        // Parité avec la barre de debug : les routes internes ne sont pas journalisées
         foreach (['/_debug/profiler', '/_debug/autre', '/edu-logs', '/edu-logs?page=1'] as $uri) {
             $_SERVER['REQUEST_URI'] = $uri;
 
-            $countBefore = $this->countLogs();
-            HttpRequestLogger::log();
+            HttpRequestLogger::start();
 
-            $this->assertSame($countBefore, $this->countLogs(), "L'URI <" . $uri . "> ne doit pas être journalisée");
+            $this->assertNull(HttpRequestLogger::getCurrentLogId(), 'L\'URI <' . $uri . '> ne doit pas être journalisée');
         }
+    }
+
+    public function testLogsCanBeFilteredBySapi(): void
+    {
+        LogsService::addLog((string) json_encode(
+            HttpRequestLogger::buildEvent('GET', '/sapi-filter-explicit', '127.0.0.1:1111', 200, 'frankenphp')
+        ));
+
+        // Le filtre sapi ne retourne que les requêtes du serveur correspondant
+        $filtered = LogsService::getLogs(50, 0, ['sapi' => 'frankenphp', 'search' => '/sapi-filter-explicit']);
+        $this->assertCount(1, $filtered);
+        $this->assertSame('frankenphp', $filtered[0]['event']['sapi']);
     }
 }

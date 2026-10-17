@@ -174,6 +174,20 @@
             color: #333;
         }
 
+        /* ===== Vue descriptif d'une requête ===== */
+        .profiler-table td.req-label { width: 170px; white-space: nowrap; color: #777; font-weight: 600; }
+        #requestBody pre {
+            margin: 0;
+            padding: 8px 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            color: #333;
+        }
+
         /* ===== Badges ===== */
         .m-GET, .m-POST, .m-PUT, .m-DELETE, .m-PATCH, .m-OTHER { font-weight: bold; font-size: 12px; padding: 1px 6px; border-radius: 3px; color: #000; background-color: #ddd; }
         .m-GET { background-color: #61affe; }
@@ -196,9 +210,6 @@
         .status-text.s-5xx { color: #b0413e; }
         .status-text { font-weight: bold; }
 
-        .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 14px; }
-        .pagination button[disabled] { opacity: 0.4; cursor: default; }
-        .pagination select { font-family: inherit; font-size: 13px; padding: 4px; border: 1px solid #ccc; }
         .back-link { margin-bottom: 14px; }
     </style>
 </head>
@@ -241,9 +252,9 @@
             </div>
 
             <nav id="logsNav">
-                <a href="#" class="disabled" title="Bient&ocirc;t disponible"><span class="ico">&#9881;</span> Requ&ecirc;te / R&eacute;ponse</a>
+                <a href="#" id="navRequest" class="disabled" title="Ouvrez le descriptif d'une requ&ecirc;te depuis la barre de debug ou la recherche"><span class="ico">&#9881;</span> Requ&ecirc;te</a>
                 <a href="#" class="disabled" title="Bient&ocirc;t disponible"><span class="ico">&#9201;</span> Performance</a>
-                <a href="#logs" class="active"><span class="ico">&#10071;</span> Logs <span id="sidebarCount" class="count">0</span></a>
+                <a href="#logs" class="active"><span class="ico">&#9776;</span> Logs <span id="sidebarCount" class="count">0</span></a>
             </nav>
 
             <form id="searchForm" autocomplete="off">
@@ -321,10 +332,13 @@
                 </table>
             </div>
 
-            <div class="pagination">
-                <span id="pageInfo">1 / 1</span>
-                <button type="button" class="btn" id="btnPrev">&#9664; Pr&eacute;c&eacute;dent</button>
-                <button type="button" class="btn" id="btnNext">Suivant &#9654;</button>
+            <!-- Vue : descriptif d'une requête HTTP -->
+            <div id="viewRequest" class="hidden">
+                <div class="back-link"><a href="#search">&#8592; Retour &agrave; la recherche</a></div>
+                <h1 id="requestTitle"></h1>
+                <table class="profiler-table">
+                    <tbody id="requestBody"></tbody>
+                </table>
             </div>
         </main>
     </div>
@@ -334,9 +348,8 @@
             var CONTEXT_MAX = 80;
             var view = 'search';
             var token = '';
+            var requestToken = '';
             var logsStatus = '';
-            var pages = { search: 1, logs: 1 };
-            var pagesTotal = 1;
             var searchFilters = { limit: 20 };
 
             function $(id) { return document.getElementById(id); }
@@ -369,6 +382,11 @@
                     ? '\u2014' : prettyNumber(memoryMb, 2) + ' Mo';
             }
             function isHttp(log) { return log.event && log.event.method !== undefined && log.event.method !== null; }
+            function requestLink(id, label) {
+                var link = el('a', null, label);
+                link.href = '#request/' + id;
+                return link;
+            }
             function timeOf(log) {
                 var match = /\d{2}:\d{2}:\d{2}/.exec((log.event && log.event.timestamp) || log.event_date || '');
                 return match ? match[0] : '';
@@ -477,7 +495,8 @@
                         tr.appendChild(tdChannel);
 
                         var tdMessage = el('td');
-                        tdMessage.appendChild(document.createTextNode(log.event.path + ' \u2192 '));
+                        tdMessage.appendChild(requestLink(log.id, log.event.path));
+                        tdMessage.appendChild(document.createTextNode(' \u2192 '));
                         tdMessage.appendChild(el('span', 'status-text ' + statusClass(log.event.status_code), log.event.status_code));
                         tdMessage.appendChild(buildContext(log));
                         tr.appendChild(tdMessage);
@@ -487,12 +506,10 @@
                     }
                     body.appendChild(tr);
                 });
-
-                setPages(data, 'logs');
             }
 
             function loadLogs() {
-                query({ page: pages.logs, limit: 20, status: logsStatus, token: token }).then(function(data) {
+                query({ limit: 20, status: logsStatus, token: token }).then(function(data) {
                     renderLogs(data);
                     if (token !== '') {
                         renderSummary(data.logs[0]);
@@ -530,7 +547,9 @@
                         var tdMethod = el('td');
                         tdMethod.appendChild(methodBadge(log.event.method));
                         tr.appendChild(tdMethod);
-                        tr.appendChild(el('td', null, log.event.path));
+                        var tdPath = el('td');
+                        tdPath.appendChild(requestLink(log.id, log.event.path));
+                        tr.appendChild(tdPath);
                         var tdSapi = el('td', 'nowrap');
                         tdSapi.appendChild(sapiBadge(log.event.sapi));
                         tr.appendChild(tdSapi);
@@ -543,33 +562,103 @@
                     tr.appendChild(tdToken);
                     body.appendChild(tr);
                 });
-
-                setPages(data, 'search');
             }
 
             function loadSearch() {
-                var params = Object.assign({ page: pages.search }, searchFilters);
-                query(params).then(renderSearch).catch(fail);
+                query(searchFilters).then(renderSearch).catch(fail);
             }
 
-            // ----- Pagination et navigation -----
-            function setPages(data, name) {
-                pages[name] = data.page;
-                pagesTotal = data.pages || 1;
-                $('pageInfo').textContent = data.page + ' / ' + pagesTotal;
-                $('btnPrev').disabled = data.page <= 1;
-                $('btnNext').disabled = data.page >= pagesTotal;
+            // ----- Vue "descriptif d'une requête" -----
+            function updateRequestNav(id) {
+                // L'entrée "Requête" de la navigation ne pointe nulle part tant
+                // qu'aucune requête n'a été consultée
+                var link = $('navRequest');
+                if (id) {
+                    link.classList.remove('disabled');
+                    link.setAttribute('href', '#request/' + id);
+                } else {
+                    link.classList.add('disabled');
+                    link.setAttribute('href', '#');
+                }
             }
 
+            function requestRow(label, valueNode) {
+                var tr = el('tr');
+                tr.appendChild(el('td', 'req-label', label));
+                var td = el('td');
+                if (typeof valueNode === 'string') { td.textContent = valueNode; } else { td.appendChild(valueNode); }
+                tr.appendChild(td);
+                return tr;
+            }
+
+            function renderRequest(log) {
+                var body = $('requestBody');
+                body.innerHTML = '';
+
+                if (isHttp(log) === false) {
+                    // Log brut (pas une requête HTTP) : on affiche le message seul
+                    $('summary').classList.add('hidden');
+                    $('requestTitle').textContent = 'Requ\u00eate HTTP';
+                    body.appendChild(requestRow('Token', '#' + log.id));
+                    body.appendChild(requestRow('Message brut', el('pre', null, log.event.raw || '')));
+                    return;
+                }
+
+                renderSummary(log);
+                $('requestTitle').textContent = 'Requ\u00eate HTTP #' + log.id;
+                var e = log.event;
+
+                body.appendChild(requestRow('Token', '#' + log.id));
+                body.appendChild(requestRow('M\u00e9thode', methodBadge(e.method)));
+                body.appendChild(requestRow('Statut HTTP', el('span', 'status-badge ' + statusClass(e.status_code), e.status_code)));
+                body.appendChild(requestRow('URL', (e.path === undefined ? '\u2014' : e.path)));
+                body.appendChild(requestRow('IP du client', (e.ip_port === undefined ? '\u2014' : e.ip_port)));
+                body.appendChild(requestRow('Serveur (SAPI)', sapiBadge(e.sapi)));
+                body.appendChild(requestRow('Dur\u00e9e', prettyDuration(e.execution_time_ms)));
+                body.appendChild(requestRow('M\u00e9moire', prettyMemory(e.memory_mb)));
+                body.appendChild(requestRow('Re\u00e7ue le', (e.timestamp === undefined ? log.event_date : e.timestamp)));
+                body.appendChild(requestRow('Ligne brute', el('pre', null, e.raw || '')));
+            }
+
+            function renderRequestEmpty() {
+                $('summary').classList.add('hidden');
+                $('requestTitle').textContent = 'Requ\u00eate introuvable';
+                var body = $('requestBody');
+                body.innerHTML = '';
+                var tr = el('tr');
+                var td = el('td', 'empty-state', 'La requ\u00eate #' + requestToken
+                    + ' n\'est plus dans la base des logs (elle a peut-\u00eatre \u00e9t\u00e9 supprim\u00e9e ou la base a \u00e9t\u00e9 r\u00e9initialis\u00e9e)');
+                td.colSpan = 2;
+                tr.appendChild(td);
+                body.appendChild(tr);
+            }
+
+            function loadRequest() {
+                query({ token: requestToken, limit: 1 }).then(function(data) {
+                    if (data.logs.length === 0) {
+                        renderRequestEmpty();
+                    } else {
+                        renderRequest(data.logs[0]);
+                    }
+                }).catch(fail);
+            }
+
+            // ----- Navigation entre les vues -----
             function show(name) {
                 view = name;
                 var isSearch = name === 'search';
                 $('viewSearch').classList.toggle('hidden', !isSearch);
-                $('viewLogs').classList.toggle('hidden', isSearch);
+                $('viewLogs').classList.toggle('hidden', name !== 'logs');
+                $('viewRequest').classList.toggle('hidden', name !== 'request');
                 $('searchForm').classList.toggle('hidden', !isSearch);
                 $('logsNav').classList.toggle('hidden', isSearch);
                 $('searchTitle').classList.toggle('hidden', !isSearch);
                 if (isSearch) { $('summary').classList.add('hidden'); }
+                // État actif des entrées de navigation (sidebar)
+                document.querySelectorAll('#logsNav a').forEach(function(node) {
+                    node.classList.toggle('active', (name === 'request' && node.id === 'navRequest')
+                        || (name === 'logs' && node.getAttribute('href') === '#logs'));
+                });
             }
 
             function route() {
@@ -578,9 +667,13 @@
                     token = hash[1] || '';
                     $('tokenFilter').classList.toggle('hidden', token === '');
                     $('tokenFilterId').textContent = '#' + token;
-                    pages.logs = 1;
                     show('logs');
                     loadLogs();
+                } else if (hash[0] === 'request') {
+                    requestToken = hash[1] || '';
+                    updateRequestNav(requestToken);
+                    show('request');
+                    loadRequest();
                 } else {
                     show('search');
                     loadSearch();
@@ -597,7 +690,6 @@
             $('searchForm').addEventListener('submit', function(event) {
                 event.preventDefault();
                 searchFilters = readForm();
-                pages.search = 1;
                 if (window.location.hash !== '' && window.location.hash !== '#search') {
                     window.location.hash = '#search';
                 } else {
@@ -614,7 +706,6 @@
                 $('searchForm').reset();
                 $('searchForm').elements.limit.value = '10';
                 searchFilters = { limit: 10 };
-                pages.search = 1;
                 if (view === 'search') { loadSearch(); } else { window.location.hash = '#search'; }
             });
 
@@ -629,15 +720,7 @@
                 if (button === null) { return; }
                 logsStatus = button.getAttribute('data-status');
                 document.querySelectorAll('#tabs button').forEach(function(node) { node.classList.toggle('active', node === button); });
-                pages.logs = 1;
                 loadLogs();
-            });
-
-            $('btnPrev').addEventListener('click', function() {
-                if (pages[view] > 1) { pages[view]--; view === 'search' ? loadSearch() : loadLogs(); }
-            });
-            $('btnNext').addEventListener('click', function() {
-                if (pages[view] < pagesTotal) { pages[view]++; view === 'search' ? loadSearch() : loadLogs(); }
             });
 
             window.addEventListener('hashchange', route);

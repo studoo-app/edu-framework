@@ -12,6 +12,7 @@
 namespace Studoo\EduFramework\Core\View;
 
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 
 /**
  * Class studooBarreDebug
@@ -57,6 +58,7 @@ class studooBarreDebug
 #edu-tb .edu-tb-status:hover { filter: brightness(1.15); background: inherit; }
 #edu-tb .edu-tb-env { background: #4f805d; color: #fff; padding: 1px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; font-size: 11px; }
 #edu-tb .edu-tb-env.prod { background: #b0413e; }
+#edu-tb .edu-tb-ico { font-size: 18px; vertical-align: -1px; margin-right: 5px; }
 #edu-tb .edu-tb-panel {
     display: none; position: absolute; bottom: 36px; left: 0; min-width: 260px; max-width: 480px;
     padding: 10px 14px; background: #444; color: #ddd; line-height: 1.5; white-space: normal;
@@ -134,13 +136,7 @@ HTML;
                 'Mémoire',
                 ['Pic d\'utilisation' => number_format($peak, 2, ',', ' ') . ' Mo', 'Limite PHP' => (string) ini_get('memory_limit')]
             ),
-            $this->block(
-                '<span class="edu-tb-env' . ($envName === 'dev' ? '' : ' prod') . '">DevTool</span>',
-                'DEV',
-                ['Profiler' => 'Ouvrir la liste des requêtes'],
-                '',
-                '/_debug/profiler#logs'
-            ),
+            $this->devToolBlock(),
         ];
 
         $right = [
@@ -169,6 +165,42 @@ HTML;
             . '</div></div>'
             . '<button type="button" id="edu-tb-mini" title="Afficher la barre de debug" aria-label="Afficher la barre de debug" onclick="eduToolbarToggle(false)">'
             . '<img src="' . $logo . '" alt=""></button>';
+    }
+
+    /**
+     * Bloc DevTool de la barre : affiche le token de la requête en cours
+     * et fait le lien vers son descriptif dans le profiler.
+     * Si la requête n'est pas journalisée (logs indisponibles, route interne, ...),
+     * le bloc pointe vers la liste des requêtes du profiler.
+     *
+     * @return string
+     */
+    private function devToolBlock(): string
+    {
+        $envName = (ConfigCore::existEnv('APP_ENV') === true ? (string) ConfigCore::getEnv('APP_ENV') : 'dev');
+        $logId = HttpRequestLogger::getCurrentLogId();
+        $label = '<span class="edu-tb-ico">&#9881;</span>';
+
+        if ($logId !== null) {
+            return $this->block(
+                $label,
+                'DEV TOOL',
+                [
+                    'Token' => '#' . $logId,
+                    'Profiler' => 'Ouvrir le descriptif de la requête',
+                ],
+                '',
+                '/_debug/profiler#request/' . $logId
+            );
+        }
+
+        return $this->block(
+            $label,
+            'DEV',
+            ['Profiler' => 'Ouvrir la liste des requêtes'],
+            '',
+            '/_debug/profiler#logs'
+        );
     }
 
     /**

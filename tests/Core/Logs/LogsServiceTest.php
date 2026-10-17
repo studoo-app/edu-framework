@@ -73,6 +73,31 @@ class LogsServiceTest extends TestCase
         $this->assertSame($eventDesc, $stmt->fetchColumn());
     }
 
+    public function testAddLogReturnsTheNewLogId(): void
+    {
+        $id = LogsService::addLog('{"method":"GET","path":"/id-test"}');
+
+        $stmt = LogsService::getConnect()->prepare('SELECT id, event_desc FROM serv_logs WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $this->assertNotFalse($row);
+        $this->assertSame($id, (int) $row['id']);
+        $this->assertSame('{"method":"GET","path":"/id-test"}', $row['event_desc']);
+    }
+
+    public function testUpdateLogRewritesTheEventDescription(): void
+    {
+        // HttpRequestLogger réserve la ligne en début de requête puis la complète
+        $id = LogsService::addLog('{"method":"GET","path":"/before","status_code":"200"}');
+
+        LogsService::updateLog($id, '{"method":"GET","path":"/before","status_code":"200","execution_time_ms":42.5}');
+
+        $logs = LogsService::getLogs(1, 0, ['token' => (string) $id]);
+        $this->assertSame('/before', $logs[0]['event']['path']);
+        $this->assertSame(42.5, $logs[0]['event']['execution_time_ms']);
+    }
+
     public function testGetLogsReturnsJsonEventsDecodedAndNewestFirst(): void
     {
         LogsService::addLog('{"method":"GET","path":"/first","status_code":"200"}');

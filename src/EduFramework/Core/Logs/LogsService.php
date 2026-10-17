@@ -63,13 +63,32 @@ class LogsService
      * Permets d'enregistrer un log dans la base de données
      *
      * @param string $eventDesc Description de l'événement à enregistrer
-     * @return void
+     * @return int Identifiant du log enregistré
      */
-    public static function addLog(string $eventDesc): void
+    public static function addLog(string $eventDesc): int
     {
         $pdo = self::getConnect();
         $stmt = $pdo->prepare("INSERT INTO serv_logs (event_desc) VALUES (:event_desc)");
         $stmt->bindParam(':event_desc', $eventDesc, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return (int) $pdo->lastInsertId();
+    }
+
+    /**
+     * Permets de mettre à jour la description d'un log enregistré
+     * (utilisée par HttpRequestLogger pour compléter une requête
+     * en fin d'exécution : statut final, temps et mémoire)
+     *
+     * @param int $id Identifiant du log à mettre à jour
+     * @param string $eventDesc Nouvelle description de l'événement
+     * @return void
+     */
+    public static function updateLog(int $id, string $eventDesc): void
+    {
+        $stmt = self::getConnect()->prepare("UPDATE serv_logs SET event_desc = :event_desc WHERE id = :id");
+        $stmt->bindParam(':event_desc', $eventDesc, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
     }
 

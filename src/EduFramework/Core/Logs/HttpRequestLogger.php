@@ -18,8 +18,11 @@ use Studoo\EduFramework\Core\ConfigCore;
  * Class HttpRequestLogger
  * Journalise chaque requête HTTP traitée par le framework, quel que soit le serveur
  * qui la sert (serveur PHP intégré, FrankenPHP, FPM, ...). La journalisation se fait
- * en fin de requête : c'est ce qui permet de mesurer le temps d'exécution
- * (execution_time_ms) et la mémoire utilisée (memory_mb), comme la barre de debug.
+ * en deux temps, comme le profiler de Symfony :
+ * - start() réserve la ligne en début de requête : son identifiant (token) est alors
+ *   disponible pour la barre de debug, qui fait le lien vers le descriptif de la requête ;
+ * - finish() complète la ligne en fin de requête avec le statut final, le temps
+ *   d'exécution (execution_time_ms) et la mémoire utilisée (memory_mb).
  * Les événements produits ont exactement le même format que ceux issus de
  * l'analyse de la sortie du serveur intégré (BufferToServer), afin que le
  * profiler affiche et filtre les requêtes de tous les serveurs de la même façon.
@@ -29,7 +32,16 @@ use Studoo\EduFramework\Core\ConfigCore;
 class HttpRequestLogger
 {
     /**
-     * Journalise la requête HTTP en cours dans la base des logs du profiler.
+     * Identifiant du log de la requête en cours (réservé par start(), null si la
+     * requête n'est pas journalisée : pas une requête HTTP, hors mode dev, ...)
+     * @var int|null
+     */
+    private static ?int $currentLogId = null;
+
+    /**
+     * Réserve la ligne de log de la requête HTTP en cours dans la base des logs.
+     * L'identifiant retourné par getCurrentLogId() est utilisé par la barre de debug
+     * pour faire le lien vers le descriptif de la requête dans le profiler.
      *
      * Ne fait rien :
      * - sans requête HTTP en cours (exécution en ligne de commande) ;
@@ -41,19 +53,40 @@ class HttpRequestLogger
      *
      * @return void
      */
-    public static function log(): void
+    public static function start(): void
     {
-        if (isset($_SERVER['REQUEST_METHOD']) === false) {
+        self::$currentLogId = null;
+
+        if (self::shouldLog() === false) {
             return;
         }
 
-        if (ConfigCore::existEnv('APP_ENV') === false || ConfigCore::getEnv('APP_ENV') !== 'dev'
-            || in_array('sqlite', PDO::getAvailableDrivers(), true) === false) {
-            return;
+        try {
+            self::$currentLogId = LogsService::addLog((string) json_encode(self::buildEvent(
+                (string) $_SERVER['REQUEST_METHOD'],
+                self::requestPath(),
+                self::clientIpPort(),
+                (int) (http_response_code() ?: 200),
+                PHP_SAPI
+            )));
+        } catch (\Throwable $exception) {
+            error_log('[EduFramework Logs] ' . $exception->getMessage());
         }
+    }
 
-        $path = (string) ($_SERVER['REQUEST_URI'] ?? '/');
-        if (str_starts_with($path, '/_debug/') === true || str_starts_with($path, '/edu-logs') === true) {
+    /**
+     * Complète la ligne de log de la requête HTTP en cours (réservée par start())
+     * avec le statut final, le temps d'exécution et la mémoire utilisée.
+     * Si la requête n'est pas journalisée, ne fait rien.
+     *
+     * @return void
+     */
+    public static function finish(): void
+    {
+        $logId = self::$currentLogId;
+        self::$currentLogId = null;
+
+        if ($logId === null) {
             return;
         }
 
@@ -61,23 +94,61 @@ class HttpRequestLogger
         $executionTimeMs = round((microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1);
         $memoryMb = round(memory_get_peak_usage(true) / 1048576, 2);
 
-        $event = json_encode(self::buildEvent(
-            (string) $_SERVER['REQUEST_METHOD'],
-            $path,
-            self::clientIpPort(),
-            (int) (http_response_code() ?: 200),
-            PHP_SAPI,
-            $executionTimeMs,
-            $memoryMb
-        ));
-
-        if (is_string($event) === true) {
-            try {
-                LogsService::addLog($event);
-            } catch (\Throwable $exception) {
-                error_log('[EduFramework Logs] ' . $exception->getMessage());
-            }
+        try {
+            LogsService::updateLog($logId, (string) json_encode(self::buildEvent(
+                (string) $_SERVER['REQUEST_METHOD'],
+                self::requestPath(),
+                self::clientIpPort(),
+                (int) (http_response_code() ?: 200),
+                PHP_SAPI,
+                $executionTimeMs,
+                $memoryMb
+            )));
+        } catch (\Throwable $exception) {
+            error_log('[EduFramework Logs] ' . $exception->getMessage());
         }
+    }
+
+    /**
+     * Retourne l'identifiant (token) du log de la requête en cours,
+     * ou null si la requête n'est pas journalisée
+     *
+     * @return int|null
+     */
+    public static function getCurrentLogId(): int|null
+    {
+        return self::$currentLogId;
+    }
+
+    /**
+     * Indique si la requête HTTP en cours doit être journalisée
+     *
+     * @return bool
+     */
+    private static function shouldLog(): bool
+    {
+        if (isset($_SERVER['REQUEST_METHOD']) === false) {
+            return false;
+        }
+
+        if (ConfigCore::existEnv('APP_ENV') === false || ConfigCore::getEnv('APP_ENV') !== 'dev'
+            || in_array('sqlite', PDO::getAvailableDrivers(), true) === false) {
+            return false;
+        }
+
+        $path = self::requestPath();
+
+        return str_starts_with($path, '/_debug/') === false && str_starts_with($path, '/edu-logs') === false;
+    }
+
+    /**
+     * Retourne le chemin de la requête en cours (avec la chaîne de requête)
+     *
+     * @return string
+     */
+    private static function requestPath(): string
+    {
+        return (string) ($_SERVER['REQUEST_URI'] ?? '/');
     }
 
     /**

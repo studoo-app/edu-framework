@@ -57,6 +57,12 @@ class LoadCouchCore
             (new LogsService());
         }
 
+        // Journalisation de la requête HTTP : la ligne de log est réservée ici afin que
+        // son identifiant soit disponible pour la barre de debug (lien vers le descriptif
+        // de la requête), puis complétée en fin de requête (statut final, temps
+        // d'exécution et mémoire) dans le bloc finally
+        HttpRequestLogger::start();
+
         // Gestion des routes
         $route = new FastRouteCore();
 
@@ -87,11 +93,9 @@ class LoadCouchCore
             // affiche la page d'erreur 500 avec le message de l'exception en mode développement
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         } finally {
-            // Journalisation de la requête HTTP dans la base des logs du profiler.
-            // Elle est faite par le framework (et non par la commande start, qui ne voit
-            // que la sortie console du serveur) afin de mesurer, quel que soit le SAPI,
-            // le temps d'exécution et la mémoire utilisée par la requête
-            HttpRequestLogger::log();
+            // Complète la ligne de log réservée en début de requête :
+            // statut final, temps d'exécution et mémoire utilisée
+            HttpRequestLogger::finish();
         }
     }
 

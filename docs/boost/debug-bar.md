@@ -34,7 +34,7 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 | :material-map-marker-radius: **Route**         | Chemin appelé, controller exécuté et paramètres de la route               |
 | :material-timer: **Temps d'exécution**    | Durée totale de la requête en millisecondes                                |
 | :material-memory: **Mémoire**             | Pic d'utilisation mémoire et limite PHP (`memory_limit`)                    |
-| :material-text-box-outline: **DevTool**         | Lien vers la page du [profiler](#le-profiler) |
+| :material-text-box-outline: **DevTool**         | **Token de la requête en cours** et lien vers son [descriptif dans le profiler](#le-profiler) (`#request/{token}`) ; si la requête n'est pas journalisée, lien vers la liste des requêtes |
 | :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`)                                            |
 | :material-package-variant: **Edu Framework** | Version du framework, date de livraison et lien vers la documentation  |
 
@@ -66,6 +66,7 @@ La base des logs étant partagée (le conteneur Docker monte le dossier du proje
 
 - liste des requêtes reçues, de la plus récente à la plus ancienne ;
 - compteur du nombre de requêtes par **famille de statut** (2xx, 3xx, 4xx, 5xx) ;
+- **descriptif d'une requête HTTP** : la page `/_debug/profiler#request/{token}` décrit la requête sélectionnée (statut, méthode, URL, IP, SAPI, durée, mémoire, ligne brute) — c'est la page ouverte par le bloc DevTool de la barre de debug ; l'URL d'une requête dans la liste est également cliquable ;
 - filtres combinables :
 
 | Filtre      | Description                                                        | Exemple                    |
@@ -145,7 +146,7 @@ Les requêtes HTTP traitées par le framework sont enregistrées dans une base *
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
 
-La collecte est assurée par la classe `HttpRequestLogger` : en fin de chaque requête (page, erreur HTTP, ...), le framework journalise lui-même la requête, **quel que soit le serveur qui la sert** (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug. La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
+La collecte est assurée par la classe `HttpRequestLogger`, en deux temps comme le profiler de Symfony : la ligne de log est **réservée en début de requête** — son identifiant (le *token*) est alors disponible pour le bloc DevTool de la barre de debug, qui fait le lien vers le descriptif de la requête — puis **complétée en fin de requête** avec le statut final, le temps d'exécution et la mémoire. C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug — quel que soit le serveur qui la sert (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
 
 Chaque événement porte les clés :
 
@@ -163,7 +164,7 @@ flowchart LR
     S["Requête HTTP<br/>(serveur PHP intégré ou FrankenPHP)"] --> HR["HttpRequestLogger<br/>(journalise la requête en fin d'exécution<br/>avec SAPI, temps et mémoire)"]
     HR --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
     DB --> API["endpoint /edu-logs<br/>(JSON)"]
-    API --> P["Profiler<br/>(filtres, pagination)"]
+    API --> P["Profiler<br/>(filtres, recherche)"]
 ```
 
 !!! info
