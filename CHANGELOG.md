@@ -2,6 +2,16 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.7.3 - 17/10/2026
+
+**new features**
+
+- Profiler : la vue Recherche (`/_debug/profiler#search`) gagne les **mêmes onglets de filtrage par famille de statut que la vue des logs** — `Tous / 2xx / 3xx / 4xx / 5xx`, avec le nombre de requêtes par famille en badge. Un clic filtre les résultats sur la famille sélectionnée (l'onglet `Tous` affiche toutes les requêtes), l'onglet actif est mis en évidence et le champ **Statut** du formulaire de recherche est synchronisé pour refléter le filtre appliqué. Les compteurs proviennent de l'API interne `/edu-logs` (`data.counts`, calculés côté serveur) : ils couvrent l'ensemble des requêtes correspondant aux autres filtres (URL, IP, dates, ...) et restent indépendants du filtre de statut, exactement comme les onglets de la vue des logs. Le rendu des badges est partagé entre les deux vues (fonction `renderCountBadges`) afin de garantir un design et un comportement identiques ; le tableau des résultats de la recherche reste inchangé
+
+**documentation**
+
+- update [La barre de debug et le profiler](docs/boost/debug-bar.md) : les onglets de filtrage par famille de statut sont documentés pour les vues **Logs** et **Recherche** (clic pour filtrer, onglet actif, synchronisation du champ Statut du formulaire)
+
 ## v2.7.2 - 17/10/2026
 
 **bug Fixes**
