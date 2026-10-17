@@ -9,6 +9,10 @@ use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\View\studooBarreDebug;
 
+/**
+ * Tests de la barre de debug : affichage de la méthode, de la route et du contrôleur,
+ * échappement des valeurs, bloc DEV avec les services de développement
+ */
 class StudooBarreDebugTest extends TestCase
 {
     /**
@@ -23,6 +27,9 @@ class StudooBarreDebugTest extends TestCase
         new ConfigCore([]);
     }
 
+    /**
+     * Réinitialise l'identifiant de requête statique et restaure $_ENV après chaque test
+     */
     protected function tearDown(): void
     {
         // Réinitialisation de l'identifiant de requête statique entre les tests
@@ -85,6 +92,10 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('aucun', (new studooBarreDebug())->generateBarDebug());
     }
 
+    /**
+     * Vérifie que le bloc DEV affiche le token de la requête journalisée
+     * avec un lien vers le profiler
+     */
     public function testDevToolBlockShowsTheRequestTokenWhenAvailable(): void
     {
         ConfigCore::setRequest(new Request('/', 'GET'));
@@ -100,6 +111,10 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('<span class="edu-tb-ico">&#9881;</span>', $html);
     }
 
+    /**
+     * Vérifie que le bloc DEV renvoie à la liste des requêtes du profiler
+     * quand aucun token n'est disponible
+     */
     public function testDevToolBlockFallsBackToTheRequestListWithoutToken(): void
     {
         ConfigCore::setRequest(new Request('/', 'GET'));

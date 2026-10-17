@@ -13,6 +13,10 @@ use Studoo\EduFramework\Core\Service\DatabaseSqlite;
 use Studoo\EduFramework\Core\Service\PdoFactory;
 use Studoo\EduFramework\Core\Service\TraceablePDO;
 
+/**
+ * Tests de TraceablePDO et PdoFactory : traçage des requêtes SQL en mode dev
+ * uniquement (query(), exec(), statements préparés) et écriture au flush()
+ */
 class TraceablePdoTest extends TestCase
 {
     private static string $logsPath;
@@ -22,15 +26,21 @@ class TraceablePdoTest extends TestCase
      */
     private array $envBackup;
 
+    /**
+     * Crée le dossier temporaire dédié aux logs avant l'ensemble des tests
+     */
     public static function setUpBeforeClass(): void
     {
         // Dossier temporaire dédié aux tests : isole les logs de la base applicative var/logs/
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-traceable-pdo-test/';
         if (is_dir(self::$logsPath) === false) {
-            mkdir(self::$logsPath, 0777, true);
+            mkdir(self::$logsPath, 0755, true);
         }
     }
 
+    /**
+     * Sauvegarde $_ENV et réinitialise les états statiques pour chaque test
+     */
     public function setUp(): void
     {
         $this->envBackup = $_ENV;
@@ -46,18 +56,28 @@ class TraceablePdoTest extends TestCase
         ]));
     }
 
+    /**
+     * Restaure $_ENV et vide le collecteur de requêtes après chaque test
+     */
     public function tearDown(): void
     {
         $_ENV = $this->envBackup;
         SqlQueryLogger::reset();
     }
 
+    /**
+     * Supprime les bases SQLite créées par les tests et le dossier temporaire
+     */
     public static function tearDownAfterClass(): void
     {
-        foreach (glob(self::$logsPath . '*.sqlite') ?: [] as $file) {
-            @unlink($file);
+        foreach (glob(self::$logsPath . '*.sqlite') ?: [] as $database) {
+            if (is_file($database) === true) {
+                unlink($database);
+            }
         }
-        @rmdir(self::$logsPath);
+        if (is_dir(self::$logsPath) === true) {
+            rmdir(self::$logsPath);
+        }
     }
 
     /**
@@ -68,6 +88,10 @@ class TraceablePdoTest extends TestCase
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, $logId);
     }
 
+    /**
+     * Vérifie qu'en mode dev la connexion retournée par PdoFactory est traçable,
+     * tout en restant un PDO compatible avec DatabaseService::getConnect()
+     */
     public function testDevModeReturnsATraceableConnection(): void
     {
         $_ENV['APP_ENV'] = 'dev';
@@ -80,6 +104,9 @@ class TraceablePdoTest extends TestCase
         $this->assertInstanceOf(PDO::class, $connection);
     }
 
+    /**
+     * Vérifie qu'en production la connexion retournée est un PDO natif, sans tracing
+     */
     public function testProdModeReturnsAPlainPdoConnection(): void
     {
         $_ENV['APP_ENV'] = 'prod';
@@ -91,6 +118,10 @@ class TraceablePdoTest extends TestCase
         $this->assertNotInstanceOf(TraceablePDO::class, $connection);
     }
 
+    /**
+     * Vérifie que le tracing suit la même condition que la journalisation HTTP :
+     * actif uniquement en mode dev
+     */
     public function testShouldTraceIsEnabledOnlyInDevMode(): void
     {
         // Le collecteur écrit dans la base SQLite des logs :
@@ -104,6 +135,10 @@ class TraceablePdoTest extends TestCase
         $this->assertInstanceOf(TraceablePDO::class, PdoFactory::create('sqlite::memory:'));
     }
 
+    /**
+     * Vérifie que la connexion applicative est tracée en dev, contrairement à la
+     * connexion aux logs qui ne doit jamais apparaître dans les requêtes collectées
+     */
     public function testAppSqlConnectionIsTraceableOnlyInDevMode(): void
     {
         // La connexion applicative SQLite (appel sans paramètre) est tracée en dev
@@ -125,6 +160,10 @@ class TraceablePdoTest extends TestCase
         $this->assertNotInstanceOf(TraceablePDO::class, $prodConnection);
     }
 
+    /**
+     * Vérifie que query() et exec() ne sont collectées qu'en présence d'une requête
+     * HTTP journalisée
+     */
     public function testQueryAndExecAreCollectedOnlyWithAnHttpRequest(): void
     {
         $_ENV['APP_ENV'] = 'dev';
@@ -145,6 +184,9 @@ class TraceablePdoTest extends TestCase
         $this->assertSame(2, SqlQueryLogger::count());
     }
 
+    /**
+     * Vérifie que chaque execute() d'un statement préparé est collecté comme une exécution
+     */
     public function testPreparedStatementExecutionsAreCollected(): void
     {
         $_ENV['APP_ENV'] = 'dev';
@@ -162,6 +204,9 @@ class TraceablePdoTest extends TestCase
         $this->assertSame(2, SqlQueryLogger::count());
     }
 
+    /**
+     * Vérifie que les requêtes collectées portent leur durée et leur nombre de lignes
+     */
     public function testCollectedQueriesCarryTheDurationAndRowsCount(): void
     {
         $_ENV['APP_ENV'] = 'dev';
@@ -178,6 +223,10 @@ class TraceablePdoTest extends TestCase
         $this->assertGreaterThanOrEqual(0, SqlQueryLogger::totalDurationMs());
     }
 
+    /**
+     * Vérifie que flush() écrit les requêtes collectées avec le token de la requête HTTP,
+     * dans l'ordre d'exécution et avec leurs mesures
+     */
     public function testFlushWritesTheCollectedQueriesWithTheRequestToken(): void
     {
         $_ENV['APP_ENV'] = 'dev';
@@ -207,6 +256,9 @@ class TraceablePdoTest extends TestCase
         $this->assertSame(0, SqlQueryLogger::count());
     }
 
+    /**
+     * Vérifie que les exécutions successives d'une même requête forment un groupe
+     */
     public function testIdenticalQueriesAreGrouped(): void
     {
         $_ENV['APP_ENV'] = 'dev';

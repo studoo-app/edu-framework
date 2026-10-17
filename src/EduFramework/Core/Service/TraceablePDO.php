@@ -57,14 +57,14 @@ class TraceablePDO extends PDO
      * Exécute une requête SQL et mesure son temps d'exécution
      *
      * @param string $query Requête SQL à exécuter
-     * @param int|null $fetchMode Mode de récupération des résultats (PDO::FETCH_*)
-     * @param mixed ...$fetchModeArgs Arguments du mode de récupération
+     * @param mixed ...$fetchModeArgs Mode de récupération des résultats (PDO::FETCH_*)
+     *                              suivi de ses éventuels arguments
      * @return PDOStatement|false
      */
-    public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
+    public function query(string $query, mixed ...$fetchModeArgs): PDOStatement|false
     {
         $start = microtime(true);
-        $statement = parent::query($query, $fetchMode, ...$fetchModeArgs);
+        $statement = parent::query($query, ...$fetchModeArgs);
         SqlQueryLogger::collect($query, self::elapsedMs($start), self::rowCountOf($statement));
         return $statement;
     }

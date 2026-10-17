@@ -19,15 +19,21 @@ class DebugSqlLogsControllerTest extends TestCase
 {
     private static string $logsPath;
 
+    /**
+     * Crée le dossier temporaire dédié aux logs avant l'ensemble des tests
+     */
     public static function setUpBeforeClass(): void
     {
         // Dossier temporaire dédié aux tests : isole les logs de la base applicative var/logs/
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-sql-endpoint-test/';
         if (is_dir(self::$logsPath) === false) {
-            mkdir(self::$logsPath, 0777, true);
+            mkdir(self::$logsPath, 0755, true);
         }
     }
 
+    /**
+     * Réinitialise les états statiques et pointe les logs vers le dossier de test
+     */
     public function setUp(): void
     {
         // Réinitialisation des états statiques pour isoler chaque test
@@ -40,15 +46,25 @@ class DebugSqlLogsControllerTest extends TestCase
         ]));
     }
 
+    /**
+     * Réinitialise le collecteur de requêtes SQL après chaque test
+     */
     public function tearDown(): void
     {
         SqlQueryLogger::reset();
     }
 
+    /**
+     * Supprime la base SQLite des logs et le dossier temporaire des tests
+     */
     public static function tearDownAfterClass(): void
     {
-        @unlink(self::$logsPath . 'core_logs.sqlite');
-        @rmdir(self::$logsPath);
+        if (is_file(self::$logsPath . 'core_logs.sqlite') === true) {
+            unlink(self::$logsPath . 'core_logs.sqlite');
+        }
+        if (is_dir(self::$logsPath) === true) {
+            rmdir(self::$logsPath);
+        }
     }
 
     /**
@@ -62,6 +78,10 @@ class DebugSqlLogsControllerTest extends TestCase
         return json_decode((string) (new DebugSqlLogsController())->execute($request), true);
     }
 
+    /**
+     * Vérifie que la réponse JSON du contrôleur expose toutes les clés documentées
+     * (token, total, durées, groupes et requêtes détaillées)
+     */
     public function testResponseIsAJsonWithTheDocumentedKeys(): void
     {
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 7);
@@ -90,6 +110,9 @@ class DebugSqlLogsControllerTest extends TestCase
         $this->assertEquals(2.0, $response['groups'][0]['duration_ms']);
     }
 
+    /**
+     * Vérifie que le token préfixé d'un "#" (forme affichée par la barre de debug) est accepté
+     */
     public function testTokenWithSharpPrefixIsAccepted(): void
     {
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 8);
@@ -104,6 +127,9 @@ class DebugSqlLogsControllerTest extends TestCase
         $this->assertNull($response['queries'][0]['rows_count']);
     }
 
+    /**
+     * Vérifie qu'un token invalide (vide, non numérique, hors limite) retourne une réponse vide
+     */
     public function testInvalidTokenReturnsAnEmptyResponse(): void
     {
         foreach ( ['', 'abc', '7.5', '-1', '99999999999999999999' ] as $token) {
@@ -122,6 +148,9 @@ class DebugSqlLogsControllerTest extends TestCase
         $this->assertSame(0, $response['total']);
     }
 
+    /**
+     * Vérifie qu'un token valide sans requêtes collectées retourne une liste vide
+     */
     public function testValidTokenWithoutQueriesReturnsAnEmptyList(): void
     {
         $response = $this->runController(['token' => '999999']);

@@ -9,6 +9,10 @@ use Studoo\EduFramework\Core\Formatter\BufferToServer;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\LogsService;
 
+/**
+ * Tests de HttpRequestLogger : construction des événements, réservation du token
+ * de requête HTTP, complétion du log en fin de requête et filtrage par SAPI
+ */
 class HttpRequestLoggerTest extends TestCase
 {
     private static string $logsPath;
@@ -23,12 +27,18 @@ class HttpRequestLoggerTest extends TestCase
      */
     private array $envBackup;
 
+    /**
+     * Définit le dossier temporaire dédié aux logs de la suite de tests
+     */
     public static function setUpBeforeClass(): void
     {
         // Dossier temporaire dédié aux tests : isole les logs de la base applicative var/logs/
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-http-logger-test/';
     }
 
+    /**
+     * Sauvegarde les superglobales et réinitialise les états statiques du logger
+     */
     public function setUp(): void
     {
         $this->serverBackup = $_SERVER;
@@ -47,18 +57,31 @@ class HttpRequestLoggerTest extends TestCase
         $_ENV['APP_ENV'] = 'dev';
     }
 
+    /**
+     * Restaure les superglobales sauvegardées par setUp()
+     */
     public function tearDown(): void
     {
         $_SERVER = $this->serverBackup;
         $_ENV = $this->envBackup;
     }
 
+    /**
+     * Supprime la base SQLite des logs et le dossier temporaire des tests
+     */
     public static function tearDownAfterClass(): void
     {
-        @unlink(self::$logsPath . 'core_logs.sqlite');
-        @rmdir(self::$logsPath);
+        if (is_file(self::$logsPath . 'core_logs.sqlite') === true) {
+            unlink(self::$logsPath . 'core_logs.sqlite');
+        }
+        if (is_dir(self::$logsPath) === true) {
+            rmdir(self::$logsPath);
+        }
     }
 
+    /**
+     * Compte les lignes de la table des logs de requêtes HTTP
+     */
     private function countLogs(): int
     {
         return (int) LogsService::getConnect()
@@ -66,6 +89,10 @@ class HttpRequestLoggerTest extends TestCase
             ->fetchColumn();
     }
 
+    /**
+     * Vérifie que buildEvent() produit une ligne au même format que le serveur intégré,
+     * analysable par le même pipeline (BufferToServer)
+     */
     public function testBuildEventHasTheSameFormatAsTheBuiltInServerOutput(): void
     {
         $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200, 'cli-server');
@@ -83,6 +110,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame($event['sapi'], $parsed['sapi']);
     }
 
+    /**
+     * Vérifie que le jour du mois est complété par un espace, comme le serveur intégré (ex : "Oct  5")
+     */
     public function testBuildEventPadsTheDayLikeTheBuiltInServer(): void
     {
         // Le serveur intégré écrit le jour sur 2 caractères complété par un espace (ex : "Oct  5")
@@ -95,6 +125,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertStringStartsWith('[' . $event['timestamp'] . '] ', $event['raw']);
     }
 
+    /**
+     * Vérifie que l'événement identifie par défaut le SAPI du serveur qui sert la requête
+     */
     public function testBuildEventDefaultsToTheCurrentSapi(): void
     {
         $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200);
@@ -103,6 +136,10 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame(PHP_SAPI, $event['sapi']);
     }
 
+    /**
+     * Vérifie que le temps d'exécution et la mémoire sont inclus et arrondis,
+     * et absents de l'événement quand aucun indicateur n'est fourni
+     */
     public function testBuildEventIncludesExecutionTimeAndMemory(): void
     {
         $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:65229', 200, 'frankenphp', 42.56, 14.251);
@@ -117,6 +154,10 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertArrayNotHasKey('memory_mb', $event);
     }
 
+    /**
+     * Vérifie que le message d'erreur transmis est conservé dans l'événement,
+     * sans casser la ligne au format serveur
+     */
     public function testBuildEventIncludesErrorMessageWhenProvided(): void
     {
         $event = HttpRequestLogger::buildEvent(
@@ -142,6 +183,10 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertArrayNotHasKey('error_message', $event);
     }
 
+    /**
+     * Vérifie que setError() formate l'exception : classe, message, fichier et ligne
+     * (l'exception précédente n'apparaît pas dans le log)
+     */
     public function testSetErrorFormatsExceptionMessageFileAndLine(): void
     {
         $exception = new \RuntimeException(
@@ -163,6 +208,10 @@ class HttpRequestLoggerTest extends TestCase
         ))->getValue(null));
     }
 
+    /**
+     * Vérifie que finish() complète le log de la requête avec l'erreur
+     * enregistrée pendant son exécution, puis réinitialise le message
+     */
     public function testFinishCompletesTheRequestWithTheErrorSetDuringTheRequest(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -193,6 +242,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertNull((new ReflectionProperty(HttpRequestLogger::class, 'errorMessage'))->getValue(null));
     }
 
+    /**
+     * Vérifie qu'un log complété sans erreur ne contient pas la clé error_message
+     */
     public function testFinishWithoutErrorDoesNotAddErrorMessageKey(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -206,6 +258,10 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertArrayNotHasKey('error_message', $completed[0]['event']);
     }
 
+    /**
+     * Vérifie le cycle start() / finish() : la ligne est d'abord réservée sans
+     * indicateurs, puis complétée avec le statut, le SAPI et les mesures
+     */
     public function testStartReservesTheRequestAndFinishCompletesIt(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -256,6 +312,9 @@ class HttpRequestLoggerTest extends TestCase
         );
     }
 
+    /**
+     * Vérifie que finish() sans start() préalable ne modifie pas la base des logs
+     */
     public function testFinishWithoutStartDoesNothing(): void
     {
         $countBefore = $this->countLogs();
@@ -265,6 +324,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame($countBefore, $this->countLogs());
     }
 
+    /**
+     * Vérifie que start() sans requête HTTP (Exemple : ligne de commande) ne journalise rien
+     */
     public function testStartDoesNothingWithoutHttpRequest(): void
     {
         unset($_SERVER['REQUEST_METHOD']);
@@ -278,6 +340,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame($countBefore, $this->countLogs());
     }
 
+    /**
+     * Vérifie que la journalisation est inactive hors du mode développement
+     */
     public function testStartDoesNothingOutsideDevMode(): void
     {
         $_ENV['APP_ENV'] = 'prod';
@@ -293,6 +358,9 @@ class HttpRequestLoggerTest extends TestCase
         $this->assertSame($countBefore, $this->countLogs());
     }
 
+    /**
+     * Vérifie que les routes internes du profiler et des logs ne sont pas journalisées
+     */
     public function testStartDoesNothingForTheProfilerAndLogsRoutes(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -307,6 +375,9 @@ class HttpRequestLoggerTest extends TestCase
         }
     }
 
+    /**
+     * Vérifie que les logs de requêtes peuvent être filtrés par SAPI
+     */
     public function testLogsCanBeFilteredBySapi(): void
     {
         LogsService::addLog((string) json_encode(
