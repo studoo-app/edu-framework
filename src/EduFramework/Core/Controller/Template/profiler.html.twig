@@ -265,16 +265,6 @@
 
     <section class="summary" id="summary">
         <h2 id="summaryUrl"></h2>
-        <div class="meta">
-            <span><b>M&eacute;thode :</b> <span id="summaryMethod"></span></span>
-            <span><b>Statut HTTP :</b> <span id="summaryStatus"></span></span>
-            <span><b>IP :</b> <span id="summaryIp"></span></span>
-            <span><b>Serveur (SAPI) :</b> <span id="summarySapi"></span></span>
-            <span><b>Dur&eacute;e :</b> <span id="summaryDuration"></span></span>
-            <span><b>M&eacute;moire :</b> <span id="summaryMemory"></span></span>
-            <span><b>Re&ccedil;ue le :</b> <span id="summaryDate"></span></span>
-            <span><b>Token :</b> <span id="summaryToken"></span></span>
-        </div>
     </section>
 
     <section class="page-title" id="searchTitle"><h2>Recherche de requ&ecirc;tes</h2></section>
@@ -519,14 +509,6 @@
                 summary.classList.remove('hidden');
                 summary.className = 'summary ' + statusClass(log.event.status_code);
                 $('summaryUrl').textContent = log.event.path;
-                $('summaryMethod').textContent = log.event.method;
-                $('summaryStatus').textContent = log.event.status_code;
-                $('summaryIp').textContent = log.event.ip_port;
-                $('summarySapi').textContent = log.event.sapi || '\u2014';
-                $('summaryDuration').textContent = prettyDuration(log.event.execution_time_ms);
-                $('summaryMemory').textContent = prettyMemory(log.event.memory_mb);
-                $('summaryDate').textContent = log.event.timestamp;
-                $('summaryToken').textContent = '#' + log.id;
             }
 
             // Badges de compteur des onglets par famille de statut,
