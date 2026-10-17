@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.7.2 - 17/10/2026
+
+**bug Fixes**
+
+- fix(toolbar): correction finale de l'alignement du bouton de fermeture à droite de la barre de debug (styles flex, hauteur et alignement)
+
 ## v2.7.1 - 17/10/2026
 
 **bug Fixes**

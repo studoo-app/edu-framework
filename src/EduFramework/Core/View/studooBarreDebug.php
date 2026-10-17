@@ -42,9 +42,9 @@ class studooBarreDebug
     font: 12px/36px 'Open Sans', Helvetica, Arial, sans-serif; text-align: left;
 }
 #edu-tb a, #edu-tb button {
-    color: inherit; text-decoration: none; display: block;
+    color: inherit; text-decoration: none; display: flex;
     margin: 0; padding: 0 12px; background: none; border: 0; border-radius: 0;
-    font-size: inherit; line-height: inherit; font-family: inherit;
+    font-size: inherit; line-height: 36px; font-family: inherit; height: 36px; align-items: center;
     cursor: pointer;
 }
 #edu-tb .edu-tb-group { display: flex; min-width: 0; }
@@ -176,7 +176,7 @@ HTML;
         return '<div id="edu-tb" role="complementary" aria-label="Edu Framework debug toolbar">'
             . '<div class="edu-tb-group">' . implode('', $blocks) . '</div>'
             . '<div class="edu-tb-group right">' . implode('', $right)
-            . '<button type="button" class="edu-tb-close" title="Réduire la barre" onclick="eduToolbarToggle(true)">&times;</button>'
+            . '<button type="button" class="edu-tb-close" title="Réduire la barre" onclick="eduToolbarToggle(true)" style="display: flex; align-items: center; height: 36px;">&times;</button>'
             . '</div></div>'
             . '<button type="button" id="edu-tb-mini" title="Afficher la barre de debug" aria-label="Afficher la barre de debug" onclick="eduToolbarToggle(false)">'
             . '<img src="' . $logo . '" alt=""></button>';
