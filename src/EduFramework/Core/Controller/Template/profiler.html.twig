@@ -337,6 +337,16 @@
             <!-- Vue : résultats de recherche -->
             <div id="viewSearch">
                 <h1 id="searchTotal"></h1>
+
+                <!-- Filtres par famille de statut : mêmes onglets que la vue des logs -->
+                <div class="tabs" id="searchTabs">
+                    <button type="button" data-status="" class="active">Tous <span class="count" data-count="all">0</span></button>
+                    <button type="button" data-status="2">2xx <span class="count" data-count="2">0</span></button>
+                    <button type="button" data-status="3">3xx <span class="count" data-count="3">0</span></button>
+                    <button type="button" data-status="4">4xx <span class="count" data-count="4">0</span></button>
+                    <button type="button" data-status="5">5xx <span class="count" data-count="5">0</span></button>
+                </div>
+
                 <table class="profiler-table">
                     <thead>
                         <tr>
@@ -519,12 +529,18 @@
                 $('summaryToken').textContent = '#' + log.id;
             }
 
-            function renderCounts(counts) {
-                document.querySelectorAll('#tabs [data-count]').forEach(function(node) {
+            // Badges de compteur des onglets par famille de statut,
+            // partagés entre les vues Logs et Recherche
+            function renderCountBadges(container, counts) {
+                container.querySelectorAll('[data-count]').forEach(function(node) {
                     var value = counts[node.getAttribute('data-count')] || 0;
                     node.textContent = value;
                     node.parentNode.classList.toggle('empty', value === 0);
                 });
+            }
+
+            function renderCounts(counts) {
+                renderCountBadges($('tabs'), counts);
                 $('sidebarCount').textContent = counts.all || 0;
             }
 
@@ -578,10 +594,22 @@
             }
 
             // ----- Vue "recherche" -----
+            // Onglets de filtrage par famille de statut, comme la vue des logs :
+            // mêmes compteurs serveur (data.counts, indépendants du filtre de statut)
+            // et même état actif (famille filtrée via le champ Statut du formulaire)
+            function renderSearchTabs(counts) {
+                renderCountBadges($('searchTabs'), counts || {});
+                var status = searchFilters.status || '';
+                document.querySelectorAll('#searchTabs button').forEach(function(node) {
+                    node.classList.toggle('active', node.getAttribute('data-status') === status);
+                });
+            }
+
             function renderSearch(data) {
                 var body = $('searchBody');
                 body.innerHTML = '';
                 $('searchTotal').textContent = data.total + (data.total > 1 ? ' r\u00e9sultats trouv\u00e9s' : ' r\u00e9sultat trouv\u00e9');
+                renderSearchTabs(data.counts);
 
                 if (data.logs.length === 0) {
                     var tr = el('tr');
@@ -878,6 +906,22 @@
             $('searchForm').addEventListener('submit', function(event) {
                 event.preventDefault();
                 searchFilters = readForm();
+                if (window.location.hash !== '' && window.location.hash !== '#search') {
+                    window.location.hash = '#search';
+                } else {
+                    loadSearch();
+                }
+            });
+
+            // Clic sur un onglet : filtre les résultats sur la famille de statut,
+            // comme les onglets de la vue des logs — le champ Statut du formulaire
+            // de recherche est synchronisé pour refléter le filtre appliqué
+            $('searchTabs').addEventListener('click', function(event) {
+                var button = event.target.closest('button');
+                if (button === null) { return; }
+                $('searchForm').elements.status.value = button.getAttribute('data-status');
+                searchFilters = readForm();
+                document.querySelectorAll('#searchTabs button').forEach(function(node) { node.classList.toggle('active', node === button); });
                 if (window.location.hash !== '' && window.location.hash !== '#search') {
                     window.location.hash = '#search';
                 } else {
