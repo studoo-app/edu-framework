@@ -219,10 +219,16 @@ HTML;
     private function databaseDetails(): array
     {
         if (ConfigCore::existEnv('DB_HOST_STATUS') === false || ConfigCore::getEnv('DB_HOST_STATUS') !== 'true') {
-            return [];
+            return [
+            '---- database ----' => "--------",
+            'DB_HOST_STATUS' => "off",
+            ];
         }
 
         $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
+        $env = static fn (string $key, string $default): string
+            => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
+        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
 
         return [
             '---- database ----' => "--------",
@@ -230,6 +236,8 @@ HTML;
             'DB_TYPE' => $get('DB_TYPE'),
             'DB_HOST' => $get('DB_HOST') . ':' . $get('DB_SOCKET'),
             'DB_NAME' => $get('DB_NAME'),
+            'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
+            'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
         ];
     }
 
@@ -248,11 +256,9 @@ HTML;
         $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
 
         return [
-            '---- services ----' => "--------",
+            '---- smtp ----' => "--------",
             'Mailpit' => $link('http://localhost:' . $env('MAILER_UI_PORT', '8025')),
-            'Mailpit SMTP' => 'localhost:' . $env('MAILER_SMTP_PORT', '1025'),
-            'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
-            'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
+            'Mailpit SMTP' => 'localhost:' . $env('MAILER_SMTP_PORT', '1025')
         ];
     }
 
