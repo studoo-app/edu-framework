@@ -250,4 +250,84 @@ class LogsService
     {
         return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
+
+    /**
+     * Permets de récupérer les requêtes SQL exécutées pendant une requête HTTP
+     * (rattachées par le token du log de la requête), de la plus ancienne à la
+     * plus récente
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @return array<int, array<string, mixed>> Liste des requêtes
+     *         (id, query, duration_ms, rows_count, event_date)
+     */
+    public static function getSqlQueries(int $tokenId): array
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT id, query, duration_ms, rows_count, event_date '
+            . 'FROM serv_sql_logs WHERE request_id = :request_id ORDER BY id ASC'
+        );
+        $stmt->bindValue(':request_id', $tokenId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $queries = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $queries[] = [
+                'id' => (int) $row['id'],
+                'query' => (string) $row['query'],
+                'duration_ms' => (float) $row['duration_ms'],
+                'rows_count' => ($row['rows_count'] === null ? null : (int) $row['rows_count']),
+                'event_date' => $row['event_date'],
+            ];
+        }
+
+        return $queries;
+    }
+
+    /**
+     * Permets de compter les requêtes SQL exécutées pendant une requête HTTP
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @return int Nombre de requêtes SQL
+     */
+    public static function countSqlQueries(int $tokenId): int
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT COUNT(*) FROM serv_sql_logs WHERE request_id = :request_id'
+        );
+        $stmt->bindValue(':request_id', $tokenId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Permets de regrouper les requêtes SQL exécutées pendant une requête HTTP :
+     * chaque requête identique est agrégée avec son nombre d'exécutions et son
+     * temps cumulé (Exemple : 5 exécutions d'un même SELECT)
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @return array<int, array{query: string, count: int, duration_ms: float}>
+     *         Groupes triés du plus grand nombre d'exécutions au plus petit
+     */
+    public static function getSqlGroups(int $tokenId): array
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT query, COUNT(*) AS count, SUM(duration_ms) AS duration_ms '
+            . 'FROM serv_sql_logs WHERE request_id = :request_id '
+            . 'GROUP BY query ORDER BY count DESC, duration_ms DESC'
+        );
+        $stmt->bindValue(':request_id', $tokenId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $groups = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $groups[] = [
+                'query' => (string) $row['query'],
+                'count' => (int) $row['count'],
+                'duration_ms' => round((float) $row['duration_ms'], 1),
+            ];
+        }
+
+        return $groups;
+    }
 }

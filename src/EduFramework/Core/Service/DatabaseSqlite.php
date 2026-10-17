@@ -25,8 +25,12 @@ use Studoo\EduFramework\Core\ConfigCore;
 class DatabaseSqlite implements DatabaseInterface
 {
     /**
-     * Permets de récupérer la connexion à la base de données
-     * 
+     * Permets de récupérer la connexion à la base de données.
+     * La connexion applicative (appel sans paramètre) est traçable (requêtes
+     * SQL mesurées) uniquement en mode dev ; la connexion aux logs de la
+     * requête (paramètres explicites, usage LogsService) n'est jamais tracée :
+     * elle ne doit pas apparaître dans les requêtes SQL collectées
+     *
      * @param string|null $dbName Nom de la base de données
      * @param string|null $pathToSqliteLogs Chemin vers le fichier SQLite
      * @throws Exception
@@ -44,6 +48,12 @@ class DatabaseSqlite implements DatabaseInterface
             throw new Exception("SQLite database file does not exist at the provided path. <" . ConfigCore::getConfig('sqlite_path') . "> ");
         }
 
-        return new PDO('sqlite:' . $pathToSqliteFile . ($dbName === null ? ConfigCore::getEnv('DB_NAME') : $dbName) . ".sqlite");
+        $dsn = 'sqlite:' . $pathToSqliteFile . ($dbName === null ? ConfigCore::getEnv('DB_NAME') : $dbName) . ".sqlite";
+
+        if ($dbName === null && $pathToSqliteLogs === null) {
+            return PdoFactory::create($dsn);
+        }
+
+        return new PDO($dsn);
     }
 }

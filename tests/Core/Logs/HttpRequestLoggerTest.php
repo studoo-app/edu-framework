@@ -298,7 +298,7 @@ class HttpRequestLoggerTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
         // Parité avec la barre de debug : les routes internes ne sont pas journalisées
-        foreach (['/_debug/profiler', '/_debug/autre', '/edu-logs', '/edu-logs?page=1'] as $uri) {
+        foreach (['/_debug/profiler', '/_debug/autre', '/edu-logs', '/edu-logs?page=1', '/edu-sql-logs', '/edu-sql-logs?token=7'] as $uri) {
             $_SERVER['REQUEST_URI'] = $uri;
 
             HttpRequestLogger::start();

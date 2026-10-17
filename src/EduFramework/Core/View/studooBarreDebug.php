@@ -13,6 +13,7 @@ namespace Studoo\EduFramework\Core\View;
 
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
+use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
 
 /**
  * Class studooBarreDebug
@@ -139,6 +140,7 @@ HTML;
                 'Mémoire',
                 ['Pic d\'utilisation' => number_format($peak, 2, ',', ' ') . ' Mo', 'Limite PHP' => (string) ini_get('memory_limit')]
             ),
+            $this->sqlBlock(),
             $this->devToolBlock(),
         ];
 
@@ -208,6 +210,47 @@ HTML;
             ['Profiler' => 'Ouvrir la liste des requêtes'],
             '',
             '/_debug/profiler#logs'
+        );
+    }
+
+    /**
+     * Bloc SQL de la barre : affiche le nombre de requêtes SQL exécutées
+     * pendant la requête HTTP en cours et leur temps cumulé, avec le lien
+     * vers la vue SQL du profiler. Le bloc est masqué s'il n'y a aucune
+     * requête collectée (base de données inactive ou pas de requête).
+     * Les requêtes exécutées après le rendu de la page ne sont pas comptées
+     * dans ce bloc (elles le sont dans le profiler).
+     *
+     * @return string
+     */
+    private function sqlBlock(): string
+    {
+        $count = SqlQueryLogger::count();
+        if ($count === 0) {
+            return '';
+        }
+
+        $totalMs = SqlQueryLogger::totalDurationMs();
+
+        $details = [
+            'Nombre de requêtes' => (string) $count,
+            'Temps SQL cumulé' => number_format($totalMs, 1, ',', ' ') . ' ms',
+        ];
+        $slowest = SqlQueryLogger::slowestQuery();
+        if ($slowest !== null) {
+            $details['Requête la plus lente'] = number_format($slowest['duration_ms'], 1, ',', ' ')
+                . ' ms — ' . mb_strimwidth($slowest['query'], 0, 60, '…');
+        }
+        $details['Profiler'] = 'Voir les requêtes SQL de cette requête HTTP';
+
+        $logId = HttpRequestLogger::getCurrentLogId();
+
+        return $this->block(
+            '<b>' . $count . '</b><small>req SQL</small> <b>' . number_format($totalMs, 1, ',', ' ') . '</b><small>ms</small>',
+            'Requêtes SQL',
+            $details,
+            '',
+            ($logId !== null ? '/_debug/profiler#sql/' . $logId : '/_debug/profiler#logs')
         );
     }
 

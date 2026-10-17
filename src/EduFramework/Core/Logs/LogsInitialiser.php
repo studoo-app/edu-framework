@@ -26,6 +26,18 @@ class LogsInitialiser
                                         event_desc TEXT
                                     )");
             }
+
+            // Table des requêtes SQL exécutées pendant une requête HTTP,
+            // rattachées par l'identifiant du log de la requête (request_id)
+            $pdo->exec("CREATE TABLE IF NOT EXISTS serv_sql_logs (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        request_id INTEGER NOT NULL,
+                                        query TEXT NOT NULL,
+                                        duration_ms REAL NOT NULL,
+                                        rows_count INTEGER,
+                                        event_date TEXT DEFAULT (datetime('now'))
+                                    )");
+            $pdo->exec("CREATE INDEX IF NOT EXISTS idx_serv_sql_logs_request_id ON serv_sql_logs (request_id)");
         } catch (\PDOException $e) {
             error_log('[EduFramework Logs] ' . $e->getMessage());
         }

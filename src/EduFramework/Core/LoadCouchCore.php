@@ -15,6 +15,7 @@ use Dotenv\Dotenv;
 use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
+use Studoo\EduFramework\Core\Controller\Debug\DebugSqlLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
 use Studoo\EduFramework\Core\Controller\Error\HttpError403Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
@@ -25,6 +26,7 @@ use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\LogsService;
+use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -75,6 +77,7 @@ class LoadCouchCore
                 && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
                 $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
                 $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
+                $route->addRoute('GET', '/edu-sql-logs', DebugSqlLogsController::class);
             }
 
             // Récupération de la route à appeler
@@ -97,8 +100,10 @@ class LoadCouchCore
             HttpRequestLogger::setError($exception);
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         } finally {
-            // Complète la ligne de log réservée en début de requête :
-            // statut final, temps d'exécution et mémoire utilisée
+            // Écrit les requêtes SQL collectées pendant la requête (table serv_sql_logs),
+            // rattachées par le token de la requête HTTP, puis complète la ligne de
+            // log réservée en début de requête : statut final, temps d'exécution et mémoire
+            SqlQueryLogger::flush();
             HttpRequestLogger::finish();
         }
     }

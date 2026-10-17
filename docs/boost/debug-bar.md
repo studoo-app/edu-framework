@@ -21,7 +21,7 @@ APP_ENV=dev
 
 !!! warning "Mode production"
 
-    Les routes `/_debug/profiler` et `/edu-logs` ne sont enregistrées **qu'en mode dev**.
+    Les routes `/_debug/profiler`, `/edu-logs` et `/edu-sql-logs` ne sont enregistrées **qu'en mode dev**.
     Elles ne sont donc pas accessibles lorsque `APP_ENV=prod`.
 
 ## La barre de debug
@@ -34,6 +34,7 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 | :material-map-marker-radius: **Route**         | Chemin appelé, controller exécuté et paramètres de la route               |
 | :material-timer: **Temps d'exécution**    | Durée totale de la requête en millisecondes                                |
 | :material-memory: **Mémoire**             | Pic d'utilisation mémoire et limite PHP (`memory_limit`)                    |
+| :material-database: **SQL**               | **Nombre de requêtes SQL** exécutées pendant la requête et temps SQL cumulé ; au survol : requête la plus lente et lien vers la [vue SQL du profiler](#les-requetes-sql) (`#sql/{token}`). Le bloc est masqué s'il n'y a aucune requête |
 | :material-text-box-outline: **DevTool**         | **Token de la requête en cours** et lien vers son [descriptif dans le profiler](#le-profiler) (`#request/{token}`) ; si la requête n'est pas journalisée, lien vers la liste des requêtes |
 | :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`) ; **services de développement** au survol : application (HTTP/HTTPS), MariaDB, Mailpit (interface web et SMTP), DbGate et phpMyAdmin — les URLs des interfaces web sont **cliquables** (ouverture dans un nouvel onglet), les ports sont lus dans le `.env` (`HTTP_PORT`, `HTTPS_PORT`, `DB_HOST`/`DB_SOCKET`, `MAILER_UI_PORT`, `MAILER_SMTP_PORT`, `DBGATE_PORT`, `PMA_PORT`) avec les valeurs par défaut du `compose.yaml` en cas d'absence |
 | :material-package-variant: **Edu Framework** | Version du framework, date de livraison et lien vers la documentation  |
@@ -75,6 +76,7 @@ La base des logs étant partagée (le conteneur Docker monte le dossier du proje
 - liste des requêtes reçues, de la plus récente à la plus ancienne ;
 - compteur du nombre de requêtes par **famille de statut** (2xx, 3xx, 4xx, 5xx) ;
 - **descriptif d'une requête HTTP** : la page `/_debug/profiler#request/{token}` décrit la requête sélectionnée (statut, méthode, URL, IP, SAPI, durée, mémoire, ligne brute) — c'est la page ouverte par le bloc DevTool de la barre de debug ; l'URL d'une requête dans la liste est également cliquable ;
+- **vue SQL d'une requête HTTP** : la page `/_debug/profiler#sql/{token}` liste les requêtes SQL exécutées pendant la requête sélectionnée (voir [« Les requêtes SQL »](#les-requetes-sql)) — accessible depuis la ligne *Requêtes SQL* du descriptif et le bloc SQL de la barre de debug ;
 - filtres combinables :
 
 | Filtre      | Description                                                        | Exemple                    |
@@ -148,12 +150,71 @@ Exemple de réponse :
 }
 ```
 
+## Les requêtes SQL
+
+En mode dev, chaque requête SQL exécutée pendant une requête HTTP est **mesurée et rattachée au token de la requête** (comme le *Doctrine panel* de Symfony). La vue SQL du profiler (`/_debug/profiler#sql/{token}`) liste pour une requête HTTP :
+
+- le **tableau chronologique** des requêtes SQL : numéro d'ordre, requête, durée (colorée au-delà de 20 ms et 100 ms), nombre de lignes retournées ou affectées, heure ;
+- un **badge** sur les requêtes identiques exécutées plusieurs fois : nombre d'exécutions et temps cumulé du groupe (`×3 requêtes identiques — 4,5 ms au total`) ;
+- le **temps SQL cumulé** et sa **part du temps de la requête HTTP** (Exemple : `12,3 ms — 34 % du temps de la requête HTTP (36,1 ms)`).
+
+### Comment fonctionne la collecte
+
+La collecte est assurée par trois classes du framework, **uniquement en mode dev** :
+
+- `PdoFactory` fabrique les connexions : en mode dev (avec l'extension `pdo_sqlite`, comme pour la journalisation des requêtes HTTP), la connexion applicative est une `TraceablePDO` — qui reste un `PDO` classique (`DatabaseService::getConnect()` est inchangé pour votre code) ;
+- `TraceablePDO` mesure le temps d'exécution de `query()` et `exec()`, et `TraceablePDOStatement` celui de chaque `execute()` de statement préparé (via `PDO::ATTR_STATEMENT_CLASS`) ;
+- `SqlQueryLogger` met les requêtes en mémoire tampon avec le token de la requête HTTP en cours, puis les écrit **groupées en une transaction** en fin de requête dans la table `serv_sql_logs` de la base des logs.
+
+En **production** (`APP_ENV=prod`), la fabrique retourne une connexion `PDO` native : les classes de tracing ne sont **ni instanciées ni chargées**, aucune mesure ni collecte n'a lieu.
+
+Les requêtes exécutées hors d'une requête HTTP journalisée ne sont jamais collectées : commandes CLI, routes internes du profiler (`/_debug/...`, `/edu-logs`, `/edu-sql-logs`) et requêtes de la base des logs elle-même — le rattachement se fait par le token, absent dans ces contextes.
+
+## L'API des requêtes SQL
+
+Le profiler s'appuie sur un endpoint interne qui retourne les requêtes SQL d'une requête HTTP au format JSON :
+
+```
+GET /edu-sql-logs?token=42
+```
+
+| Paramètre  | Description                                             | Défaut    |
+|------------|---------------------------------------------------------|-----------|
+| `token`    | Identifiant du log de la requête HTTP (le `#` du bloc DevTool est accepté : `#42`) | requis |
+
+Exemple de réponse :
+
+```json
+{
+    "token": 42,
+    "total": 3,
+    "total_duration_ms": 2.6,
+    "groups": [
+        { "query": "SELECT * FROM ville WHERE nom = :nom", "count": 2, "duration_ms": 1.6 },
+        { "query": "SELECT 1", "count": 1, "duration_ms": 1.0 }
+    ],
+    "queries": [
+        {
+            "id": 1,
+            "query": "SELECT 1",
+            "duration_ms": 1.0,
+            "rows_count": 1,
+            "event_date": "2026-10-17 15:04:25"
+        }
+    ]
+}
+```
+
+- `queries` : liste chronologique des exécutions (`rows_count` à `null` si le pilote ne fournit pas l'information, Exemple : `-1` pour un `SELECT` sous PostgreSQL) ;
+- `groups` : requêtes identiques regroupées avec leur nombre d'exécutions et leur temps cumulé.
+
 ## Le stockage des logs
 
 Les requêtes HTTP traitées par le framework sont enregistrées dans une base **SQLite** dédiée :
 
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
+- table : `serv_sql_logs` (colonnes `id`, `request_id` (token de la requête HTTP), `query`, `duration_ms`, `rows_count`, `event_date`) — requêtes SQL collectées par `SqlQueryLogger`, indexée sur `request_id`
 
 La collecte est assurée par la classe `HttpRequestLogger`, en deux temps comme le profiler de Symfony : la ligne de log est **réservée en début de requête** — son identifiant (le *token*) est alors disponible pour le bloc DevTool de la barre de debug, qui fait le lien vers le descriptif de la requête — puis **complétée en fin de requête** avec le statut final, le temps d'exécution et la mémoire. C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug — quel que soit le serveur qui la sert (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
 
@@ -174,20 +235,25 @@ Les événements étant au même format pour tous les serveurs, le profiler affi
 ```mermaid
 flowchart LR
     S["Requête HTTP<br/>(serveur PHP intégré ou FrankenPHP)"] --> HR["HttpRequestLogger<br/>(journalise la requête en fin d'exécution<br/>avec SAPI, temps et mémoire)"]
-    HR --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
-    DB --> API["endpoint /edu-logs<br/>(JSON)"]
-    API --> P["Profiler<br/>(filtres, recherche)"]
+    S --> SQL["Requêtes SQL de l'application<br/>(TraceablePDO, uniquement en dev)"]
+    SQL --> SQLG["SqlQueryLogger<br/>(tampon + écriture groupée<br/>rattachée au token de la requête)"]
+    HR --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>tables serv_logs et serv_sql_logs")]
+    SQLG --> DB
+    DB --> API["endpoints /edu-logs et /edu-sql-logs<br/>(JSON)"]
+    API --> P["Profiler<br/>(filtres, recherche, vue SQL par requête)"]
 ```
 
 !!! info
 
-    Les requêtes du profiler et de la barre de debug (`/_debug/...` et `/edu-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
+    Les requêtes du profiler et de la barre de debug (`/_debug/...`, `/edu-logs` et `/edu-sql-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
 
 !!! note "Limitations"
 
     - seules les requêtes **exécutées par PHP** sont journalisées : les fichiers statiques servis directement par le serveur web (assets de `public/upload/`, ...) ne le sont pas, que ce soit par le serveur intégré ou par Caddy ;
     - dans le conteneur Docker, l'IP du client est celle vue par FrankenPHP (réseau Docker) : le filtre IP du profiler donne l'IP du pont Docker, pas `127.0.0.1` ;
-    - en mode worker de FrankenPHP (non activé par défaut), le pic de mémoire est cumulé sur la durée de vie du worker : `memory_mb` reflète alors le worker et non la seule requête.
+    - en mode worker de FrankenPHP (non activé par défaut), le pic de mémoire est cumulé sur la durée de vie du worker : `memory_mb` reflète alors le worker et non la seule requête ;
+    - le bloc **SQL** de la barre de debug compte les requêtes exécutées jusqu'au rendu de la page : les requêtes exécutées après (si elles existent) ne sont pas comptées dans le bloc, mais le sont dans le profiler ;
+    - les requêtes SQL ne sont collectées **qu'en mode dev** : en production, la connexion est un `PDO` natif, sans mesure ni écriture dans la base des logs.
 
 ## Ajouter ses propres logs
 

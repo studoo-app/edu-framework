@@ -103,6 +103,7 @@
         .sidebar nav a.active { background-color: #666; color: #fff; }
         .sidebar nav a.disabled { color: #777; cursor: not-allowed; }
         .sidebar nav .ico { width: 22px; text-align: center; }
+        .sidebar nav .ico svg { vertical-align: -2px; }
         .sidebar nav .count { margin-left: auto; background-color: #e0e0e0; color: #444; font-size: 11px; padding: 1px 7px; border-radius: 3px; font-weight: bold; }
 
         .sidebar form { padding: 14px 10px; display: flex; flex-direction: column; gap: 10px; }
@@ -193,6 +194,36 @@
             color: #b0413e;
         }
 
+        /* ===== Vue requêtes SQL ===== */
+        .sql-meta { margin: 0 0 16px; font-size: 14px; color: #555; }
+        .sql-meta b { color: #222; }
+        .sql-query {
+            margin: 0;
+            padding: 8px 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            color: #333;
+        }
+        .sql-group-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background-color: #e0e0e0;
+            color: #444;
+            white-space: nowrap;
+        }
+        .sql-duration { font-weight: bold; white-space: nowrap; }
+        .sql-duration.medium { color: #a46a1f; }
+        .sql-duration.slow { color: #b0413e; }
+        #sidebarSqlCount:empty { display: none; }
+
         /* ===== Badges ===== */
         .m-GET, .m-POST, .m-PUT, .m-DELETE, .m-PATCH, .m-OTHER { font-weight: bold; font-size: 12px; padding: 1px 6px; border-radius: 3px; color: #000; background-color: #ddd; }
         .m-GET { background-color: #61affe; }
@@ -258,7 +289,7 @@
 
             <nav id="logsNav">
                 <a href="#" id="navRequest" class="disabled" title="Ouvrez le descriptif d'une requ&ecirc;te depuis la barre de debug ou la recherche"><span class="ico">&#9881;</span> Requ&ecirc;te</a>
-                <a href="#" class="disabled" title="Bient&ocirc;t disponible"><span class="ico">&#9201;</span> Performance</a>
+                <a href="#" id="navSql" class="disabled" title="Ouvrez le descriptif d'une requ&ecirc;te puis cliquez sur la ligne Requ&ecirc;tes SQL"><span class="ico"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><ellipse cx="8" cy="3.75" rx="5.5" ry="2.25"/><path d="M2.5 3.75v8.5c0 1.24 2.46 2.25 5.5 2.25s5.5-1.01 5.5-2.25v-8.5"/><path d="M2.5 8c0 1.24 2.46 2.25 5.5 2.25S13.5 9.24 13.5 8"/></svg></span> SQL <span id="sidebarSqlCount" class="count"></span></a>
                 <a href="#logs" class="active"><span class="ico">&#9776;</span> Logs <span id="sidebarCount" class="count">0</span></a>
             </nav>
 
@@ -345,6 +376,19 @@
                     <tbody id="requestBody"></tbody>
                 </table>
             </div>
+
+            <!-- Vue : requêtes SQL d'une requête HTTP -->
+            <div id="viewSql" class="hidden">
+                <div class="back-link"><a href="#request" id="sqlBackLink">&#8592; Retour au descriptif de la requ&ecirc;te</a></div>
+                <h1 id="sqlTitle"></h1>
+                <div class="sql-meta" id="sqlMeta"></div>
+                <table class="profiler-table">
+                    <thead>
+                        <tr><th>#</th><th>Requ&ecirc;te SQL</th><th>Dur&eacute;e</th><th>Lignes</th><th>Heure</th></tr>
+                    </thead>
+                    <tbody id="sqlBody"></tbody>
+                </table>
+            </div>
         </main>
     </div>
 
@@ -354,6 +398,7 @@
             var view = 'search';
             var token = '';
             var requestToken = '';
+            var sqlToken = '';
             var logsStatus = '';
             var searchFilters = { limit: 20 };
 
@@ -403,6 +448,14 @@
                     if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
                 });
                 return fetch('/edu-logs?' + url.toString()).then(function(response) { return response.json(); });
+            }
+
+            function sqlQuery(params) {
+                var url = new URLSearchParams();
+                Object.keys(params).forEach(function(key) {
+                    if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
+                });
+                return fetch('/edu-sql-logs?' + url.toString()).then(function(response) { return response.json(); });
             }
 
             function fail(error) { console.error('[EduFramework Profiler]', error); }
@@ -587,6 +640,18 @@
                 }
             }
 
+            function updateSqlNav(id) {
+                // L'entrée "SQL" de la navigation suit la dernière requête SQL consultée
+                var link = $('navSql');
+                if (id) {
+                    link.classList.remove('disabled');
+                    link.setAttribute('href', '#sql/' + id);
+                } else {
+                    link.classList.add('disabled');
+                    link.setAttribute('href', '#');
+                }
+            }
+
             function requestRow(label, valueNode) {
                 var tr = el('tr');
                 tr.appendChild(el('td', 'req-label', label));
@@ -621,6 +686,12 @@
                 body.appendChild(requestRow('Serveur (SAPI)', sapiBadge(e.sapi)));
                 body.appendChild(requestRow('Dur\u00e9e', prettyDuration(e.execution_time_ms)));
                 body.appendChild(requestRow('M\u00e9moire', prettyMemory(e.memory_mb)));
+                // Les requêtes SQL de la requête HTTP : le compte est complété
+                // par loadRequest() dès que l'API /edu-sql-logs a répondu
+                var sqlLink = el('a', null, '\u2014');
+                sqlLink.href = '#sql/' + log.id;
+                sqlLink.id = 'requestSqlLink';
+                body.appendChild(requestRow('Requ\u00eates SQL', sqlLink));
                 if (e.error_message !== undefined) {
                     body.appendChild(requestRow('Erreur', el('pre', 'error-message', e.error_message)));
                 }
@@ -647,7 +718,108 @@
                         renderRequestEmpty();
                     } else {
                         renderRequest(data.logs[0]);
+                        // Complète la ligne "Requêtes SQL" du descriptif avec le compte
+                        // et le temps cumulé des requêtes SQL de la requête HTTP
+                        sqlQuery({ token: requestToken }).then(function(sql) {
+                            var link = $('requestSqlLink');
+                            if (link === null) { return; }
+                            link.textContent = sql.total === 0
+                                ? 'Aucune requ\u00eate SQL'
+                                : sql.total + ' requ\u00eate' + (sql.total > 1 ? 's' : '')
+                                    + ' \u2014 ' + prettyNumber(sql.total_duration_ms, 1) + ' ms';
+                        }).catch(fail);
                     }
+                }).catch(fail);
+            }
+
+            // ----- Vue "requêtes SQL d'une requête HTTP" -----
+            function durationClass(durationMs) {
+                if (durationMs > 100) { return 'sql-duration slow'; }
+                if (durationMs > 20) { return 'sql-duration medium'; }
+                return 'sql-duration';
+            }
+
+            function sqlTimeOf(entry) {
+                var match = /\d{2}:\d{2}:\d{2}/.exec(entry.event_date || '');
+                return match ? match[0] : (entry.event_date || '');
+            }
+
+            function renderSql(sqlData, log) {
+                var body = $('sqlBody');
+                body.innerHTML = '';
+                $('sidebarSqlCount').textContent = sqlData.total || 0;
+                $('sqlTitle').textContent = sqlData.total + (sqlData.total > 1 ? ' requ\u00eates SQL' : ' requ\u00eate SQL');
+
+                // Totaux : temps SQL cumulé et part du temps de la requête HTTP
+                var meta = $('sqlMeta');
+                meta.innerHTML = '';
+                if (sqlData.total > 0) {
+                    meta.appendChild(document.createTextNode('Temps SQL cumul\u00e9 : '));
+                    meta.appendChild(el('b', null, prettyNumber(sqlData.total_duration_ms, 1) + ' ms'));
+                    var executionTimeMs = (log && log.event && log.event.execution_time_ms !== undefined)
+                        ? Number(log.event.execution_time_ms) : 0;
+                    if (executionTimeMs > 0) {
+                        meta.appendChild(document.createTextNode(
+                            ' \u2014 ' + Math.round(sqlData.total_duration_ms / executionTimeMs * 100)
+                            + ' % du temps de la requ\u00eate HTTP (' + prettyNumber(executionTimeMs, 1) + ' ms)'
+                        ));
+                    }
+                }
+
+                if (sqlData.queries.length === 0) {
+                    var trEmpty = el('tr');
+                    var tdEmpty = el('td', 'empty-state', 'Aucune requ\u00eate SQL enregistr\u00e9e pour cette requ\u00eate HTTP');
+                    tdEmpty.colSpan = 5;
+                    trEmpty.appendChild(tdEmpty);
+                    body.appendChild(trEmpty);
+                    return;
+                }
+
+                // Regroupement des requêtes identiques : badge de nombre d'exécutions
+                var groups = {};
+                (sqlData.groups || []).forEach(function(group) { groups[group.query] = group; });
+
+                sqlData.queries.forEach(function(entry, index) {
+                    var tr = el('tr');
+                    tr.appendChild(el('td', 'time', String(index + 1)));
+
+                    var tdQuery = el('td');
+                    tdQuery.appendChild(el('pre', 'sql-query', entry.query));
+                    var group = groups[entry.query];
+                    if (group !== undefined && group.count > 1) {
+                        tdQuery.appendChild(el('div', 'sql-group-badge',
+                            '\u00d7' + group.count + ' requ\u00eates identiques \u2014 '
+                            + prettyNumber(group.duration_ms, 1) + ' ms au total'));
+                    }
+                    tr.appendChild(tdQuery);
+
+                    tr.appendChild(el('td', durationClass(entry.duration_ms), prettyNumber(entry.duration_ms, 1) + ' ms'));
+                    tr.appendChild(el('td', 'time',
+                        (entry.rows_count === null || entry.rows_count === undefined) ? '\u2014' : String(entry.rows_count)));
+                    tr.appendChild(el('td', 'time', sqlTimeOf(entry)));
+                    body.appendChild(tr);
+                });
+            }
+
+            function loadSql() {
+                if (sqlToken === '') {
+                    $('summary').classList.add('hidden');
+                    renderSql({ token: null, total: 0, total_duration_ms: 0, groups: [], queries: [] }, null);
+                    return;
+                }
+
+                // Bandeau de la requête (summary) + requêtes SQL : deux appels parallèles
+                Promise.all([
+                    query({ token: sqlToken, limit: 1 }),
+                    sqlQuery({ token: sqlToken })
+                ]).then(function(results) {
+                    var log = (results[0].logs.length > 0 ? results[0].logs[0] : null);
+                    if (log !== null) {
+                        renderSummary(log);
+                    } else {
+                        $('summary').classList.add('hidden');
+                    }
+                    renderSql(results[1], log);
                 }).catch(fail);
             }
 
@@ -658,6 +830,7 @@
                 $('viewSearch').classList.toggle('hidden', !isSearch);
                 $('viewLogs').classList.toggle('hidden', name !== 'logs');
                 $('viewRequest').classList.toggle('hidden', name !== 'request');
+                $('viewSql').classList.toggle('hidden', name !== 'sql');
                 $('searchForm').classList.toggle('hidden', !isSearch);
                 $('logsNav').classList.toggle('hidden', isSearch);
                 $('searchTitle').classList.toggle('hidden', !isSearch);
@@ -665,6 +838,7 @@
                 // État actif des entrées de navigation (sidebar)
                 document.querySelectorAll('#logsNav a').forEach(function(node) {
                     node.classList.toggle('active', (name === 'request' && node.id === 'navRequest')
+                        || (name === 'sql' && node.id === 'navSql')
                         || (name === 'logs' && node.getAttribute('href') === '#logs'));
                 });
             }
@@ -682,6 +856,12 @@
                     updateRequestNav(requestToken);
                     show('request');
                     loadRequest();
+                } else if (hash[0] === 'sql') {
+                    sqlToken = hash[1] || '';
+                    updateSqlNav(sqlToken);
+                    if (sqlToken !== '') { $('sqlBackLink').setAttribute('href', '#request/' + sqlToken); }
+                    show('sql');
+                    loadSql();
                 } else {
                     show('search');
                     loadSearch();

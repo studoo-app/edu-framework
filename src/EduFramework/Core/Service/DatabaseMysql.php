@@ -17,11 +17,13 @@ use Studoo\EduFramework\Core\ConfigCore;
 class DatabaseMysql implements DatabaseInterface
 {
     /**
+     * La connexion est traçable (requêtes SQL mesurées) uniquement en mode dev
+     *
      * @return PDO
      */
     public function getManager(): PDO
     {
-        return new PDO(
+        return PdoFactory::create(
             'mysql:host=' . ConfigCore::getEnv("DB_HOST") .
             ';port=' . ConfigCore::getEnv("DB_SOCKET") .
             ';dbname=' . ConfigCore::getEnv("DB_NAME"),
