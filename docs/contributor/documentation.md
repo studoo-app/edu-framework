@@ -44,6 +44,12 @@ Pour ce projet, nous utilisons ProperDocs, le fork maintenu de MkDocs, pour la d
 
     Pour plus informations, visitez le site [https://formulae.brew.sh/formula/python](https://formulae.brew.sh/formula/python@3.12){:target="_blank"}
 
+    La génération des cartes sociales (plugin `material/social`) utilise `cairosvg`, qui nécessite la bibliothèque native `cairo` :
+
+    ```bash
+    brew install cairo
+    ```
+
 
 ## Installation de l'environnement virtuel Python   
 
@@ -52,6 +58,13 @@ Créer un environnement virtuel Python avec la commande suivante :
 ```bash
 python3 -m venv venv
 ```
+
+!!! warning "macOS : vérifiez votre Python"
+
+    Si `python3` correspond au Python fourni par Apple (`/usr/bin/python3` ou `/Library/Developer/CommandLineTools/...`), le venv ne trouvera pas les bibliothèques installées via Homebrew et `properdocs serve` échouera avec l'erreur `no library called "cairo-2" was found`.
+
+    Vérifiez avec `command -v python3` que vous utilisez bien le Python de Homebrew (`/opt/homebrew/bin/python3`) avant de créer le venv.
+
 !!! abstract "ENVironnement Virtuel"
 
     Pourquoi utiliser un environnement virtuel Python ? [https://docs.python.org/3/library/venv.html(https://docs.python.org/3/library/venv.html){:target="_blank"}
