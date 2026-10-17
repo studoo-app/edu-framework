@@ -41,15 +41,16 @@ class studooBarreDebug
     background: #222; color: #ddd; border-top: 1px solid #444;
     font: 12px/36px 'Open Sans', Helvetica, Arial, sans-serif; text-align: left;
 }
-#edu-tb a {
+#edu-tb a, #edu-tb button {
     color: inherit; text-decoration: none; display: block;
     margin: 0; padding: 0 12px; background: none; border: 0; border-radius: 0;
-    font-size: inherit; line-height: inherit;
+    font-size: inherit; line-height: inherit; font-family: inherit;
+    cursor: pointer;
 }
 #edu-tb .edu-tb-group { display: flex; min-width: 0; }
 #edu-tb .edu-tb-block { position: relative; padding: 0 12px; border-right: 1px solid #333; white-space: nowrap; cursor: default; }
 #edu-tb .edu-tb-group.right .edu-tb-block { border-right: 0; border-left: 1px solid #333; }
-#edu-tb .edu-tb-block:hover { background: #444; color: #fff; }
+#edu-tb .edu-tb-block:hover, #edu-tb .edu-tb-close:hover { background: #444; color: #fff; }
 #edu-tb .edu-tb-block b { color: #fff; font-weight: 600; }
 #edu-tb .edu-tb-block small { color: #999; font-size: 11px; margin-left: 3px; }
 #edu-tb .edu-tb-status { color: #fff; font-weight: bold; background: #4f805d; }
@@ -74,7 +75,11 @@ class studooBarreDebug
 #edu-tb .edu-tb-panel em a { color: #9fc6ff; }
 #edu-tb .edu-tb-panel em a:hover { color: #c3d9ff; text-decoration: underline; }
 #edu-tb .edu-tb-panel a { display: inline; padding: 0; margin: 0; }
-#edu-tb .edu-tb-close { cursor: pointer; background: none; border: 0; color: #aaa; font: inherit; padding: 0 12px; }
+#edu-tb .edu-tb-close { 
+    cursor: pointer; background: none; border: 0; border-left: 1px solid #333; 
+    color: #aaa; font: inherit; padding: 0 12px; 
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+}
 #edu-tb .edu-tb-close:hover { color: #fff; background: #444; }
 #edu-tb img { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
 #edu-tb-mini {
