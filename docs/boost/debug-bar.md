@@ -74,7 +74,7 @@ La base des logs étant partagée (le conteneur Docker monte le dossier du proje
 ### Fonctionnalités
 
 - liste des requêtes reçues, de la plus récente à la plus ancienne ;
-- compteur du nombre de requêtes par **famille de statut** (2xx, 3xx, 4xx, 5xx) ;
+- compteur du nombre de requêtes par **famille de statut** (2xx, 3xx, 4xx, 5xx) : onglets de filtrage en tête des vues **Logs** et **Recherche** (un clic filtre les résultats sur la famille, l'onglet **Tous** affiche toutes les requêtes ; dans la vue Recherche, le champ Statut du formulaire est synchronisé) ;
 - **descriptif d'une requête HTTP** : la page `/_debug/profiler#request/{token}` décrit la requête sélectionnée (statut, méthode, URL, IP, SAPI, durée, mémoire, ligne brute) — c'est la page ouverte par le bloc DevTool de la barre de debug ; l'URL d'une requête dans la liste est également cliquable ;
 - **vue SQL d'une requête HTTP** : la page `/_debug/profiler#sql/{token}` liste les requêtes SQL exécutées pendant la requête sélectionnée (voir [« Les requêtes SQL »](#les-requetes-sql)) — accessible depuis la ligne *Requêtes SQL* du descriptif et le bloc SQL de la barre de debug ;
 - filtres combinables :
