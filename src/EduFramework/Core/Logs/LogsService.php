@@ -37,6 +37,10 @@ class LogsService
             $this->dbNameLogs,
             ConfigCore::getConfig('sqlite_logs_path')
         );
+        // Plusieurs SAPI peuvent écrire en même temps dans la même base
+        // (serveur PHP intégré sur le poste, FrankenPHP dans le conteneur Docker) :
+        // en cas de verrou SQLite, on attend jusqu'à 5 secondes plutôt que d'échouer
+        self::$dbConnectLogs->exec('PRAGMA busy_timeout = 5000;');
         (new LogsInitialiser())->exeStructure();
     }
 
@@ -79,6 +83,7 @@ class LogsService
      * - status : code statut complet (500) ou famille de code statut (2, 3, 4 ou 5 pour 2xx, 3xx, 4xx, 5xx)
      * - search : recherche textuelle dans l'événement
      * - ip : adresse IP du client
+     * - sapi : SAPI ayant servi la requête (cli-server, frankenphp, ...)
      * - url : fragment du chemin de la requête
      * - token : identifiant du log
      * - from / until : bornes de date (YYYY-MM-DD, heure locale)
@@ -182,6 +187,11 @@ class LogsService
         if (empty($filters['ip']) === false) {
             $where[] = "event_desc LIKE :ip ESCAPE '\\'";
             $params[':ip'] = '%"ip_port":"' . self::escapeLike($filters['ip']) . '%';
+        }
+
+        if (empty($filters['sapi']) === false) {
+            $where[] = "event_desc LIKE :sapi ESCAPE '\\'";
+            $params[':sapi'] = '%"sapi":"' . self::escapeLike($filters['sapi']) . '"%';
         }
 
         if (empty($filters['url']) === false) {

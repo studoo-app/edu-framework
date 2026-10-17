@@ -28,6 +28,8 @@ class BufferToServer extends BufferFormat
     /**
      * Formate le buffer pour la traitement des logs
      * Exemple de formatage : [Mon May  5 08:02:06 2025] 127.0.0.1:65229 [200]: GET /
+     * La clé `sapi` identifie le serveur à l'origine de la requête : le buffer analysé
+     * provient toujours du serveur PHP intégré (cli-server)
      *
      * @return array
      */
@@ -42,6 +44,7 @@ class BufferToServer extends BufferFormat
                 'status_code' => (is_array($matches) && isset($matches[3]) ? $matches[3] : null),
                 'method' => (is_array($matches) && isset($matches[4]) ? $matches[4] : null),
                 'path' => (is_array($matches) && isset($matches[5]) ? $matches[5] : null),
+                'sapi' => 'cli-server',
             ];
     }
 }

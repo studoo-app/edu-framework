@@ -23,6 +23,7 @@ use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
+use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
@@ -85,6 +86,11 @@ class LoadCouchCore
             // Toute autre erreur non gérée (y compris les erreurs de configuration)
             // affiche la page d'erreur 500 avec le message de l'exception en mode développement
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
+        } finally {
+            // Journalisation de la requête HTTP dans la base des logs du profiler.
+            // Uniquement pour les SAPI autres que le serveur PHP intégré (ex : FrankenPHP),
+            // dont les requêtes ne passent pas par la commande `php bin/edu start`
+            HttpRequestLogger::log();
         }
     }
 

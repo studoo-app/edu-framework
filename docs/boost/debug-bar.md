@@ -46,13 +46,21 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 
 ## Le profiler
 
-Le profiler est une page (style *Symfony Profiler*) qui permet de naviguer dans les requêtes HTTP journalisées par le serveur de développement.
+Le profiler est une page (style *Symfony Profiler*) qui permet de naviguer dans les requêtes HTTP journalisées par le serveur (serveur PHP intégré ou FrankenPHP).
 
 Elle est disponible à l'adresse :
 
 ```
 http://localhost:8042/_debug/profiler
 ```
+
+ou, si l'application est servie par FrankenPHP (voir la doc [« L'application dans Docker »](../installation/docker.md)) :
+
+```
+https://localhost/_debug/profiler
+```
+
+La base des logs étant partagée (le conteneur Docker monte le dossier du projet), le profiler affiche **toutes** les requêtes reçues, quel que soit le serveur qui les a traitées.
 
 ### Fonctionnalités
 
@@ -66,6 +74,7 @@ http://localhost:8042/_debug/profiler
 | **Statut**  | Code complet ou famille de code (2, 3, 4 ou 5 pour 2xx à 5xx)      | `404` ou `4`               |
 | **Recherche** | Recherche textuelle dans l'événement                              | `favicon`                  |
 | **IP**      | Adresse IP du client                                               | `127.0.0.1`                |
+| **SAPI**    | Serveur ayant traité la requête                                    | `cli-server` ou `frankenphp` |
 | **URL**     | Fragment du chemin de la requête                                   | `/ville`                   |
 | **Token**   | Identifiant du log                                                 | `42`                       |
 | **From / Until** | Bornes de date (format `YYYY-MM-DD`, heure locale)           | `2026-10-01`               |
@@ -88,6 +97,7 @@ Paramètres de la requête :
 | `status`   | Filtre sur le statut complet (`500`) ou sa famille (`5`) | —        |
 | `search`   | Recherche textuelle                                     | —         |
 | `ip`       | Filtre sur l'adresse IP du client                       | —         |
+| `sapi`     | Filtre sur le SAPI ayant servi la requête (`cli-server`, `frankenphp`, ...) | — |
 | `url`      | Filtre sur le chemin de la requête                      | —         |
 | `token`    | Filtre sur l'identifiant du log                         | —         |
 | `from`     | Date de début (`YYYY-MM-DD`)                            | —         |
@@ -118,7 +128,8 @@ Exemple de réponse :
                 "ip_port": "127.0.0.1:65229",
                 "status_code": "200",
                 "method": "GET",
-                "path": "/"
+                "path": "/",
+                "sapi": "cli-server"
             }
         }
     ]
@@ -127,16 +138,26 @@ Exemple de réponse :
 
 ## Le stockage des logs
 
-Les requêtes HTTP sont journalisées par la commande `php bin/edu start` : le framework analyse la sortie du serveur PHP intégré (grâce aux classes `BufferFormat` et `BufferToServer`) et enregistre chaque requête dans une base **SQLite** dédiée :
+Les requêtes HTTP sont enregistrées dans une base **SQLite** dédiée :
 
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
 
+La collecte s'adapte au serveur qui sert l'application, afin de faire cohabiter les deux environnements :
+
+| Serveur | SAPI | Collecte des requêtes |
+|---------|------|-----------------------|
+| `php bin/edu start` (serveur PHP intégré) | `cli-server` | la commande `start` analyse la sortie du serveur (classes `BufferFormat` et `BufferToServer`) et enregistre chaque ligne |
+| FrankenPHP (Docker, `https://localhost/`) | autre que `cli-server` | la classe `HttpRequestLogger` journalise chaque requête en fin d'exécution (`APP_ENV=dev` requis) |
+
+Les deux mécanismes produisent des événements **au même format** (même JSON, même ligne brute que le serveur intégré), dans la même base : le profiler affiche donc l'historique complet, même si les deux serveurs tournent simultanément. Chaque événement porte une clé `sapi` qui identifie le serveur à l'origine de la requête (`cli-server` pour le serveur PHP intégré, `frankenphp` pour FrankenPHP) : elle est affichée dans le profiler et filtrable (champ **SAPI** de l'API). Pour éviter les erreurs de verrou SQLite entre le poste et le conteneur, la connexion attend jusqu'à 5 secondes la disponibilité de la base (`PRAGMA busy_timeout`).
+
 ```mermaid
 flowchart LR
-    S["php bin/edu start<br/>(serveur PHP intégré)"] --> BF["BufferFormat<br/>(analyse la ligne de log)"]
-    BF --> BS["BufferToServer<br/>(enregistre le log)"]
-    BS --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
+    S["php bin/edu start<br/>(serveur PHP intégré)"] --> BF["BufferToServer<br/>(analyse la sortie du serveur)"]
+    FP["FrankenPHP<br/>(https://localhost/)"] --> HR["HttpRequestLogger<br/>(journalise la requête en fin d'exécution)"]
+    BF --> DB[("SQLite<br/>var/logs/core_logs.sqlite<br/>table serv_logs")]
+    HR --> DB
     DB --> API["endpoint /edu-logs<br/>(JSON)"]
     API --> P["Profiler<br/>(filtres, pagination)"]
 ```
@@ -144,6 +165,11 @@ flowchart LR
 !!! info
 
     Les requêtes du profiler et de la barre de debug (`/_debug/...` et `/edu-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
+
+!!! note "Limitations sous FrankenPHP"
+
+    - les fichiers statiques servis directement par Caddy (CSS, JS, images, ...) ne passent pas par PHP : ils ne sont pas journalisés ;
+    - dans le conteneur Docker, l'IP du client est celle vue par FrankenPHP (réseau Docker) : le filtre IP du profiler donne l'IP du pont Docker, pas `127.0.0.1`.
 
 ## Ajouter ses propres logs
 

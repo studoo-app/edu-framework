@@ -206,6 +206,22 @@ class LogsServiceTest extends TestCase
         $this->assertSame([], LogsService::getLogs(50, 0, ['token' => (string) $id, 'url' => '/unknown']));
     }
 
+    public function testGetLogsFiltersBySapi(): void
+    {
+        LogsService::addLog((string) json_encode(['method' => 'GET', 'path' => '/sapi-frankenphp', 'status_code' => '200', 'sapi' => 'frankenphp']));
+        LogsService::addLog((string) json_encode(['method' => 'GET', 'path' => '/sapi-cli-server', 'status_code' => '200', 'sapi' => 'cli-server']));
+
+        $logs = LogsService::getLogs(50, 0, ['sapi' => 'frankenphp']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertSame('frankenphp', $log['event']['sapi']);
+        }
+
+        // Les logs sans clé sapi (ancien format) ne sont pas retournés par ce filtre
+        $this->assertSame(1, LogsService::countLogs(['sapi' => 'cli-server', 'search' => '/sapi-cli-server']));
+    }
+
     public function testGetLogsFiltersByDateRange(): void
     {
         LogsService::addLog('{"method":"GET","path":"/dated","status_code":"200"}');
