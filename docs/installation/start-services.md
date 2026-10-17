@@ -3,7 +3,7 @@
 Edu Framework utilise plusieurs services pour fonctionner. Pour les installer, vous avez deux possibilités :
     
 - [Utiliser Docker pour émuler les services](#utiliser-docker-pour-emuler-les-services)
-- [Installer les services directement sur votre machine](#utiliser-docker-pour-emuler-les-services)
+- [Installer les services directement sur votre machine](#installer-les-services-sur-votre-machine)
 
 
 ## Utiliser Docker pour émuler les services
@@ -14,7 +14,29 @@ Edu Framework utilise plusieurs services pour fonctionner. Pour les installer, v
 
 Démarrer Docker Desktop sur votre machine puis :
 
-=== "Actuellement à partir de la version 2.0"
+=== "Actuellement à partir de la version 2.7"
+
+    Le fichier `compose.yaml` inclut désormais un serveur web FrankenPHP qui exécute l'application elle-même dans Docker (voir la page dédiée : [L'application dans Docker](docker.md)).
+
+    Pour démarrer tous les services :
+
+    ```bash
+    docker compose up -d --build
+    ```
+
+    Si vous exécutez l'application sur votre poste avec `php bin/edu start`, vous pouvez ne démarrer que les services utiles, sans le serveur web :
+
+    ```bash
+    docker compose up -d database mailer dbgate phpmyadmin
+    ```
+
+    Pour arrêter les services, vous pouvez suivre les instructions suivantes :
+
+    ```bash
+    docker compose down
+    ```
+
+=== "De la version 2.0 à la version 2.6"
 
     Pour installation et démarrer des services, vous pouvez suivre les instructions suivantes :
 
@@ -64,10 +86,15 @@ Les services sont prêts à être utilisés. Vous pouvez maintenant démarrer vo
 
 | Composants                                                    | Socket (port d'écoute) | URL                                            | Version   |
 |---------------------------------------------------------------|------------------------|------------------------------------------------|-----------|
-| :simple-mysql: [MySQL](https://hub.docker.com/_/mysql){:target="_blank"}                                      | 3306                   | 127.0.0.1:3306                                 | Mysql 8.0 |
-| :simple-phpmyadmin: [PHPMyAdmin](https://www.phpmyadmin.net/){:target="_blank"} | 8081                   | [http://127.0.0.1:8081](http://127.0.0.1:8081){:target="_blank"} | PMA 5.2.x |
+| :simple-frankenphp: [FrankenPHP](https://frankenphp.dev){:target="_blank"} | 80 / 443 | [http://127.0.0.1](http://127.0.0.1){:target="_blank"} | PHP 8.4 |
+| :simple-mariadb: [MariaDB](https://hub.docker.com/_/mariadb){:target="_blank"} | 3306 | 127.0.0.1:3306 | latest |
+| :simple-phpmyadmin: [PHPMyAdmin](https://www.phpmyadmin.net/){:target="_blank"} | 8081                   | [http://127.0.0.1:8081](http://127.0.0.1:8081){:target="_blank"} | latest |
 | :octicons-mail-24: [MailPit](https://github.com/axllent/mailpit){:target="_blank"}  | 1025 (SMTP) / 8025 (UI)   | [http://127.0.0.1:8025](http://127.0.0.1:8025){:target="_blank"} | latest |
 | :simple-docker: [dbgate](https://dbgate.org){:target="_blank"}  | 8082                   | [http://127.0.0.1:8082](http://127.0.0.1:8082){:target="_blank"} | latest |
+
+!!! tip "Ports paramétrables"
+
+    Depuis la version 2.7, tous les ports publiés sur votre machine sont paramétrables dans le fichier `.env` — pratique pour faire tourner plusieurs projets simultanément. Voir [Ports et coexistence de plusieurs projets](docker.md#ports-et-coexistence-de-plusieurs-projets).
 
 !!! info "MailPit : le service de mail"
 
@@ -87,7 +114,7 @@ Les services sont prêts à être utilisés. Vous pouvez maintenant démarrer vo
     Il propose deux connexions pré-configurées :
 
     - **MySql** : serveur `database`, utilisateur `root`, mot de passe `studoo` (base `app_db`)
-    - **SQLite** : fichier `var/sqlite/app_db.sqlite`
+    - **SQLite** : fichier `var/logs/core_logs.sqlite` (logs des requêtes, consultables également depuis le [profiler](../boost/debug-bar.md#le-profiler))
 
 !!! info 
     
@@ -97,7 +124,7 @@ Les services sont prêts à être utilisés. Vous pouvez maintenant démarrer vo
     - Mot de passe : `studoo`
     - Base de données par défaut : `app_db`
 
-Vous pouvez également accéder à la base de données MySQL via un client SQL comme [DBeaver](https://dbeaver.io/){:target="_blank"} ou [MySQL Workbench](https://www.mysql.com/products/workbench/){:target="_blank"}.
+Vous pouvez également accéder à la base de données MariaDB via un client SQL comme [DBeaver](https://dbeaver.io/){:target="_blank"} ou [MySQL Workbench](https://www.mysql.com/products/workbench/){:target="_blank"}.
 
 ## Installer les services sur votre machine
 

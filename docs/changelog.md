@@ -2,6 +2,23 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.7.0 - 17/10/2026
+
+**new features**
+
+- Barre de debug : le bloc **DEV** liste les services de développement avec leurs URLs cliquables (application HTTP/HTTPS, MariaDB, Mailpit et son SMTP, DbGate, phpMyAdmin) — ports lus dans le `.env` (défauts du `compose.yaml`), variables transmises au conteneur `frankenphp`
+- Exécution de l'application dans Docker via [FrankenPHP](https://frankenphp.dev){:target="_blank"} : nouveau service web `frankenphp` dans le `compose.yaml` (PHP 8.4, HTTPS et HTTP/3), `Dockerfile` avec les extensions requises par le framework, `Caddyfile` pilotable par `SERVER_NAME`, variables du `.env` transmises au conteneur (surcharges réseau `DB_HOST`, `DB_SOCKET`, `MAILER_DSN`), conteneurs préfixés par `APP_NAME`, ports et `SERVER_NAME` paramétrables dans le `.env` (mode HTTPS local : `SERVER_NAME=localhost`), healthcheck MariaDB — le flux classique `php bin/edu start` reste inchangé
+
+**bug Fixes**
+
+- Profiler : les requêtes servies par FrankenPHP ne s'enregistraient pas dans la base des logs — seul le serveur PHP intégré (`php bin/edu start`) la remplissait, sans indicateur de performance par requête. La nouvelle classe `HttpRequestLogger` journalise désormais **chaque requête traitée par le framework, quel que soit le SAPI** (serveur intégré, FrankenPHP, FPM, ...), avec le serveur à l'origine (`sapi`, affiché et filtrable dans le profiler via le champ **SAPI** et le paramètre `sapi` de l'API `/edu-logs`), le temps d'exécution (`execution_time_ms`) et la mémoire utilisée (`memory_mb`) par requête, mesurés comme la barre de debug. Comme le profiler de Symfony, la ligne est réservée en début de requête puis complétée en fin : le bloc DevTool de la barre de debug affiche le token de la requête et pointe vers la nouvelle page **descriptif de la requête** (`#request/{token}` : statut, méthode, URL, IP, SAPI, durée, mémoire, ligne brute). La commande `php bin/edu start` n'écrit plus dans la base (affichage console uniquement) : seules les requêtes exécutées par PHP sont journalisées (fichiers statiques servis directement par le serveur web exclus), et la base partagée entre les serveurs est protégée contre les verrous (`PRAGMA busy_timeout`). La barre de pagination du profiler est supprimée : la navigation se fait par les filtres, le sélecteur « Résultats » et les raccourcis « 10 derniers » / « Dernier » (le paramètre `page` de l'API reste supporté)
+
+**documentation**
+
+- new [L'application dans Docker](installation/docker.md) : architecture, démarrage/arrêt, variables d'environnement, ports et coexistence de plusieurs projets, mode HTTPS local (certificat auto-signé, limitation `https://127.0.0.1`), vérification des prérequis dans le conteneur, dépannage
+- update [Démarrer les services](installation/start-services.md) : MySQL devient MariaDB, service FrankenPHP dans le tableau des ports, commandes par version, corrections de liens
+- update [La barre de debug et le profiler](boost/debug-bar.md) : collecte de toutes les requêtes par `HttpRequestLogger` quel que soit le serveur (clé `sapi`, temps d'exécution et mémoire par requête), token de la requête dans le bloc DevTool, nouvelle page descriptif d'une requête (`#request/{token}`), profiler disponible sur les deux serveurs (`http://localhost:8042/_debug/profiler` et `https://localhost/_debug/profiler`), limitations (fichiers statiques non journalisés, IP du réseau Docker, mode worker FrankenPHP) ; liste des services de développement (URLs cliquables) dans le bloc DEV
+
 ## v2.6.3 - 15/10/2026
 
 **bug Fixes**

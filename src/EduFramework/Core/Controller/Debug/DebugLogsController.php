@@ -34,6 +34,7 @@ class DebugLogsController implements ControllerInterface
      * - status : filtre sur le code statut (500) ou sur sa famille (2, 3, 4 ou 5)
      * - search : recherche textuelle dans l'événement
      * - ip : filtre sur l'adresse IP du client
+     * - sapi : filtre sur le SAPI ayant servi la requête (cli-server, frankenphp, ...)
      * - url : filtre sur le chemin de la requête
      * - token : filtre sur l'identifiant du log
      * - from / until : bornes de date (YYYY-MM-DD)
@@ -50,6 +51,7 @@ class DebugLogsController implements ControllerInterface
             'status' => $this->filterStatus($request->get('status')),
             'search' => $request->get('search'),
             'ip' => $this->filterPattern($request->get('ip'), '/^[0-9a-fA-F:.]{1,45}$/'),
+            'sapi' => $this->filterPattern($request->get('sapi'), '/^[a-zA-Z0-9-]{1,20}$/'),
             'url' => $request->get('url'),
             'token' => $this->filterPattern(ltrim((string) $request->get('token'), '#'), '/^\d{1,18}$/'),
             'from' => $this->filterPattern($request->get('from'), '/^\d{4}-\d{2}-\d{2}$/'),

@@ -100,7 +100,7 @@ Elles ne sont donc plus accessibles lorsque `APP_ENV=prod`. Si votre application
 ## Les nouveautés
 
 ### **La barre de debug et le profiler**
-En mode développement (`APP_ENV=dev`), une **barre de debug** s'affiche en bas de chaque page (statut HTTP, route, temps d'exécution, mémoire, base de données, ...) et une **page de profiler** permet de naviguer dans l'historique des requêtes HTTP.
+En mode développement (`APP_ENV=dev`), une **barre de debug** s'affiche en bas de chaque page (statut HTTP, route, temps d'exécution, mémoire, DEV, ...) et une **page de profiler** permet de naviguer dans l'historique des requêtes HTTP.
 
 Pour plus de détails, consulter la page [La barre de debug et le profiler](../boost/debug-bar.md).
 

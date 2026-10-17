@@ -12,11 +12,13 @@
 namespace Studoo\EduFramework\Core\View;
 
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
+use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
 
 /**
  * Class studooBarreDebug
  * Barre de debug affichée en bas des pages en mode dev (style Web Debug Toolbar de Symfony) :
- * un bloc par information (statut HTTP, route, temps, mémoire, base de données, logs),
+ * un bloc par information (statut HTTP, route, temps, mémoire, DEV),
  * le détail s'affiche au survol et la barre peut être réduite.
  *
  * @package Studoo\EduFramework\Core\View
@@ -57,6 +59,7 @@ class studooBarreDebug
 #edu-tb .edu-tb-status:hover { filter: brightness(1.15); background: inherit; }
 #edu-tb .edu-tb-env { background: #4f805d; color: #fff; padding: 1px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; font-size: 11px; }
 #edu-tb .edu-tb-env.prod { background: #b0413e; }
+#edu-tb .edu-tb-ico { font-size: 18px; vertical-align: -1px; margin-right: 5px; }
 #edu-tb .edu-tb-panel {
     display: none; position: absolute; bottom: 36px; left: 0; min-width: 260px; max-width: 480px;
     padding: 10px 14px; background: #444; color: #ddd; line-height: 1.5; white-space: normal;
@@ -68,6 +71,9 @@ class studooBarreDebug
 #edu-tb .edu-tb-panel div { display: flex; justify-content: space-between; gap: 18px; }
 #edu-tb .edu-tb-panel span { color: #aaa; }
 #edu-tb .edu-tb-panel em { font-style: normal; color: #fff; word-break: break-all; text-align: right; }
+#edu-tb .edu-tb-panel em a { color: #9fc6ff; }
+#edu-tb .edu-tb-panel em a:hover { color: #c3d9ff; text-decoration: underline; }
+#edu-tb .edu-tb-panel a { display: inline; padding: 0; margin: 0; }
 #edu-tb .edu-tb-close { cursor: pointer; background: none; border: 0; color: #aaa; font: inherit; padding: 0 12px; }
 #edu-tb .edu-tb-close:hover { color: #fff; background: #444; }
 #edu-tb img { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
@@ -134,26 +140,20 @@ HTML;
                 'Mémoire',
                 ['Pic d\'utilisation' => number_format($peak, 2, ',', ' ') . ' Mo', 'Limite PHP' => (string) ini_get('memory_limit')]
             ),
-            $this->databaseBlock(),
-            $this->block(
-                'Logs',
-                'Logs',
-                ['Profiler' => 'Ouvrir la liste des requêtes'],
-                '',
-                '/_debug/profiler#logs'
-            ),
+            $this->sqlBlock(),
+            $this->devToolBlock(),
         ];
 
         $right = [
             $this->block(
                 '<span class="edu-tb-env' . ($envName === 'dev' ? '' : ' prod') . '">' . $this->escape($envName) . '</span>',
                 'Environnement',
-                ['APP_ENV' => $envName]
-            ),
-            $this->block(
-                'PHP <b>' . PHP_VERSION . '</b>',
-                'PHP',
-                ['Version' => PHP_VERSION, 'SAPI' => PHP_SAPI]
+                array_merge(
+                    ['APP_ENV' => $envName],
+                    ['PHP' => PHP_VERSION, 'SAPI' => PHP_SAPI],
+                    $this->databaseDetails(),
+                    $this->devServicesDetails()
+                )
             ),
             $this->block(
                 '<img src="' . $logo . '" alt="">' . $this->escape((string) ConfigCore::getConfig('version')),
@@ -178,21 +178,133 @@ HTML;
     }
 
     /**
-     * Bloc d'information sur la base de données (affiché uniquement si elle est activée)
+     * Bloc DevTool de la barre : affiche le token de la requête en cours
+     * et fait le lien vers son descriptif dans le profiler.
+     * Si la requête n'est pas journalisée (logs indisponibles, route interne, ...),
+     * le bloc pointe vers la liste des requêtes du profiler.
+     *
+     * @return string
      */
-    private function databaseBlock(): string
+    private function devToolBlock(): string
     {
-        if (ConfigCore::existEnv('DB_HOST_STATUS') === false || ConfigCore::getEnv('DB_HOST_STATUS') !== 'true') {
+        $envName = (ConfigCore::existEnv('APP_ENV') === true ? (string) ConfigCore::getEnv('APP_ENV') : 'dev');
+        $logId = HttpRequestLogger::getCurrentLogId();
+        $label = '<span class="edu-tb-ico">&#9881;</span>';
+
+        if ($logId !== null) {
+            return $this->block(
+                $label,
+                'DEV TOOL',
+                [
+                    'Token' => '#' . $logId,
+                    'Profiler' => 'Ouvrir le descriptif de la requête',
+                ],
+                '',
+                '/_debug/profiler#request/' . $logId
+            );
+        }
+
+        return $this->block(
+            $label,
+            'DEV',
+            ['Profiler' => 'Ouvrir la liste des requêtes'],
+            '',
+            '/_debug/profiler#logs'
+        );
+    }
+
+    /**
+     * Bloc SQL de la barre : affiche le nombre de requêtes SQL exécutées
+     * pendant la requête HTTP en cours et leur temps cumulé, avec le lien
+     * vers la vue SQL du profiler. Le bloc est masqué s'il n'y a aucune
+     * requête collectée (base de données inactive ou pas de requête).
+     * Les requêtes exécutées après le rendu de la page ne sont pas comptées
+     * dans ce bloc (elles le sont dans le profiler).
+     *
+     * @return string
+     */
+    private function sqlBlock(): string
+    {
+        $count = SqlQueryLogger::count();
+        if ($count === 0) {
             return '';
         }
 
-        $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
+        $totalMs = SqlQueryLogger::totalDurationMs();
+
+        $details = [
+            'Nombre de requêtes' => (string) $count,
+            'Temps SQL cumulé' => number_format($totalMs, 1, ',', ' ') . ' ms',
+        ];
+        $slowest = SqlQueryLogger::slowestQuery();
+        if ($slowest !== null) {
+            $details['Requête la plus lente'] = number_format($slowest['duration_ms'], 1, ',', ' ')
+                . ' ms — ' . mb_strimwidth($slowest['query'], 0, 60, '…');
+        }
+        $details['Profiler'] = 'Voir les requêtes SQL de cette requête HTTP';
+
+        $logId = HttpRequestLogger::getCurrentLogId();
 
         return $this->block(
-            '<b>' . $this->escape($get('DB_TYPE')) . '</b>',
-            'Base de données',
-            ['Type' => $get('DB_TYPE'), 'Hôte' => $get('DB_HOST') . ':' . $get('DB_SOCKET'), 'Base' => $get('DB_NAME')]
+            '<b>' . $count . '</b><small>req SQL</small> <b>' . number_format($totalMs, 1, ',', ' ') . '</b><small>ms</small>',
+            'Requêtes SQL',
+            $details,
+            '',
+            ($logId !== null ? '/_debug/profiler#sql/' . $logId : '/_debug/profiler#logs')
         );
+    }
+
+    /**
+     * Détails sur la base de données (affichés dans le panneau de survol du bloc DEV,
+     * uniquement si elle est activée via DB_HOST_STATUS=true) : type, hôte (avec les
+     * valeurs par défaut localhost:3306), nom de la base et liens vers DbGate et phpMyAdmin
+     *
+     * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
+     */
+    private function databaseDetails(): array
+    {
+        if (ConfigCore::existEnv('DB_HOST_STATUS') === false || ConfigCore::getEnv('DB_HOST_STATUS') !== 'true') {
+            return [
+            '---- database ----' => "--------",
+            'DB_HOST_STATUS' => "off",
+            ];
+        }
+
+        $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
+        $env = static fn (string $key, string $default): string
+            => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
+        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
+
+        return [
+            '---- database ----' => "--------",
+            'DB_HOST_STATUS' => $get('DB_HOST_STATUS') ? "on" : "off",
+            'DB_TYPE' => $get('DB_TYPE'),
+            'DB_HOST' => $env('DB_HOST', 'localhost') . ':' . $env('DB_SOCKET', '3306'),
+            'DB_NAME' => $get('DB_NAME'),
+            'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
+            'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
+        ];
+    }
+
+    /**
+     * Services de messagerie publiés sur l'hôte (affichés dans le panneau de survol du bloc DEV) :
+     * interface web et SMTP de Mailpit. Les URLs sont construites à partir du .env
+     * (mêmes variables que compose.yaml), avec les valeurs par défaut du compose
+     * si une variable est absente.
+     *
+     * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
+     */
+    private function devServicesDetails(): array
+    {
+        $env = static fn (string $key, string $default): string
+            => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
+        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
+
+        return [
+            '---- smtp ----' => "--------",
+            'Mailpit' => $link('http://localhost:' . $env('MAILER_UI_PORT', '8025')),
+            'Mailpit SMTP' => 'localhost:' . $env('MAILER_SMTP_PORT', '1025')
+        ];
     }
 
     /**
@@ -200,7 +312,8 @@ HTML;
      *
      * @param string $html Contenu HTML déjà échappé du bloc
      * @param string $title Titre du panneau de détail
-     * @param array<string, string> $details Lignes du panneau (libellé => valeur), échappées ici
+     * @param array<string, string|array{text: string, href: string}> $details Lignes du panneau
+     *        (libellé => valeur, ou libellé => lien sous la forme ['text' => ..., 'href' => ...]), échappées ici
      * @param string $class Classes CSS supplémentaires
      * @param string|null $href Lien (le bloc s'ouvre dans un nouvel onglet)
      */
@@ -208,7 +321,11 @@ HTML;
     {
         $rows = '';
         foreach ($details as $label => $value) {
-            $rows .= '<div><span>' . $this->escape($label) . '</span><em>' . $this->escape($value) . '</em></div>';
+            $content = is_array($value)
+                ? '<a href="' . $this->escape($value['href']) . '" target="_blank" rel="noopener">'
+                    . $this->escape($value['text']) . '</a>'
+                : $this->escape($value);
+            $rows .= '<div><span>' . $this->escape($label) . '</span><em>' . $content . '</em></div>';
         }
 
         $inner = $html . '<div class="edu-tb-panel"><h4>' . $this->escape($title) . '</h4>' . $rows . '</div>';

@@ -8,16 +8,26 @@ use ReflectionProperty;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Logs\LogsService;
 
+/**
+ * Tests de LogsService : connexion SQLite des logs, ajout et mise à jour
+ * des lignes, lecture des événements et filtres (méthode, statut, SAPI, dates)
+ */
 class LogsServiceTest extends TestCase
 {
     private static string $logsPath;
 
+    /**
+     * Définit le dossier temporaire dédié aux logs de la suite de tests
+     */
     public static function setUpBeforeClass(): void
     {
         // Dossier temporaire dédié aux tests : isole les logs de la base applicative var/sqlite/
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-logs-test/';
     }
 
+    /**
+     * Réinitialise la connexion statique pour tester l'initialisation à chaque test
+     */
     public function setUp(): void
     {
         // Réinitialisation de la connexion statique pour tester l'initialisation à chaque test
@@ -29,10 +39,17 @@ class LogsServiceTest extends TestCase
         ]));
     }
 
+    /**
+     * Supprime la base SQLite des logs et le dossier temporaire des tests
+     */
     public static function tearDownAfterClass(): void
     {
-        @unlink(self::$logsPath . 'core_logs.sqlite');
-        @rmdir(self::$logsPath);
+        if (is_file(self::$logsPath . 'core_logs.sqlite') === true) {
+            unlink(self::$logsPath . 'core_logs.sqlite');
+        }
+        if (is_dir(self::$logsPath) === true) {
+            rmdir(self::$logsPath);
+        }
     }
 
     public function testGetConnectInitializesTheConnectionLazily(): void
@@ -71,6 +88,37 @@ class LogsServiceTest extends TestCase
             ->prepare('SELECT event_desc FROM serv_logs WHERE id = (SELECT MAX(id) FROM serv_logs)');
         $stmt->execute();
         $this->assertSame($eventDesc, $stmt->fetchColumn());
+    }
+
+    /**
+     * Vérifie que addLog() retourne l'identifiant de la nouvelle ligne insérée
+     */
+    public function testAddLogReturnsTheNewLogId(): void
+    {
+        $id = LogsService::addLog('{"method":"GET","path":"/id-test"}');
+
+        $stmt = LogsService::getConnect()->prepare('SELECT id, event_desc FROM serv_logs WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $this->assertNotFalse($row);
+        $this->assertSame($id, (int) $row['id']);
+        $this->assertSame('{"method":"GET","path":"/id-test"}', $row['event_desc']);
+    }
+
+    /**
+     * Vérifie que updateLog() remplace la description de l'événement par la version complétée
+     */
+    public function testUpdateLogRewritesTheEventDescription(): void
+    {
+        // HttpRequestLogger réserve la ligne en début de requête puis la complète
+        $id = LogsService::addLog('{"method":"GET","path":"/before","status_code":"200"}');
+
+        LogsService::updateLog($id, '{"method":"GET","path":"/before","status_code":"200","execution_time_ms":42.5}');
+
+        $logs = LogsService::getLogs(1, 0, ['token' => (string) $id]);
+        $this->assertSame('/before', $logs[0]['event']['path']);
+        $this->assertSame(42.5, $logs[0]['event']['execution_time_ms']);
     }
 
     public function testGetLogsReturnsJsonEventsDecodedAndNewestFirst(): void
@@ -204,6 +252,26 @@ class LogsServiceTest extends TestCase
         $this->assertSame([$id], array_column(LogsService::getLogs(50, 0, ['ip' => '10.1.2.3', 'url' => '/blog/post']), 'id'));
         $this->assertSame([$id], array_column(LogsService::getLogs(50, 0, ['token' => (string) $id]), 'id'));
         $this->assertSame([], LogsService::getLogs(50, 0, ['token' => (string) $id, 'url' => '/unknown']));
+    }
+
+    /**
+     * Vérifie que le filtre sapi ne retourne que les requêtes servies par ce SAPI
+     * et ignore les logs d'ancien format sans clé sapi
+     */
+    public function testGetLogsFiltersBySapi(): void
+    {
+        LogsService::addLog((string) json_encode(['method' => 'GET', 'path' => '/sapi-frankenphp', 'status_code' => '200', 'sapi' => 'frankenphp']));
+        LogsService::addLog((string) json_encode(['method' => 'GET', 'path' => '/sapi-cli-server', 'status_code' => '200', 'sapi' => 'cli-server']));
+
+        $logs = LogsService::getLogs(50, 0, ['sapi' => 'frankenphp']);
+
+        $this->assertNotEmpty($logs);
+        foreach ($logs as $log) {
+            $this->assertSame('frankenphp', $log['event']['sapi']);
+        }
+
+        // Les logs sans clé sapi (ancien format) ne sont pas retournés par ce filtre
+        $this->assertSame(1, LogsService::countLogs(['sapi' => 'cli-server', 'search' => '/sapi-cli-server']));
     }
 
     public function testGetLogsFiltersByDateRange(): void

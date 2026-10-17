@@ -30,6 +30,9 @@ Pour installer le framework, vous devez suivre les instructions suivantes :
       - [ ] [Problème de démarrage](start-application.md#probleme-de-demarrage)
 - [ ] [La commande bin/edu](command-edu.md)
 - [ ] [Démarrer les services](start-services.md)
+- [ ] [:simple-docker: L'application dans Docker](docker.md)
+      - [ ] [Démarrer le stack complet](docker.md#demarrer-le-stack-complet)
+      - [ ] [Ports et coexistence de plusieurs projets](docker.md#ports-et-coexistence-de-plusieurs-projets)
 - [ ] [Comment versionner son projet](versionning.md)
 
 

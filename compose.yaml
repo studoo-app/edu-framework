@@ -1,35 +1,106 @@
+# Infrastructure Docker Edu-Framework
+#
+# Les variables ${...} sont résolues automatiquement depuis le fichier .env
+# situé à la racine du projet (mécanisme natif de Docker Compose).
+# Le conteneur PHP reçoit ces mêmes variables : elles écrasent le .env monté
+# (Dotenv est chargé en mode "immutable", l'environnement Docker prime).
+#
+# Serveur web : FrankenPHP — https://frankenphp.dev/docs/docker/
+
 services:
+  frankenphp:
+    container_name: ${APP_NAME}-http-server
+    build: .
+    # tty: true => logs lisibles en dev ; retirer pour des logs JSON (prod)
+    tty: true
+    environment:
+      # Application (voir .env)
+      APP_NAME: ${APP_NAME:-edu-framework}
+      APP_ENV: ${APP_ENV:-dev}
+      TZ: ${TZ:-Europe/Paris}
+      # Base de données : mêmes valeurs que le .env, sauf l'hôte et le port
+      # qui, dans le réseau Docker, sont toujours ceux du service (database:3306)
+      DB_HOST_STATUS: ${DB_HOST_STATUS:-true}
+      DB_TYPE: ${DB_TYPE:-mysql}
+      DB_HOST: database
+      DB_SOCKET: 3306
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-studoo}
+      DB_NAME: ${DB_NAME:-app_db}
+      # Mailer : Mailpit est joignable par le nom du service Docker
+      # (le .env local pointe lui vers localhost:1025)
+      MAILER_DSN: smtp://mailer:1025
+      # Caddy (voir Caddyfile) :
+      #   ":80" => HTTP simple (dev) | "localhost" => HTTPS auto | "exemple.fr" => Let's Encrypt
+      SERVER_NAME: ${SERVER_NAME:-:80}
+      # Options globales Caddy, ex: CADDY_GLOBAL_OPTIONS=debug
+      CADDY_GLOBAL_OPTIONS: ${CADDY_GLOBAL_OPTIONS:-}
+      # Ports des services publiés sur l'hôte (voir .env) : utilisés par la
+      # barre de debug pour afficher les URLs des services dans le bloc DEV
+      HTTP_PORT: ${HTTP_PORT:-80}
+      HTTPS_PORT: ${HTTPS_PORT:-443}
+      PMA_PORT: ${PMA_PORT:-8081}
+      DBGATE_PORT: ${DBGATE_PORT:-8082}
+      MAILER_UI_PORT: ${MAILER_UI_PORT:-8025}
+      MAILER_SMTP_PORT: ${MAILER_SMTP_PORT:-1025}
+    ports:
+      - "${HTTP_PORT:-80}:80"        # HTTP
+      - "${HTTPS_PORT:-443}:443"     # HTTPS
+      - "${HTTPS_PORT:-443}:443/udp" # HTTP/3
+    volumes:
+      - .:/app
+      - ./Caddyfile:/etc/frankenphp/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
   database:
-    container_name: edu-web-database
+    container_name: ${APP_NAME}-database
     image: mariadb:latest
     ports:
-      - "3306:3306"
+      # Port publié sur l'hôte : piloté par DB_SOCKET du .env (même valeur que
+      # pour le dev hors Docker) ; le conteneur écoute toujours sur 3306
+      - "${DB_SOCKET:-3306}:3306"
     restart: always
     environment:
-      MYSQL_DATABASE: app_db
-      MYSQL_ROOT_PASSWORD: studoo
+      MYSQL_DATABASE: ${DB_NAME:-app_db}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-studoo}
+      # Utilisateur applicatif secondaire (dbgate et phpMyAdmin utilisent "root")
       MYSQL_USER: stud
       MYSQL_PASSWORD: studoo
-      # Si tu changes le mot de passe root ou stud, change aussi le mot de passe dans le fichier .env et dans la config du service dbgate
-#      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      # Si tu changes le mot de passe root ou stud, change aussi le mot de passe
+      # dans le fichier .env et dans la config du service dbgate
       TZ: Europe/Paris
     volumes:
       - ./var/dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   mailer:
-    container_name: edu-web-mailer
+    container_name: ${APP_NAME}-mailer
     image: axllent/mailpit
     ports:
-      - "1025"
-      - "8025:8025"
+      # SMTP : à garder aligné avec MAILER_DSN du .env pour le dev hors Docker
+      - "${MAILER_SMTP_PORT:-1025}:1025"
+      # Interface web de Mailpit
+      - "${MAILER_UI_PORT:-8025}:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
   dbgate:
-    container_name: edu-web-dbgate
+    container_name: ${APP_NAME}-dbgate
     image: dbgate/dbgate
     restart: always
     ports:
-      - 8082:3000
+      - "${DBGATE_PORT:-8082}:3000"
     volumes:
       - ./var/dbgate:/root/.dbgate
       - ./var/logs:/home/jan
@@ -39,7 +110,7 @@ services:
       LABEL_con1: MySql
       SERVER_con1: database
       USER_con1: root
-      PASSWORD_con1: studoo
+      PASSWORD_con1: ${DB_PASSWORD:-studoo}
       PORT_con1: 3306
       ENGINE_con1: mysql@dbgate-plugin-mysql
 
@@ -48,10 +119,10 @@ services:
       ENGINE_con2: sqlite@dbgate-plugin-sqlite
 
   phpmyadmin:
-    container_name: edu-web-pma
+    container_name: ${APP_NAME}-pma
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8081:80"
+      - "${PMA_PORT:-8081}:80"
     environment:
       PMA_HOST: database
       PMA_PORT: 3306
@@ -62,6 +133,8 @@ services:
     restart: always
     links:
       - database
+
+# Volumes persistants pour Caddy (certificats et configuration)
 volumes:
-  dbgate-data:
-    driver: local
+  caddy_data:
+  caddy_config:

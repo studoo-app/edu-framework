@@ -1,0 +1,49 @@
+# Caddyfile Edu-Framework — serveur web du conteneur FrankenPHP
+#
+# compose.yaml monte ce fichier dans /etc/frankenphp/Caddyfile
+# Le projet est monté dans /app, le docroot est donc /app/public
+#
+# Doc : https://frankenphp.dev/docs/config/ et https://caddyserver.com/docs/caddyfile
+{
+	# Évite l'installation du certificat CA local dans le conteneur
+	skip_install_trust
+
+	# Options globales Caddy injectables par variable d'environnement
+	# (ex : CADDY_GLOBAL_OPTIONS=debug pour des logs verbeux)
+	{$CADDY_GLOBAL_OPTIONS}
+
+	# Configuration FrankenPHP injectable par variable d'environnement
+	# (ex : FRANKENPHP_CONFIG="worker /app/public/index.php")
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+# Blocs de configuration additionnels injectables par variable d'environnement
+{$CADDY_EXTRA_CONFIG}
+
+# SERVER_NAME (variable d'environnement, voir compose.yaml) :
+#   ":80"          -> HTTP simple, pratique en développement (défaut)
+#   "localhost"    -> HTTPS automatique (certificat local auto-signé)
+#   "exemple.fr"   -> HTTPS automatique via Let's Encrypt (production)
+{$SERVER_NAME::80} {
+	# Racine du site : le docroot du framework
+	root {$SERVER_ROOT:/app/public}
+
+	# Compression des réponses
+	encode zstd gzip
+
+	# Directives supplémentaires injectables par variable d'environnement
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	# Exécute PHP et sert les fichiers statiques
+	php_server {
+		# Mode worker (application chargée en mémoire, plus performant).
+		# À valider avec Edu-Framework avant activation :
+		# https://frankenphp.dev/docs/worker/
+		#worker /app/public/index.php
+	}
+}
+
+# Fichiers de configuration additionnels
+import Caddyfile.d/*.caddyfile

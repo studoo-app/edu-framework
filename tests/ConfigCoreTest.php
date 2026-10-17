@@ -122,7 +122,9 @@ class ConfigCoreTest extends TestCase
 
     public function testEduframeYmlFileNotExist()
     {
-        // Sans le fichier eduframe.yml, les valeurs par défaut du framework sont conservées
+        // Sans le fichier eduframe.yml, les valeurs par défaut du framework sont conservées.
+        // L'identité (version, date_version, php_version) provient uniquement de ce fichier :
+        // elle n'a pas de valeur par défaut dans le code.
         $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
         $pathBackup = $pathEduframe . '.bak';
 
@@ -132,7 +134,9 @@ class ConfigCoreTest extends TestCase
             (new ConfigCore([]));
 
             $this->assertEquals('EduFramework', ConfigCore::getConfig('name'));
-            $this->assertEquals('v2.6.0', ConfigCore::getConfig('version'));
+            $this->assertNull(ConfigCore::getConfig('version'));
+            $this->assertNull(ConfigCore::getConfig('date_version'));
+            $this->assertNull(ConfigCore::getConfig('php_version'));
         } finally {
             // Restauration du fichier original
             rename($pathBackup, $pathEduframe);
@@ -141,7 +145,8 @@ class ConfigCoreTest extends TestCase
 
     public function testEduframeYmlPartiel()
     {
-        // Un fichier avec un seul paramètre : seules les clés présentes sont surchargées
+        // Un fichier avec un seul paramètre : seules les clés présentes sont surchargées,
+        // les clés d'identité absentes du fichier restent sans valeur
         $pathEduframe = dirname(__DIR__) . '/eduframe.yml';
         $pathBackup = $pathEduframe . '.bak';
 
@@ -152,7 +157,7 @@ class ConfigCoreTest extends TestCase
             (new ConfigCore([]));
 
             $this->assertEquals('Mon Framework', ConfigCore::getConfig('name'));
-            $this->assertEquals('v2.6.0', ConfigCore::getConfig('version'));
+            $this->assertNull(ConfigCore::getConfig('version'));
         } finally {
             rename($pathBackup, $pathEduframe);
         }

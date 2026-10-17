@@ -15,6 +15,7 @@ use Dotenv\Dotenv;
 use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
+use Studoo\EduFramework\Core\Controller\Debug\DebugSqlLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
 use Studoo\EduFramework\Core\Controller\Error\HttpError403Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
@@ -23,7 +24,9 @@ use Studoo\EduFramework\Core\Controller\Error\HttpErrorDefaultController;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
+use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\LogsService;
+use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -56,6 +59,12 @@ class LoadCouchCore
             (new LogsService());
         }
 
+        // Journalisation de la requête HTTP : la ligne de log est réservée ici afin que
+        // son identifiant soit disponible pour la barre de debug (lien vers le descriptif
+        // de la requête), puis complétée en fin de requête (statut final, temps
+        // d'exécution et mémoire) dans le bloc finally
+        HttpRequestLogger::start();
+
         // Gestion des routes
         $route = new FastRouteCore();
 
@@ -68,13 +77,16 @@ class LoadCouchCore
                 && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
                 $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
                 $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
+                $route->addRoute('GET', '/edu-sql-logs', DebugSqlLogsController::class);
             }
 
             // Récupération de la route à appeler
             echo $route->getRoute();
         } catch (ErrorHttpStatusException $exception) {
             // Une erreur HTTP a été levée par un controller (Exemple: accès interdit 403)
-            // On affiche la page d'erreur correspondant au code HTTP de l'exception
+            // On journalise l'erreur pour aider les développeurs à l'identifier,
+            // puis on affiche la page d'erreur correspondant au code HTTP de l'exception
+            HttpRequestLogger::setError($exception);
             echo match ($exception->getCode()) {
                 403 => (new HttpError403Controller($exception))->execute($this->getRequest()),
                 404 => (new HttpError404Controller($exception))->execute($this->getRequest()),
@@ -83,8 +95,16 @@ class LoadCouchCore
             };
         } catch (\Throwable $exception) {
             // Toute autre erreur non gérée (y compris les erreurs de configuration)
-            // affiche la page d'erreur 500 avec le message de l'exception en mode développement
+            // On journalise l'erreur pour aider les développeurs à l'identifier,
+            // puis on affiche la page d'erreur 500 avec le message de l'exception en mode développement
+            HttpRequestLogger::setError($exception);
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
+        } finally {
+            // Écrit les requêtes SQL collectées pendant la requête (table serv_sql_logs),
+            // rattachées par le token de la requête HTTP, puis complète la ligne de
+            // log réservée en début de requête : statut final, temps d'exécution et mémoire
+            SqlQueryLogger::flush();
+            HttpRequestLogger::finish();
         }
     }
 

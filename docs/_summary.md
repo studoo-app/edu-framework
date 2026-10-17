@@ -6,6 +6,7 @@
     * [Start/Stop l'application](installation/start-application.md)
     * [La commande bin/edu](installation/command-edu.md)
     * [Démarrer les services](installation/start-services.md)
+    * [L'application dans Docker](installation/docker.md)
     * [Comment versionner son projet](installation/versionning.md)
 * [Construire](build/index.md)
     * [Le concept d'archirtecture MVC](build/concept-mvc.md)

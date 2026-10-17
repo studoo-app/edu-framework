@@ -19,6 +19,7 @@ class BufferToServerTest extends TestCase
         $this->assertSame('200', $result['status_code']);
         $this->assertSame('GET', $result['method']);
         $this->assertSame('/', $result['path']);
+        $this->assertSame('cli-server', $result['sapi']);
     }
 
     public function testGetFormatBufferParsesLineWithTrailingNewLine(): void
@@ -31,6 +32,7 @@ class BufferToServerTest extends TestCase
         $this->assertSame('200', $result['status_code']);
         $this->assertSame('GET', $result['method']);
         $this->assertSame('/', $result['path']);
+        $this->assertSame('cli-server', $result['sapi']);
     }
 
     public function testGetFormatBufferParsesPostRequestWithStatusCodeAndLongPath(): void
@@ -41,6 +43,7 @@ class BufferToServerTest extends TestCase
         $this->assertSame('404', $result['status_code']);
         $this->assertSame('POST', $result['method']);
         $this->assertSame('/api/users/42', $result['path']);
+        $this->assertSame('cli-server', $result['sapi']);
     }
 
     public function testGetFormatBufferReturnsRawBufferWhenLineDoesNotMatch(): void
@@ -54,6 +57,8 @@ class BufferToServerTest extends TestCase
         $this->assertNull($result['status_code']);
         $this->assertNull($result['method']);
         $this->assertNull($result['path']);
+        // Le buffer analysé provient toujours du serveur PHP intégré
+        $this->assertSame('cli-server', $result['sapi']);
     }
 
     public function testGetBufferReturnsTheOriginalBuffer(): void
