@@ -25,7 +25,7 @@ flowchart LR
 
 | Composants                                                    | Socket (port d'écoute)          | URL                                            | Version  |
 |---------------------------------------------------------------|--------------------------------|------------------------------------------------|----------|
-| :simple-frankenphp: [FrankenPHP](https://frankenphp.dev){:target="_blank"} | 80 (HTTP)<br/>443 (mode HTTPS)          | [http://127.0.0.1](http://127.0.0.1){:target="_blank"} | PHP 8.4  |
+| :simple-apache: [FrankenPHP](https://frankenphp.dev){:target="_blank"} | 80 (HTTP)<br/>443 (mode HTTPS)          | [http://127.0.0.1](http://127.0.0.1){:target="_blank"} | PHP 8.4  |
 | :simple-mariadb: [MariaDB](https://hub.docker.com/_/mariadb){:target="_blank"} | 3306 | 127.0.0.1:3306                                 | latest   |
 | :simple-phpmyadmin: [PHPMyAdmin](https://www.phpmyadmin.net/){:target="_blank"} | 8081 | [http://127.0.0.1:8081](http://127.0.0.1:8081){:target="_blank"} | latest |
 | :octicons-mail-24: [MailPit](https://github.com/axllent/mailpit){:target="_blank"} | 1025 (SMTP) / 8025 (UI) | [http://127.0.0.1:8025](http://127.0.0.1:8025){:target="_blank"} | latest |
