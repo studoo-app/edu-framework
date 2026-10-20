@@ -306,11 +306,16 @@ Pour trouver ce qui ralentit une page, cherchez **les rectangles larges sur les 
 | **Left Heavy** | Les appels identiques sont **regroupés** et triés, le plus coûteux à gauche       | Trouver rapidement le chemin d'appels qui coûte le plus cher |
 | **Sandwich**   | Un tableau des fonctions (temps propre et temps total). Une fonction sélectionnée affiche ses **appelants** au-dessus et ses **appelés** en dessous | Analyser une fonction précise appelée depuis plusieurs endroits |
 
+<figure markdown="span">
+![Vue Left Heavy de Speedscope](../assets/screen-speedscope-left-heavy.png)
+<figcaption>La vue Left Heavy d'une requête vers /medecin/new : sous Twig\Environment::compileSource, la compilation du template occupe presque toute la largeur</figcaption>
+</figure>
+
 **5. Naviguer.** La molette (ou le pincement sur un pavé tactile) zoome, un glisser déplace la vue, et un clic sur un rectangle affiche en bas de l'écran le détail de la fonction (temps propre, temps total, fichier).
 
 !!! example "Exemple : la compilation d'un template Twig"
 
-    Sur la première requête vers `/medecin/new` après la modification de son template, la vue **Left Heavy** montre que presque toute la requête (environ 11 ms sur 12) se trouve sous `Twig\Environment::compileSource` : Twig **compile** le template en PHP (`Lexer::tokenize` puis `Parser::parse`) avant de l'afficher.
+    Sur la première requête vers `/medecin/new` après la modification de son template, la vue **Left Heavy** (capture ci-dessus) montre que presque toute la requête (environ 11 ms sur 12) se trouve sous `Twig\Environment::compileSource` : Twig **compile** le template en PHP (`Lexer::tokenize` puis `Parser::parse`) avant de l'afficher.
     Le résultat est mis en cache dans `var/cache/twig` : les requêtes suivantes sur cette page n'ont plus ce coût.
     Avant d'optimiser une page, profilez donc **plusieurs requêtes** pour ne pas confondre un coût de premier chargement avec un vrai problème de performance.
 
