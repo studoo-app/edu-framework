@@ -208,6 +208,65 @@ Exemple de réponse :
 - `queries` : liste chronologique des exécutions (`rows_count` à `null` si le pilote ne fournit pas l'information, Exemple : `-1` pour un `SELECT` sous PostgreSQL) ;
 - `groups` : requêtes identiques regroupées avec leur nombre d'exécutions et leur temps cumulé.
 
+## Le profiler de code
+
+Le profiler de code mesure **le temps passé dans chaque fonction PHP** pendant une requête HTTP, pour repérer ce qui ralentit une page. Il s'appuie sur l'extension [Excimer](https://www.mediawiki.org/wiki/Excimer){:target="_blank"} (Wikimedia), un profiler **par échantillonnage** : toutes les 0,1 ms, Excimer relève la pile d'appels en cours. Une fonction présente dans 30 % des relevés a consommé environ 30 % du temps de la requête. Le coût reste faible (quelques %) et fonctionne avec FrankenPHP, y compris en mode worker.
+
+!!! info "Un résultat statistique"
+
+    Une fonction très courte (moins de 0,1 ms) peut ne jamais apparaître dans le profil. Les temps affichés sont des estimations : `nombre de relevés × 0,1 ms`.
+
+### Installer l'extension
+
+L'image Docker du framework installe Excimer par défaut (argument de build `EDU_PROFILER=1`). Pour construire une image sans profiler :
+
+```bash
+EDU_PROFILER_BUILD=0 docker compose build
+```
+
+Hors Docker, installez l'extension avec PECL (`pecl install excimer`) puis activez-la dans le `php.ini` (`extension=excimer`). La commande `php bin/edu check:config` indique si l'extension est chargée.
+
+### Activer le profilage
+
+Le profilage se règle avec la variable `EDU_PROFILER` du `.env` :
+
+```bash
+## << Config profiler de code
+EDU_PROFILER=trigger
+EDU_PROFILER_KEEP=50
+## >> Config profiler de code
+```
+
+| Valeur    | Comportement                                                                 |
+|-----------|------------------------------------------------------------------------------|
+| `off`     | Profiler désactivé, le bloc **Code** est masqué                              |
+| `trigger` | (défaut) Profilage à la demande : bouton **Code** de la barre de debug, ou paramètre `?_profile=1` dans l'URL |
+| `on`      | Chaque requête est profilée                                                  |
+
+`EDU_PROFILER_KEEP` fixe le nombre de profils conservés (les plus anciens sont supprimés, 50 par défaut).
+
+En mode `trigger`, un clic sur le bloc **Code** pose le cookie `edu_profile=1` et recharge la page : cette page **et les suivantes** sont profilées, jusqu'au clic sur **Désactiver** dans le panneau du bloc.
+
+### Lire le profil
+
+- Le bloc **Code** de la barre de debug affiche le temps profilé et la fonction la plus coûteuse ; son panneau liste le top 3 des fonctions.
+- L'onglet **Code** du profiler (`/_debug/profiler#code/{token}`) affiche le tableau de toutes les fonctions, triable par **temps propre** (temps passé dans la fonction elle-même) ou **temps inclusif** (fonction et fonctions appelées), filtrable par origine (`app`, `framework`, `vendor`). Un clic sur une fonction affiche ses appelants et ses appelés.
+- Le bouton **Télécharger (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour obtenir un *flamegraph*.
+
+### L'API du profil de code
+
+```
+GET /edu-code-profile?token=42
+```
+
+| Paramètre | Description                                                         | Défaut |
+|-----------|---------------------------------------------------------------------|--------|
+| `token`   | Identifiant du log de la requête HTTP (`#42` accepté)               | requis |
+| `full`    | `1` : ajoute toutes les fonctions (`functions`) et le graphe d'appels (`edges`) | — |
+| `format`  | `speedscope` : retourne le fichier Speedscope de la requête         | —      |
+
+La réponse contient `status` (`ready`, ou `pending` tant que le profil n'est pas enregistré), `summary` (`driver`, `period_ms`, `samples`, `wall_ms`, `peak_mb`, `functions_count`) et `top` (fonctions les plus coûteuses). Les profils sont stockés, compressés, dans la table `serv_code_profiles` de la base des logs.
+
 ## Le stockage des logs
 
 Les requêtes HTTP traitées par le framework sont enregistrées dans une base **SQLite** dédiée :

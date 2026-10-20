@@ -110,14 +110,17 @@ class LogsService
      * @param int $limit Nombre de logs à récupérer
      * @param int $offset Décalage pour la pagination
      * @param array<string, string|null> $filters Filtres optionnels
-     * @return array<int, array<string, mixed>> Liste des logs (id, event_date, event)
+     * @return array<int, array<string, mixed>> Liste des logs (id, event_date, event, profiled :
+     *         la requête a un profil de code)
      */
     public static function getLogs(int $limit = 20, int $offset = 0, array $filters = []): array
     {
         [$where, $params] = self::buildFilters($filters);
 
         $stmt = self::getConnect()->prepare(
-            'SELECT id, event_date, event_desc FROM serv_logs' . $where
+            'SELECT id, event_date, event_desc, '
+            . '(SELECT COUNT(*) FROM serv_code_profiles WHERE request_id = serv_logs.id) AS profiled '
+            . 'FROM serv_logs' . $where
             . ' ORDER BY id DESC LIMIT :limit OFFSET :offset'
         );
         foreach ($params as $key => $value) {
@@ -134,6 +137,7 @@ class LogsService
                 'id' => (int) $row['id'],
                 'event_date' => $row['event_date'],
                 'event' => (is_array($event) === true ? $event : ['raw' => (string) $row['event_desc']]),
+                'profiled' => ((int) $row['profiled'] > 0),
             ];
         }
 
@@ -329,5 +333,48 @@ class LogsService
         }
 
         return $groups;
+    }
+
+    /**
+     * Permets de récupérer le profil de code d'une requête HTTP (rattaché par
+     * le token du log de la requête), enregistré par CodeProfileLogger
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @param bool $withData true pour décompresser aussi les données complètes (clé data)
+     * @return array<string, mixed>|null Profil (driver, period_ms, samples, wall_ms, peak_mb,
+     *         functions_count, top, event_date, data), null si la requête n'a pas de profil
+     */
+    public static function getCodeProfile(int $tokenId, bool $withData = false): ?array
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT driver, period_ms, samples, wall_ms, peak_mb, functions_count, top_json, event_date'
+            . ($withData === true ? ', data' : '')
+            . ' FROM serv_code_profiles WHERE request_id = :request_id'
+        );
+        $stmt->bindValue(':request_id', $tokenId, PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
+
+        $profile = [
+            'driver' => (string) $row['driver'],
+            'period_ms' => (float) $row['period_ms'],
+            'samples' => (int) $row['samples'],
+            'wall_ms' => (float) $row['wall_ms'],
+            'peak_mb' => ($row['peak_mb'] === null ? null : (float) $row['peak_mb']),
+            'functions_count' => (int) $row['functions_count'],
+            'top' => json_decode((string) $row['top_json'], true) ?: [],
+            'event_date' => $row['event_date'],
+        ];
+
+        if ($withData === true) {
+            $raw = @gzuncompress((string) $row['data']);
+            $data = ($raw === false ? null : json_decode($raw, true));
+            $profile['data'] = (is_array($data) === true ? $data : []);
+        }
+
+        return $profile;
     }
 }

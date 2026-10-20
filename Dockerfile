@@ -32,6 +32,13 @@ RUN install-php-extensions \
     intl \
     opcache
 
+# Profiler de code de la barre de debug (Excimer, profiler par échantillonnage)
+# Installé uniquement pour l'image de développement :
+#   docker compose build --build-arg EDU_PROFILER=0   => image sans profiler
+# Doc : https://www.mediawiki.org/wiki/Excimer
+ARG EDU_PROFILER=1
+RUN if [ "$EDU_PROFILER" = "1" ]; then install-php-extensions excimer; fi
+
 # Composer (depuis l'image officielle)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

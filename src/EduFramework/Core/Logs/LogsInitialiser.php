@@ -38,6 +38,22 @@ class LogsInitialiser
                                         event_date TEXT DEFAULT (datetime('now'))
                                     )");
             $pdo->exec("CREATE INDEX IF NOT EXISTS idx_serv_sql_logs_request_id ON serv_sql_logs (request_id)");
+
+            // Table des profils de code (profiler de la barre de debug), un profil
+            // par requête HTTP, rattaché par l'identifiant du log de la requête (request_id)
+            $pdo->exec("CREATE TABLE IF NOT EXISTS serv_code_profiles (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        request_id INTEGER NOT NULL UNIQUE,
+                                        driver TEXT NOT NULL,
+                                        period_ms REAL NOT NULL,
+                                        samples INTEGER NOT NULL,
+                                        wall_ms REAL NOT NULL,
+                                        peak_mb REAL,
+                                        functions_count INTEGER NOT NULL,
+                                        top_json TEXT NOT NULL,
+                                        data BLOB NOT NULL,
+                                        event_date TEXT DEFAULT (datetime('now'))
+                                    )");
         } catch (\PDOException $e) {
             error_log('[EduFramework Logs] ' . $e->getMessage());
         }

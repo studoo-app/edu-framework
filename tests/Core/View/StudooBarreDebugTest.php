@@ -7,6 +7,8 @@ use ReflectionProperty;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
+use Studoo\EduFramework\Core\Profiler\CodeProfiler;
+use Studoo\EduFramework\Core\Profiler\ProfilerDriverInterface;
 use Studoo\EduFramework\Core\View\studooBarreDebug;
 
 /**
@@ -34,6 +36,10 @@ class StudooBarreDebugTest extends TestCase
     {
         // Réinitialisation de l'identifiant de requête statique entre les tests
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
+        // Réinitialisation du profiler de code (driver factice, cookie du bouton Code)
+        CodeProfiler::reset();
+        CodeProfiler::setDriver(null);
+        unset($_COOKIE[CodeProfiler::COOKIE]);
         // Restauration des variables d'environnement modifiées par les tests
         foreach ($this->envBackup as $key => $value) {
             if ($value === null) {
@@ -210,5 +216,106 @@ class StudooBarreDebugTest extends TestCase
 
         $this->assertStringNotContainsString('"&port=9090"', $html);
         $this->assertStringContainsString('&quot;&amp;port=9090', $html);
+    }
+
+    /**
+     * Driver de profilage factice : disponible ou non, sans extension installée
+     */
+    private function fakeDriver(bool $available): ProfilerDriverInterface
+    {
+        return new class ($available) implements ProfilerDriverInterface {
+            public function __construct(private bool $available)
+            {
+            }
+
+            public function name(): string
+            {
+                return 'fake';
+            }
+
+            public function isAvailable(): bool
+            {
+                return $this->available;
+            }
+
+            public function start(): void
+            {
+            }
+
+            public function stop(): array
+            {
+                return [];
+            }
+        };
+    }
+
+    /**
+     * Le bloc Code est masqué quand le profiler est désactivé (EDU_PROFILER=off)
+     */
+    public function testCodeBlockIsHiddenWhenTheProfilerIsOff(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'off']);
+        CodeProfiler::setDriver($this->fakeDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringNotContainsString('edu-tb-code', $html);
+    }
+
+    /**
+     * Sans l'extension Excimer, le bloc Code est grisé et renvoie à la documentation
+     */
+    public function testCodeBlockShowsTheMissingExtension(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => null]);
+        CodeProfiler::setDriver($this->fakeDriver(false));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('edu-tb-code missing', $html);
+        $this->assertStringContainsString('excimer non installée', $html);
+        $this->assertStringNotContainsString('eduProfileToggle(true)', $html);
+    }
+
+    /**
+     * En mode trigger sans cookie, le bloc Code est un bouton qui active le profilage
+     */
+    public function testCodeBlockIsAButtonWhenProfilingIsInactive(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'trigger']);
+        CodeProfiler::setDriver($this->fakeDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+        (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('edu-tb-code off', $html);
+        $this->assertStringContainsString('onclick="eduProfileToggle(true)"', $html);
+        $this->assertStringNotContainsString('id="edu-tb-code"', $html);
+        $this->assertStringNotContainsString('eduLoadCodeProfile();', $html);
+    }
+
+    /**
+     * Requête profilée : le bloc Code renvoie à l'onglet Code du profiler et
+     * charge le résumé du profil en JavaScript
+     */
+    public function testCodeBlockLinksToTheProfileWhenProfilingIsActive(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'trigger']);
+        $_COOKIE[CodeProfiler::COOKIE] = '1';
+        CodeProfiler::setDriver($this->fakeDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+        (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
+        CodeProfiler::start();
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('id="edu-tb-code" data-token="42"', $html);
+        $this->assertStringContainsString('href="/_debug/profiler#code/42"', $html);
+        // En mode trigger, le panneau permet de désactiver le profilage
+        $this->assertStringContainsString('eduProfileToggle(false)', $html);
+        $this->assertStringContainsString('eduLoadCodeProfile();', $html);
     }
 }
