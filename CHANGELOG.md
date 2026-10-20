@@ -11,7 +11,7 @@
 
 **documentation**
 
-- update [La barre de debug et le profiler](docs/boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil, API)
+- update [La barre de debug et le profiler](docs/boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil avec captures d'écran, lecture du flamegraph avec Speedscope, API)
 - update [Installation avec Docker](docs/installation/docker.md) : variables d'environnement `EDU_PROFILER`, `EDU_PROFILER_KEEP` et `EDU_PROFILER_BUILD`
 - update [Prérequis](docs/installation/prerequis.md) : installation de l'extension optionnelle `excimer` hors Docker
 

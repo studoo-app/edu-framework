@@ -250,8 +250,69 @@ En mode `trigger`, un clic sur le bloc **Code** pose le cookie `edu_profile=1` e
 ### Lire le profil
 
 - Le bloc **Code** de la barre de debug affiche le temps profilé et la fonction la plus coûteuse ; son panneau liste le top 3 des fonctions.
+
+<figure markdown="span">
+![Panneau du bloc Code de la barre de debug](../assets/screen-profiler-code-bar.png){width="720"}
+<figcaption>Le panneau du bloc Code : temps profilé, top 3 des fonctions et lien Désactiver</figcaption>
+</figure>
+
 - L'onglet **Code** du profiler (`/_debug/profiler#code/{token}`) affiche le tableau de toutes les fonctions, triable par **temps propre** (temps passé dans la fonction elle-même) ou **temps inclusif** (fonction et fonctions appelées), filtrable par origine (`app`, `framework`, `vendor`). Un clic sur une fonction affiche ses appelants et ses appelés.
-- Le bouton **Télécharger (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour obtenir un *flamegraph*.
+
+<figure markdown="span">
+![Onglet Code du profiler](../assets/screen-profiler-code-tab.png)
+<figcaption>L'onglet Code du profiler, toutes les origines cochées, trié par temps propre</figcaption>
+</figure>
+
+<figure markdown="span">
+![Appelants et appelés d'une fonction](../assets/screen-profiler-code-graph.png)
+<figcaption>Après un clic sur une fonction : ses appelants (Appelée par) et ses appelés (Appelle)</figcaption>
+</figure>
+
+- Le bouton **Télécharger le flamegraph (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour obtenir un *flamegraph* (voir ci-dessous).
+
+### Lire le flamegraph avec Speedscope
+
+Le tableau de l'onglet **Code** additionne les temps par fonction, mais il ne montre pas **l'enchaînement des appels**. Le *flamegraph* le montre : chaque relevé de la pile d'appels est dessiné, et l'on voit d'un coup d'œil quel chemin dans le code consomme le temps.
+
+[Speedscope](https://github.com/jlfwong/speedscope){:target="_blank"} est un visualiseur de flamegraph open source qui fonctionne dans le navigateur.
+
+**1. Exporter le profil.** Dans l'onglet **Code** d'une requête, cliquez sur **Télécharger le flamegraph (Speedscope)**. Le navigateur enregistre un fichier `edu-profile-{token}.speedscope.json`.
+
+**2. Ouvrir le fichier.** Cliquez sur **Ouvrir speedscope.app**, puis sur **Browse** pour choisir le fichier, ou glissez-déposez-le directement dans la fenêtre.
+
+<figure markdown="span">
+![Écran d'accueil de speedscope.app](../assets/screen-speedscope-home.png){width="634"}
+<figcaption>L'écran d'accueil de speedscope.app : bouton Browse ou glisser-déposer du fichier</figcaption>
+</figure>
+
+!!! info "Le fichier reste sur votre poste"
+
+    speedscope.app lit le fichier **dans le navigateur** : le profil n'est envoyé à aucun serveur.
+    Il contient néanmoins les noms des fonctions et les chemins des fichiers de votre application.
+
+**3. Lire le graphe.** Chaque rectangle est un appel de fonction :
+
+- **la largeur** d'un rectangle est le temps passé dans la fonction **et dans tout ce qu'elle appelle** (le temps inclusif) ;
+- **de haut en bas**, on descend dans la pile d'appels : la première ligne est le point d'entrée (`public/index.php`), la ligne en dessous contient les fonctions qu'il appelle, et ainsi de suite ;
+- **une couleur** correspond à une fonction, ce qui aide à repérer une même fonction à plusieurs endroits.
+
+Pour trouver ce qui ralentit une page, cherchez **les rectangles larges sur les lignes du bas** : c'est là que le temps est réellement consommé.
+
+**4. Choisir une vue.** Les trois onglets en haut à gauche (ou les touches ++1++, ++2++, ++3++) changent la présentation :
+
+| Vue            | Ce qu'elle montre                                                                 | Quand l'utiliser |
+|----------------|-----------------------------------------------------------------------------------|------------------|
+| **Time Order** | Les piles d'appels dans **l'ordre chronologique** de la requête (l'axe horizontal est le temps écoulé) | Comprendre le déroulement de la requête : routage, controller, rendu du template, ... |
+| **Left Heavy** | Les appels identiques sont **regroupés** et triés, le plus coûteux à gauche       | Trouver rapidement le chemin d'appels qui coûte le plus cher |
+| **Sandwich**   | Un tableau des fonctions (temps propre et temps total). Une fonction sélectionnée affiche ses **appelants** au-dessus et ses **appelés** en dessous | Analyser une fonction précise appelée depuis plusieurs endroits |
+
+**5. Naviguer.** La molette (ou le pincement sur un pavé tactile) zoome, un glisser déplace la vue, et un clic sur un rectangle affiche en bas de l'écran le détail de la fonction (temps propre, temps total, fichier).
+
+!!! example "Exemple : la compilation d'un template Twig"
+
+    Sur la première requête vers `/medecin/new` après la modification de son template, la vue **Left Heavy** montre que presque toute la requête (environ 11 ms sur 12) se trouve sous `Twig\Environment::compileSource` : Twig **compile** le template en PHP (`Lexer::tokenize` puis `Parser::parse`) avant de l'afficher.
+    Le résultat est mis en cache dans `var/cache/twig` : les requêtes suivantes sur cette page n'ont plus ce coût.
+    Avant d'optimiser une page, profilez donc **plusieurs requêtes** pour ne pas confondre un coût de premier chargement avec un vrai problème de performance.
 
 ### L'API du profil de code
 
