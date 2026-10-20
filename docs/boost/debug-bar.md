@@ -36,7 +36,7 @@ La barre s'affiche automatiquement en bas de chaque page. Chaque bloc affiche un
 | :material-memory: **Mémoire**             | Pic d'utilisation mémoire et limite PHP (`memory_limit`)                    |
 | :material-database: **SQL**               | **Nombre de requêtes SQL** exécutées pendant la requête et temps SQL cumulé ; au survol : requête la plus lente et lien vers la [vue SQL du profiler](#les-requetes-sql) (`#sql/{token}`). Le bloc est masqué s'il n'y a aucune requête |
 | :material-text-box-outline: **DevTool**         | **Token de la requête en cours** et lien vers son [descriptif dans le profiler](#le-profiler) (`#request/{token}`) ; si la requête n'est pas journalisée, lien vers la liste des requêtes |
-| :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`) ; **services de développement** au survol : application (HTTP/HTTPS), MariaDB, Mailpit (interface web et SMTP), DbGate et phpMyAdmin — les URLs des interfaces web sont **cliquables** (ouverture dans un nouvel onglet), les ports sont lus dans le `.env` (`HTTP_PORT`, `HTTPS_PORT`, `DB_HOST`/`DB_SOCKET`, `MAILER_UI_PORT`, `MAILER_SMTP_PORT`, `DBGATE_PORT`, `PMA_PORT`) avec les valeurs par défaut du `compose.yaml` en cas d'absence |
+| :material-application-brackets: **DEV**   | Version de PHP et SAPI utilisée; type, hôte et nom de la base de données au survol (visible uniquement si `DB_HOST_STATUS=true`) ; **services de développement** au survol : application (HTTP/HTTPS), MariaDB, Mailpit (interface web et SMTP), DbGate et phpMyAdmin — les URLs des interfaces web sont **cliquables** (ouverture dans un nouvel onglet), les ports sont lus dans le `.env` (`HTTP_PORT`, `HTTPS_PORT`, `DB_HOST`/`DB_SOCKET`, `MAILER_UI_PORT`, `MAILER_SMTP_PORT`, `DBGATE_PORT`, `PMA_PORT`) avec les valeurs par défaut du `compose.yaml` en cas d'absence. Les colonnes contenant des liens sont correctement alignées avec les autres informations. |
 | :material-package-variant: **Edu Framework** | Version du framework, date de livraison et lien vers la documentation  |
 
 !!! tip "Accès aux services Docker depuis la barre"
@@ -207,6 +207,138 @@ Exemple de réponse :
 
 - `queries` : liste chronologique des exécutions (`rows_count` à `null` si le pilote ne fournit pas l'information, Exemple : `-1` pour un `SELECT` sous PostgreSQL) ;
 - `groups` : requêtes identiques regroupées avec leur nombre d'exécutions et leur temps cumulé.
+
+## Le profiler de code
+
+Le profiler de code mesure **le temps passé dans chaque fonction PHP** pendant une requête HTTP, pour repérer ce qui ralentit une page. Il s'appuie sur l'extension [Excimer](https://www.mediawiki.org/wiki/Excimer){:target="_blank"} (Wikimedia), un profiler **par échantillonnage** : toutes les 0,1 ms, Excimer relève la pile d'appels en cours. Une fonction présente dans 30 % des relevés a consommé environ 30 % du temps de la requête. Le coût reste faible (quelques %) et fonctionne avec FrankenPHP, y compris en mode worker.
+
+!!! warning "Déjà disponible avec FrankenPHP dans Docker"
+
+    Si votre application tourne sur le serveur d'exécution **FrankenPHP dans Docker** (service `frankenphp`, voir [« L'application dans Docker »](../installation/docker.md)), le profiler de code est **déjà prêt** : l'extension Excimer est installée dans l'image et le profilage à la demande est activé par défaut (`EDU_PROFILER=trigger`).
+    Il n'y a rien à installer ni à configurer : ouvrez l'application (`https://localhost`) et cliquez sur le bloc **Code** de la barre de debug.
+
+    L'installation décrite ci-dessous ne concerne que l'exécution **hors Docker** (serveur PHP intégré, par exemple `http://localhost:8042`).
+
+!!! info "Un résultat statistique"
+
+    Une fonction très courte (moins de 0,1 ms) peut ne jamais apparaître dans le profil. Les temps affichés sont des estimations : `nombre de relevés × 0,1 ms`.
+
+### Installer l'extension
+
+L'image Docker du framework installe Excimer par défaut (argument de build `EDU_PROFILER=1`). Pour construire une image sans profiler :
+
+```bash
+EDU_PROFILER_BUILD=0 docker compose build
+```
+
+Hors Docker, installez l'extension avec PECL (`pecl install excimer`) puis activez-la dans le `php.ini` (`extension=excimer`). La commande `php bin/edu check:config` indique si l'extension est chargée.
+
+### Activer le profilage
+
+Le profilage se règle avec la variable `EDU_PROFILER` du `.env` :
+
+```bash
+## << Config profiler de code
+EDU_PROFILER=trigger
+EDU_PROFILER_KEEP=50
+## >> Config profiler de code
+```
+
+| Valeur    | Comportement                                                                 |
+|-----------|------------------------------------------------------------------------------|
+| `off`     | Profiler désactivé, le bloc **Code** est masqué                              |
+| `trigger` | (défaut) Profilage à la demande : bouton **Code** de la barre de debug, ou paramètre `?_profile=1` dans l'URL |
+| `on`      | Chaque requête est profilée                                                  |
+
+`EDU_PROFILER_KEEP` fixe le nombre de profils conservés (les plus anciens sont supprimés, 50 par défaut).
+
+En mode `trigger`, un clic sur le bloc **Code** pose le cookie `edu_profile=1` et recharge la page : cette page **et les suivantes** sont profilées, jusqu'au clic sur **Désactiver** dans le panneau du bloc.
+
+### Lire le profil
+
+- Le bloc **Code** de la barre de debug affiche le temps profilé et la fonction la plus coûteuse ; son panneau liste le top 3 des fonctions.
+
+<figure markdown="span">
+![Panneau du bloc Code de la barre de debug](../assets/screen-profiler-code-bar.png){width="720"}
+<figcaption>Le panneau du bloc Code : temps profilé, top 3 des fonctions et lien Désactiver</figcaption>
+</figure>
+
+- L'onglet **Code** du profiler (`/_debug/profiler#code/{token}`) affiche le tableau de toutes les fonctions, triable par **temps propre** (temps passé dans la fonction elle-même) ou **temps inclusif** (fonction et fonctions appelées), filtrable par origine (`app`, `framework`, `vendor`). Un clic sur une fonction affiche ses appelants et ses appelés.
+
+<figure markdown="span">
+![Onglet Code du profiler](../assets/screen-profiler-code-tab.png)
+<figcaption>L'onglet Code du profiler, toutes les origines cochées, trié par temps propre</figcaption>
+</figure>
+
+<figure markdown="span">
+![Appelants et appelés d'une fonction](../assets/screen-profiler-code-graph.png)
+<figcaption>Après un clic sur une fonction : ses appelants (Appelée par) et ses appelés (Appelle)</figcaption>
+</figure>
+
+- Le bouton **Télécharger le flamegraph (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour obtenir un *flamegraph* (voir ci-dessous).
+
+### Lire le flamegraph avec Speedscope
+
+Le tableau de l'onglet **Code** additionne les temps par fonction, mais il ne montre pas **l'enchaînement des appels**. Le *flamegraph* le montre : chaque relevé de la pile d'appels est dessiné, et l'on voit d'un coup d'œil quel chemin dans le code consomme le temps.
+
+[Speedscope](https://github.com/jlfwong/speedscope){:target="_blank"} est un visualiseur de flamegraph open source qui fonctionne dans le navigateur.
+
+**1. Exporter le profil.** Dans l'onglet **Code** d'une requête, cliquez sur **Télécharger le flamegraph (Speedscope)**. Le navigateur enregistre un fichier `edu-profile-{token}.speedscope.json`.
+
+**2. Ouvrir le fichier.** Cliquez sur **Ouvrir speedscope.app**, puis sur **Browse** pour choisir le fichier, ou glissez-déposez-le directement dans la fenêtre.
+
+<figure markdown="span">
+![Écran d'accueil de speedscope.app](../assets/screen-speedscope-home.png){width="634"}
+<figcaption>L'écran d'accueil de speedscope.app : bouton Browse ou glisser-déposer du fichier</figcaption>
+</figure>
+
+!!! info "Le fichier reste sur votre poste"
+
+    speedscope.app lit le fichier **dans le navigateur** : le profil n'est envoyé à aucun serveur.
+    Il contient néanmoins les noms des fonctions et les chemins des fichiers de votre application.
+
+**3. Lire le graphe.** Chaque rectangle est un appel de fonction :
+
+- **la largeur** d'un rectangle est le temps passé dans la fonction **et dans tout ce qu'elle appelle** (le temps inclusif) ;
+- **de haut en bas**, on descend dans la pile d'appels : la première ligne est le point d'entrée (`public/index.php`), la ligne en dessous contient les fonctions qu'il appelle, et ainsi de suite ;
+- **une couleur** correspond à une fonction, ce qui aide à repérer une même fonction à plusieurs endroits.
+
+Pour trouver ce qui ralentit une page, cherchez **les rectangles larges sur les lignes du bas** : c'est là que le temps est réellement consommé.
+
+**4. Choisir une vue.** Les trois onglets en haut à gauche (ou les touches ++1++, ++2++, ++3++) changent la présentation :
+
+| Vue            | Ce qu'elle montre                                                                 | Quand l'utiliser |
+|----------------|-----------------------------------------------------------------------------------|------------------|
+| **Time Order** | Les piles d'appels dans **l'ordre chronologique** de la requête (l'axe horizontal est le temps écoulé) | Comprendre le déroulement de la requête : routage, controller, rendu du template, ... |
+| **Left Heavy** | Les appels identiques sont **regroupés** et triés, le plus coûteux à gauche       | Trouver rapidement le chemin d'appels qui coûte le plus cher |
+| **Sandwich**   | Un tableau des fonctions (temps propre et temps total). Une fonction sélectionnée affiche ses **appelants** au-dessus et ses **appelés** en dessous | Analyser une fonction précise appelée depuis plusieurs endroits |
+
+<figure markdown="span">
+![Vue Left Heavy de Speedscope](../assets/screen-speedscope-left-heavy.png)
+<figcaption>La vue Left Heavy d'une requête vers /medecin/new : sous Twig\Environment::compileSource, la compilation du template occupe presque toute la largeur</figcaption>
+</figure>
+
+**5. Naviguer.** La molette (ou le pincement sur un pavé tactile) zoome, un glisser déplace la vue, et un clic sur un rectangle affiche en bas de l'écran le détail de la fonction (temps propre, temps total, fichier).
+
+!!! example "Exemple : la compilation d'un template Twig"
+
+    Sur la première requête vers `/medecin/new` après la modification de son template, la vue **Left Heavy** (capture ci-dessus) montre que presque toute la requête (environ 11 ms sur 12) se trouve sous `Twig\Environment::compileSource` : Twig **compile** le template en PHP (`Lexer::tokenize` puis `Parser::parse`) avant de l'afficher.
+    Le résultat est mis en cache dans `var/cache/twig` : les requêtes suivantes sur cette page n'ont plus ce coût.
+    Avant d'optimiser une page, profilez donc **plusieurs requêtes** pour ne pas confondre un coût de premier chargement avec un vrai problème de performance.
+
+### L'API du profil de code
+
+```
+GET /edu-code-profile?token=42
+```
+
+| Paramètre | Description                                                         | Défaut |
+|-----------|---------------------------------------------------------------------|--------|
+| `token`   | Identifiant du log de la requête HTTP (`#42` accepté)               | requis |
+| `full`    | `1` : ajoute toutes les fonctions (`functions`) et le graphe d'appels (`edges`) | — |
+| `format`  | `speedscope` : retourne le fichier Speedscope de la requête         | —      |
+
+La réponse contient `status` (`ready`, ou `pending` tant que le profil n'est pas enregistré), `summary` (`driver`, `period_ms`, `samples`, `wall_ms`, `peak_mb`, `functions_count`) et `top` (fonctions les plus coûteuses). Les profils sont stockés, compressés, dans la table `serv_code_profiles` de la base des logs.
 
 ## Le stockage des logs
 

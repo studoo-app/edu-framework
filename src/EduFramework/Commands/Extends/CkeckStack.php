@@ -75,6 +75,8 @@ class CkeckStack
         $this->checkExtension('mbstring');
         $this->checkExtension('openssl');
         $this->checkExtension('json');
+        // Extension optionnelle : profiler de code de la barre de debug
+        $this->checkExtension('excimer');
     }
 
     /**

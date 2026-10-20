@@ -10,13 +10,21 @@
 services:
   frankenphp:
     container_name: ${APP_NAME}-http-server
-    build: .
+    build:
+      context: .
+      args:
+        # Profiler de code de la barre de debug (extension Excimer) :
+        # 1 => installé (défaut, développement) | 0 => image sans profiler
+        EDU_PROFILER: ${EDU_PROFILER_BUILD:-1}
     # tty: true => logs lisibles en dev ; retirer pour des logs JSON (prod)
     tty: true
     environment:
       # Application (voir .env)
       APP_NAME: ${APP_NAME:-edu-framework}
       APP_ENV: ${APP_ENV:-dev}
+      # Profiler de code de la barre de debug : off | trigger | on (voir .env)
+      EDU_PROFILER: ${EDU_PROFILER:-trigger}
+      EDU_PROFILER_KEEP: ${EDU_PROFILER_KEEP:-50}
       TZ: ${TZ:-Europe/Paris}
       # Base de données : mêmes valeurs que le .env, sauf l'hôte et le port
       # qui, dans le réseau Docker, sont toujours ceux du service (database:3306)

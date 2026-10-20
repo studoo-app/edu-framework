@@ -247,6 +247,33 @@
         .status-text { font-weight: bold; }
 
         .back-link { margin-bottom: 14px; }
+        /* Onglet Code : profiler du code PHP (Excimer) */
+        .code-filters { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 14px; font-size: 14px; }
+        .code-filters label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .code-note { margin: 0 0 16px; font-size: 13px; color: #777; }
+        .code-actions { margin: 0 0 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .origin-badge { display: inline-block; padding: 2px 6px; border-radius: 2px; font-size: 12px; font-weight: bold; white-space: nowrap; background: #eee; color: #555; }
+        .origin-badge.app { background: #fff1c2; color: #7a5b00; }
+        .origin-badge.framework { background: #cfe2ff; color: #0b4f8a; }
+        .origin-badge.vendor { background: #e8e0f5; color: #5a3d8a; }
+        #codeBody tr.app td { background: #fffbea; }
+        #codeBody tr { cursor: pointer; }
+        #codeBody tr.selected td { background: #e8f0fe; }
+        .code-fn { font-family: monospace; font-size: 13px; word-break: break-all; }
+        .code-file { display: block; color: #888; font-size: 12px; font-family: monospace; word-break: break-all; }
+        .code-bar { display: inline-block; height: 6px; background: #4f805d; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+        .profiler-table th.sortable button { all: inherit; cursor: pointer; user-select: none; display: inline; padding: 0; border: 0; background: none; }
+        .profiler-table th.sortable button:focus-visible, .code-fn-btn:focus-visible { outline: 2px solid #4f805d; outline-offset: 2px; }
+        .profiler-table th.sortable.sorted button::after { content: ' \25BE'; }
+        .code-fn-btn { font-family: monospace; font-size: 13px; color: inherit; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; }
+        #codeGraph .code-fn-btn { color: #0b62a3; text-decoration: underline; }
+        #codeGraph { margin-top: 24px; }
+        #codeGraph h2 { font-size: 16px; margin: 0 0 10px; }
+        .code-graph-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .code-graph-cols h3 { font-size: 13px; text-transform: uppercase; color: #777; margin: 0 0 6px; }
+        .code-graph-cols a { cursor: pointer; }
+        .profiled-badge { display: inline-block; margin-left: 6px; padding: 1px 5px; border-radius: 2px; font-size: 11px; background: #fff1c2; color: #7a5b00; text-decoration: none; }
+        @media (max-width: 800px) { .code-graph-cols { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -265,16 +292,6 @@
 
     <section class="summary" id="summary">
         <h2 id="summaryUrl"></h2>
-        <div class="meta">
-            <span><b>M&eacute;thode :</b> <span id="summaryMethod"></span></span>
-            <span><b>Statut HTTP :</b> <span id="summaryStatus"></span></span>
-            <span><b>IP :</b> <span id="summaryIp"></span></span>
-            <span><b>Serveur (SAPI) :</b> <span id="summarySapi"></span></span>
-            <span><b>Dur&eacute;e :</b> <span id="summaryDuration"></span></span>
-            <span><b>M&eacute;moire :</b> <span id="summaryMemory"></span></span>
-            <span><b>Re&ccedil;ue le :</b> <span id="summaryDate"></span></span>
-            <span><b>Token :</b> <span id="summaryToken"></span></span>
-        </div>
     </section>
 
     <section class="page-title" id="searchTitle"><h2>Recherche de requ&ecirc;tes</h2></section>
@@ -290,6 +307,7 @@
             <nav id="logsNav">
                 <a href="#" id="navRequest" class="disabled" title="Ouvrez le descriptif d'une requ&ecirc;te depuis la barre de debug ou la recherche"><span class="ico">&#9881;</span> Requ&ecirc;te</a>
                 <a href="#" id="navSql" class="disabled" title="Ouvrez le descriptif d'une requ&ecirc;te puis cliquez sur la ligne Requ&ecirc;tes SQL"><span class="ico"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><ellipse cx="8" cy="3.75" rx="5.5" ry="2.25"/><path d="M2.5 3.75v8.5c0 1.24 2.46 2.25 5.5 2.25s5.5-1.01 5.5-2.25v-8.5"/><path d="M2.5 8c0 1.24 2.46 2.25 5.5 2.25S13.5 9.24 13.5 8"/></svg></span> SQL <span id="sidebarSqlCount" class="count"></span></a>
+                <a href="#" id="navCode" class="disabled" title="Activez le profilage avec le bloc Code de la barre de debug, puis ouvrez le profil d'une requ&ecirc;te"><span class="ico">&#9201;</span> Code</a>
                 <a href="#logs" class="active"><span class="ico">&#9776;</span> Logs <span id="sidebarCount" class="count">0</span></a>
             </nav>
 
@@ -399,6 +417,40 @@
                     <tbody id="sqlBody"></tbody>
                 </table>
             </div>
+            <!-- Vue : profil du code PHP exécuté pendant une requête HTTP -->
+            <div id="viewCode" class="hidden">
+                <div class="back-link"><a href="#request" id="codeBackLink">&#8592; Retour au descriptif de la requ&ecirc;te</a></div>
+                <h1 id="codeTitle"></h1>
+                <div class="sql-meta" id="codeMeta"></div>
+                <p class="code-note">Les temps sont estim&eacute;s par &eacute;chantillonnage : la pile d'appels est relev&eacute;e &agrave; intervalle r&eacute;gulier. Le <b>temps propre</b> est pass&eacute; dans la fonction elle-m&ecirc;me (y compris les fonctions natives de PHP qu'elle appelle), le <b>temps inclusif</b> compte aussi les fonctions qu'elle appelle. Une fonction plus courte que la p&eacute;riode peut ne pas appara&icirc;tre.</p>
+                <div class="code-actions" id="codeActions">
+                    <a class="btn" id="codeSpeedscope" href="#" download>T&eacute;l&eacute;charger le flamegraph (Speedscope)</a>
+                    <a class="btn" href="https://www.speedscope.app" target="_blank" rel="noopener">Ouvrir speedscope.app</a>
+                </div>
+                <div class="code-filters" id="codeFilters">
+                    <label><input type="checkbox" value="app" checked> Mon code (app/)</label>
+                    <label><input type="checkbox" value="framework"> Framework</label>
+                    <label><input type="checkbox" value="vendor"> D&eacute;pendances (vendor/)</label>
+                    <label><input type="checkbox" value="other"> Autre</label>
+                </div>
+                <table class="profiler-table" id="codeTable">
+                    <thead>
+                        <tr>
+                            <th>Fonction</th><th>Origine</th>
+                            <th class="sortable sorted" data-sort="self"><button type="button">Temps propre</button></th>
+                            <th class="sortable" data-sort="inclusive"><button type="button">Temps inclusif</button></th>
+                        </tr>
+                    </thead>
+                    <tbody id="codeBody"></tbody>
+                </table>
+                <div id="codeGraph" class="hidden">
+                    <h2 id="codeGraphTitle"></h2>
+                    <div class="code-graph-cols">
+                        <div><h3>Appel&eacute;e par</h3><table class="profiler-table"><tbody id="codeCallers"></tbody></table></div>
+                        <div><h3>Appelle</h3><table class="profiler-table"><tbody id="codeCallees"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -409,6 +461,10 @@
             var token = '';
             var requestToken = '';
             var sqlToken = '';
+            var codeToken = '';
+            var codeData = null;
+            var codeSort = 'self';
+            var codeSelected = null;
             var logsStatus = '';
             var searchFilters = { limit: 20 };
 
@@ -468,6 +524,14 @@
                 return fetch('/edu-sql-logs?' + url.toString()).then(function(response) { return response.json(); });
             }
 
+            function codeQuery(params) {
+                var url = new URLSearchParams();
+                Object.keys(params).forEach(function(key) {
+                    if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
+                });
+                return fetch('/edu-code-profile?' + url.toString()).then(function(response) { return response.json(); });
+            }
+
             function fail(error) { console.error('[EduFramework Profiler]', error); }
 
             // ----- Contexte d'un log : tronqué si long, complet au clic ("Show full context") -----
@@ -519,14 +583,6 @@
                 summary.classList.remove('hidden');
                 summary.className = 'summary ' + statusClass(log.event.status_code);
                 $('summaryUrl').textContent = log.event.path;
-                $('summaryMethod').textContent = log.event.method;
-                $('summaryStatus').textContent = log.event.status_code;
-                $('summaryIp').textContent = log.event.ip_port;
-                $('summarySapi').textContent = log.event.sapi || '\u2014';
-                $('summaryDuration').textContent = prettyDuration(log.event.execution_time_ms);
-                $('summaryMemory').textContent = prettyMemory(log.event.memory_mb);
-                $('summaryDate').textContent = log.event.timestamp;
-                $('summaryToken').textContent = '#' + log.id;
             }
 
             // Badges de compteur des onglets par famille de statut,
@@ -635,6 +691,12 @@
                         tr.appendChild(tdMethod);
                         var tdPath = el('td');
                         tdPath.appendChild(requestLink(log.id, log.event.path));
+                        if (log.profiled === true) {
+                            var badge = el('a', 'profiled-badge', 'profil');
+                            badge.href = '#code/' + log.id;
+                            badge.title = 'Profil du code de cette requ\u00eate';
+                            tdPath.appendChild(badge);
+                        }
                         tr.appendChild(tdPath);
                         var tdSapi = el('td', 'nowrap');
                         tdSapi.appendChild(sapiBadge(log.event.sapi));
@@ -674,6 +736,18 @@
                 if (id) {
                     link.classList.remove('disabled');
                     link.setAttribute('href', '#sql/' + id);
+                } else {
+                    link.classList.add('disabled');
+                    link.setAttribute('href', '#');
+                }
+            }
+
+            function updateCodeNav(id) {
+                // L'entrée "Code" de la navigation suit le dernier profil consulté
+                var link = $('navCode');
+                if (id) {
+                    link.classList.remove('disabled');
+                    link.setAttribute('href', '#code/' + id);
                 } else {
                     link.classList.add('disabled');
                     link.setAttribute('href', '#');
@@ -720,6 +794,11 @@
                 sqlLink.href = '#sql/' + log.id;
                 sqlLink.id = 'requestSqlLink';
                 body.appendChild(requestRow('Requ\u00eates SQL', sqlLink));
+                // Profil du code : présent seulement si la requête a été profilée
+                var codeLink = el('a', null, log.profiled === true ? 'Voir le profil du code' : 'Requ\u00eate non profil\u00e9e');
+                codeLink.href = '#code/' + log.id;
+                codeLink.id = 'requestCodeLink';
+                body.appendChild(requestRow('Profil du code', codeLink));
                 if (e.error_message !== undefined) {
                     body.appendChild(requestRow('Erreur', el('pre', 'error-message', e.error_message)));
                 }
@@ -851,6 +930,177 @@
                 }).catch(fail);
             }
 
+            // ----- Vue "profil du code d'une requête HTTP" -----
+            function originBadge(origin) {
+                var labels = { app: 'mon code', framework: 'framework', vendor: 'vendor', other: 'autre' };
+                return el('span', 'origin-badge ' + origin, labels[origin] || origin);
+            }
+
+            function codeFilters() {
+                var origins = [];
+                document.querySelectorAll('#codeFilters input:checked').forEach(function(node) { origins.push(node.value); });
+                return origins;
+            }
+
+            function timeCell(ms, pct, max) {
+                var td = el('td', 'nowrap');
+                var bar = el('span', 'code-bar');
+                bar.style.width = Math.max(2, Math.round(pct / Math.max(max, 1) * 80)) + 'px';
+                td.appendChild(bar);
+                td.appendChild(el('b', null, prettyNumber(ms, 2) + ' ms'));
+                td.appendChild(document.createTextNode(' (' + prettyNumber(pct, 1) + ' %)'));
+                return td;
+            }
+
+            function renderCodeEmpty(message) {
+                $('codeMeta').innerHTML = '';
+                $('codeActions').classList.add('hidden');
+                $('codeGraph').classList.add('hidden');
+                var body = $('codeBody');
+                body.innerHTML = '';
+                var tr = el('tr');
+                var td = el('td', 'empty-state');
+                td.colSpan = 4;
+                td.appendChild(document.createTextNode(message + ' '));
+                var activate = el('a', null, 'Activer le profilage et rouvrir la page');
+                activate.href = '#';
+                activate.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    document.cookie = 'edu_profile=1; path=/; SameSite=Lax';
+                    query({ token: codeToken, limit: 1 }).then(function(data) {
+                        var path = (data.logs.length > 0 && data.logs[0].event) ? data.logs[0].event.path : '/';
+                        // Seule une URL du site est rouverte (le chemin journalisé vient de la requête HTTP)
+                        var url = new URL(path || '/', window.location.origin);
+                        if (url.origin !== window.location.origin) { url = new URL('/', window.location.origin); }
+                        window.open(url.href, '_blank', 'noopener');
+                    }).catch(fail);
+                });
+                td.appendChild(activate);
+                tr.appendChild(td);
+                body.appendChild(tr);
+            }
+
+            function renderCodeTable() {
+                var body = $('codeBody');
+                body.innerHTML = '';
+                var origins = codeFilters();
+                var functions = codeData.functions.filter(function(fn) {
+                    return origins.indexOf(fn.origin) !== -1 && (fn.self > 0 || fn.inclusive > 0);
+                });
+                functions.sort(function(a, b) { return b[codeSort] - a[codeSort]; });
+                document.querySelectorAll('#codeTable th.sortable').forEach(function(node) {
+                    node.classList.toggle('sorted', node.getAttribute('data-sort') === codeSort);
+                });
+
+                if (functions.length === 0) {
+                    var trEmpty = el('tr');
+                    var tdEmpty = el('td', 'empty-state', 'Aucune fonction pour ce filtre : cochez Framework ou Autre pour voir le reste du code ex\u00e9cut\u00e9');
+                    tdEmpty.colSpan = 4;
+                    trEmpty.appendChild(tdEmpty);
+                    body.appendChild(trEmpty);
+                    return;
+                }
+
+                var maxSelf = Math.max.apply(null, functions.map(function(fn) { return fn.self_pct; }));
+                var maxInclusive = Math.max.apply(null, functions.map(function(fn) { return fn.inclusive_pct; }));
+                functions.forEach(function(fn) {
+                    var tr = el('tr', fn.origin === 'app' ? 'app' : null);
+                    if (fn.name === codeSelected) { tr.classList.add('selected'); }
+                    var tdName = el('td');
+                    // Bouton : la sélection est aussi accessible au clavier
+                    var nameButton = el('button', 'code-fn code-fn-btn', fn.name);
+                    nameButton.type = 'button';
+                    nameButton.addEventListener('click', function(event) { event.stopPropagation(); selectFunction(fn.name); });
+                    tdName.appendChild(nameButton);
+                    if (fn.file) { tdName.appendChild(el('span', 'code-file', fn.file + (fn.line ? ':' + fn.line : ''))); }
+                    tr.appendChild(tdName);
+                    var tdOrigin = el('td');
+                    tdOrigin.appendChild(originBadge(fn.origin));
+                    tr.appendChild(tdOrigin);
+                    tr.appendChild(timeCell(fn.self_ms, fn.self_pct, maxSelf));
+                    tr.appendChild(timeCell(fn.inclusive_ms, fn.inclusive_pct, maxInclusive));
+                    tr.addEventListener('click', function() { selectFunction(fn.name); });
+                    body.appendChild(tr);
+                });
+            }
+
+            function graphRows(target, edges, key) {
+                target.innerHTML = '';
+                if (edges.length === 0) {
+                    var tr = el('tr');
+                    tr.appendChild(el('td', 'empty-state', '\u2014'));
+                    target.appendChild(tr);
+                    return;
+                }
+                edges.forEach(function(edge) {
+                    var tr = el('tr');
+                    var td = el('td');
+                    var link = el('button', 'code-fn code-fn-btn', edge[key]);
+                    link.type = 'button';
+                    link.addEventListener('click', function() { selectFunction(edge[key]); });
+                    td.appendChild(link);
+                    tr.appendChild(td);
+                    tr.appendChild(el('td', 'nowrap', prettyNumber(edge.ms, 2) + ' ms'));
+                    target.appendChild(tr);
+                });
+            }
+
+            function selectFunction(name) {
+                codeSelected = name;
+                renderCodeTable();
+                $('codeGraph').classList.remove('hidden');
+                $('codeGraphTitle').textContent = name;
+                graphRows($('codeCallers'), codeData.edges.filter(function(edge) { return edge.callee === name; }), 'caller');
+                graphRows($('codeCallees'), codeData.edges.filter(function(edge) { return edge.caller === name; }), 'callee');
+                $('codeGraph').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function renderCode(data) {
+                codeSelected = null;
+                $('codeGraph').classList.add('hidden');
+                $('codeTitle').textContent = 'Profil du code \u2014 requ\u00eate #' + codeToken;
+                if (data.status !== 'ready') {
+                    codeData = null;
+                    renderCodeEmpty('Cette requ\u00eate n\'a pas \u00e9t\u00e9 profil\u00e9e (ou le profil a \u00e9t\u00e9 supprim\u00e9 : seuls les derniers sont conserv\u00e9s).');
+                    return;
+                }
+                codeData = data;
+                var meta = $('codeMeta');
+                meta.innerHTML = '';
+                meta.appendChild(document.createTextNode('Temps profil\u00e9 : '));
+                meta.appendChild(el('b', null, prettyNumber(data.summary.wall_ms, 1) + ' ms'));
+                meta.appendChild(document.createTextNode(' \u2014 ' + data.summary.samples + ' \u00e9chantillons (1 toutes les '
+                    + prettyNumber(data.summary.period_ms, 1) + ' ms) \u2014 ' + data.summary.functions_count + ' fonctions \u2014 m\u00e9moire '
+                    + prettyMemory(data.summary.peak_mb) + ' \u2014 driver ' + data.summary.driver));
+                $('codeActions').classList.remove('hidden');
+                $('codeSpeedscope').href = '/edu-code-profile?token=' + encodeURIComponent(codeToken) + '&format=speedscope';
+                $('codeSpeedscope').setAttribute('download', 'edu-profile-' + codeToken + '.speedscope.json');
+                renderCodeTable();
+            }
+
+            function loadCode() {
+                if (codeToken === '') {
+                    $('summary').classList.add('hidden');
+                    renderCode({ status: 'pending' });
+                    return;
+                }
+                var requested = codeToken;
+                Promise.all([
+                    query({ token: requested, limit: 1 }),
+                    codeQuery({ token: requested, full: 1 })
+                ]).then(function(results) {
+                    // Réponse d'un profil qui n'est plus affiché : ignorée
+                    if (requested !== codeToken || window.location.hash.indexOf('#code/') !== 0) { return; }
+                    var log = (results[0].logs.length > 0 ? results[0].logs[0] : null);
+                    if (log !== null) {
+                        renderSummary(log);
+                    } else {
+                        $('summary').classList.add('hidden');
+                    }
+                    renderCode(results[1]);
+                }).catch(fail);
+            }
+
             // ----- Navigation entre les vues -----
             function show(name) {
                 view = name;
@@ -859,6 +1109,7 @@
                 $('viewLogs').classList.toggle('hidden', name !== 'logs');
                 $('viewRequest').classList.toggle('hidden', name !== 'request');
                 $('viewSql').classList.toggle('hidden', name !== 'sql');
+                $('viewCode').classList.toggle('hidden', name !== 'code');
                 $('searchForm').classList.toggle('hidden', !isSearch);
                 $('logsNav').classList.toggle('hidden', isSearch);
                 $('searchTitle').classList.toggle('hidden', !isSearch);
@@ -867,6 +1118,7 @@
                 document.querySelectorAll('#logsNav a').forEach(function(node) {
                     node.classList.toggle('active', (name === 'request' && node.id === 'navRequest')
                         || (name === 'sql' && node.id === 'navSql')
+                        || (name === 'code' && node.id === 'navCode')
                         || (name === 'logs' && node.getAttribute('href') === '#logs'));
                 });
             }
@@ -890,6 +1142,12 @@
                     if (sqlToken !== '') { $('sqlBackLink').setAttribute('href', '#request/' + sqlToken); }
                     show('sql');
                     loadSql();
+                } else if (hash[0] === 'code') {
+                    codeToken = hash[1] || '';
+                    updateCodeNav(codeToken);
+                    if (codeToken !== '') { $('codeBackLink').setAttribute('href', '#request/' + codeToken); }
+                    show('code');
+                    loadCode();
                 } else {
                     show('search');
                     loadSearch();
@@ -953,6 +1211,15 @@
                 logsStatus = button.getAttribute('data-status');
                 document.querySelectorAll('#tabs button').forEach(function(node) { node.classList.toggle('active', node === button); });
                 loadLogs();
+            });
+
+            $('codeFilters').addEventListener('change', function() { if (codeData !== null) { renderCodeTable(); } });
+
+            $('codeTable').querySelector('thead').addEventListener('click', function(event) {
+                var th = event.target.closest('th.sortable');
+                if (th === null || codeData === null) { return; }
+                codeSort = th.getAttribute('data-sort');
+                renderCodeTable();
             });
 
             window.addEventListener('hashchange', route);

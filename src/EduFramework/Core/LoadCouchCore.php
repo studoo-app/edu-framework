@@ -14,6 +14,7 @@ namespace Studoo\EduFramework\Core;
 use Dotenv\Dotenv;
 use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Controller\Debug\DebugCodeProfileController;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\DebugSqlLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
@@ -27,6 +28,7 @@ use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
+use Studoo\EduFramework\Core\Profiler\CodeProfiler;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Studoo\EduFramework\Core\View\TwigCore;
 
@@ -65,6 +67,10 @@ class LoadCouchCore
         // d'exécution et mémoire) dans le bloc finally
         HttpRequestLogger::start();
 
+        // Profiler de code de la barre de debug : démarre le profilage de la requête
+        // si elle est journalisée et si le profilage est demandé (bouton Code de la barre)
+        CodeProfiler::start();
+
         // Gestion des routes
         $route = new FastRouteCore();
 
@@ -78,6 +84,7 @@ class LoadCouchCore
                 $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
                 $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
                 $route->addRoute('GET', '/edu-sql-logs', DebugSqlLogsController::class);
+                $route->addRoute('GET', '/edu-code-profile', DebugCodeProfileController::class);
             }
 
             // Récupération de la route à appeler
@@ -100,6 +107,9 @@ class LoadCouchCore
             HttpRequestLogger::setError($exception);
             echo (new HttpErrorDefaultController($exception))->execute($this->getRequest());
         } finally {
+            // Arrête le profilage avant d'écrire les logs, pour ne pas profiler la journalisation,
+            // puis enregistre le profil de code rattaché au token de la requête
+            CodeProfiler::stop();
             // Écrit les requêtes SQL collectées pendant la requête (table serv_sql_logs),
             // rattachées par le token de la requête HTTP, puis complète la ligne de
             // log réservée en début de requête : statut final, temps d'exécution et mémoire

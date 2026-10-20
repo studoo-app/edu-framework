@@ -11,8 +11,20 @@
 
  namespace Studoo\EduFramework\Core\Logs;
 
+/**
+ * Class LogsInitialiser
+ * Crée la structure de la base SQLite des logs (var/logs/core_logs.sqlite) :
+ * tables des requêtes HTTP, des requêtes SQL et des profils de code
+ *
+ * @package Studoo\EduFramework\Core\Logs
+ */
 class LogsInitialiser
 {
+    /**
+     * Crée les tables de la base des logs si elles n'existent pas encore
+     *
+     * @return void
+     */
     public function exeStructure(): void
     {
         try {
@@ -38,6 +50,22 @@ class LogsInitialiser
                                         event_date TEXT DEFAULT (datetime('now'))
                                     )");
             $pdo->exec("CREATE INDEX IF NOT EXISTS idx_serv_sql_logs_request_id ON serv_sql_logs (request_id)");
+
+            // Table des profils de code (profiler de la barre de debug), un profil
+            // par requête HTTP, rattaché par l'identifiant du log de la requête (request_id)
+            $pdo->exec("CREATE TABLE IF NOT EXISTS serv_code_profiles (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        request_id INTEGER NOT NULL UNIQUE,
+                                        driver TEXT NOT NULL,
+                                        period_ms REAL NOT NULL,
+                                        samples INTEGER NOT NULL,
+                                        wall_ms REAL NOT NULL,
+                                        peak_mb REAL,
+                                        functions_count INTEGER NOT NULL,
+                                        top_json TEXT NOT NULL,
+                                        data BLOB NOT NULL,
+                                        event_date TEXT DEFAULT (datetime('now'))
+                                    )");
         } catch (\PDOException $e) {
             error_log('[EduFramework Logs] ' . $e->getMessage());
         }

@@ -2,11 +2,13 @@
 
 namespace Core\View;
 
+use Core\Profiler\FakeProfilerDriver;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
+use Studoo\EduFramework\Core\Profiler\CodeProfiler;
 use Studoo\EduFramework\Core\View\studooBarreDebug;
 
 /**
@@ -22,6 +24,9 @@ class StudooBarreDebugTest extends TestCase
      */
     private array $envBackup = [];
 
+    /**
+     * Initialise la configuration du framework avant chaque test
+     */
     protected function setUp(): void
     {
         new ConfigCore([]);
@@ -34,6 +39,10 @@ class StudooBarreDebugTest extends TestCase
     {
         // Réinitialisation de l'identifiant de requête statique entre les tests
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
+        // Réinitialisation du profiler de code (driver factice, cookie du bouton Code)
+        CodeProfiler::reset();
+        CodeProfiler::setDriver(null);
+        unset($_COOKIE[CodeProfiler::COOKIE]);
         // Restauration des variables d'environnement modifiées par les tests
         foreach ($this->envBackup as $key => $value) {
             if ($value === null) {
@@ -62,6 +71,9 @@ class StudooBarreDebugTest extends TestCase
         }
     }
 
+    /**
+     * Vérifie que la barre affiche la route, le contrôleur et la version de PHP
+     */
     public function testToolbarDisplaysMethodRouteAndController(): void
     {
         ConfigCore::setRequest((new Request('/users/12', 'GET'))->setHander('App\\Controller\\UserController'));
@@ -75,6 +87,9 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('<span>PHP</span><em>' . PHP_VERSION . '</em>', $html);
     }
 
+    /**
+     * Vérifie que la route est échappée (pas d'injection HTML)
+     */
     public function testToolbarEscapesTheRoute(): void
     {
         ConfigCore::setRequest(new Request('/<script>alert(1)</script>', 'GET'));
@@ -85,6 +100,9 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
     }
 
+    /**
+     * Vérifie que la barre s'affiche sans contrôleur
+     */
     public function testToolbarWithoutControllerDoesNotFail(): void
     {
         ConfigCore::setRequest(new Request('/', 'GET'));
@@ -159,16 +177,17 @@ class StudooBarreDebugTest extends TestCase
         $html = (new studooBarreDebug())->generateBarDebug();
 
         // Les interfaces web sont des liens cliquables ouverts dans un nouvel onglet
+        // (le texte du lien n'affiche pas le protocole)
         $this->assertStringContainsString(
-            '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">http://localhost:8025</a></em>',
+            '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">localhost:8025</a></em>',
             $html
         );
         $this->assertStringContainsString(
-            '<span>DbGate</span><em><a href="http://localhost:8082" target="_blank" rel="noopener">http://localhost:8082</a></em>',
+            '<span>DbGate</span><em><a href="http://localhost:8082" target="_blank" rel="noopener">localhost:8082</a></em>',
             $html
         );
         $this->assertStringContainsString(
-            '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">http://localhost:8081</a></em>',
+            '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">localhost:8081</a></em>',
             $html
         );
         // La base de données et le SMTP de Mailpit sont des services TCP : simple texte
@@ -210,5 +229,75 @@ class StudooBarreDebugTest extends TestCase
 
         $this->assertStringNotContainsString('"&port=9090"', $html);
         $this->assertStringContainsString('&quot;&amp;port=9090', $html);
+    }
+
+    /**
+     * Le bloc Code est masqué quand le profiler est désactivé (EDU_PROFILER=off)
+     */
+    public function testCodeBlockIsHiddenWhenTheProfilerIsOff(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'off']);
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringNotContainsString('edu-tb-code', $html);
+    }
+
+    /**
+     * Sans l'extension Excimer, le bloc Code est grisé et renvoie à la documentation
+     */
+    public function testCodeBlockShowsTheMissingExtension(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => null]);
+        CodeProfiler::setDriver(new FakeProfilerDriver(false));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('edu-tb-code missing', $html);
+        $this->assertStringContainsString('excimer non installée', $html);
+        $this->assertStringNotContainsString('eduProfileToggle(true)', $html);
+    }
+
+    /**
+     * En mode trigger sans cookie, le bloc Code est un bouton qui active le profilage
+     */
+    public function testCodeBlockIsAButtonWhenProfilingIsInactive(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'trigger']);
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+        (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('edu-tb-code off', $html);
+        $this->assertStringContainsString('onclick="eduProfileToggle(true)"', $html);
+        $this->assertStringNotContainsString('id="edu-tb-code"', $html);
+        $this->assertStringNotContainsString('eduLoadCodeProfile();', $html);
+    }
+
+    /**
+     * Requête profilée : le bloc Code renvoie à l'onglet Code du profiler et
+     * charge le résumé du profil en JavaScript
+     */
+    public function testCodeBlockLinksToTheProfileWhenProfilingIsActive(): void
+    {
+        $this->setEnv(['EDU_PROFILER' => 'trigger']);
+        $_COOKIE[CodeProfiler::COOKIE] = '1';
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
+        ConfigCore::setRequest(new Request('/', 'GET'));
+        (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
+        CodeProfiler::start();
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('id="edu-tb-code" data-token="42"', $html);
+        $this->assertStringContainsString('href="/_debug/profiler#code/42"', $html);
+        // En mode trigger, le panneau permet de désactiver le profilage
+        $this->assertStringContainsString('<button type="button" class="edu-tb-action" onclick="eduProfileToggle(false)">', $html);
+        $this->assertStringContainsString('eduLoadCodeProfile();', $html);
     }
 }
