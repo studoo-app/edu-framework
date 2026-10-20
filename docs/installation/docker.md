@@ -71,6 +71,9 @@ Docker Compose lit le fichier `.env` à la racine du projet et transmet ses vari
 | `DB_TYPE`      | Type de base (`mysql`, `mariadb`, `sqlite`)                 | `mysql`                |
 | `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Identifiants de la base  | `root` / `studoo` / `app_db` |
 | `MAILER_DSN`   | Serveur SMTP pour l'envoi de mails                          | `smtp://localhost:1025` |
+| `EDU_PROFILER` | Profiler de code : `off`, `trigger` (à la demande) ou `on`  | `trigger`              |
+| `EDU_PROFILER_KEEP` | Nombre de profils de code conservés                    | `50`                   |
+| `EDU_PROFILER_BUILD` | `0` construit l'image sans l'extension Excimer        | `1`                    |
 
 !!! warning "Trois valeurs sont surchargées dans le conteneur"
 

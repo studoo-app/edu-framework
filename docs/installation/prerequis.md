@@ -251,6 +251,16 @@ Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suiv
 ````
 Enlever le point-virgule pour activer l'extension.
 
+#### excimer extension (optionnelle)
+
+L'extension `excimer` active le [profiler de code](../boost/debug-bar.md#le-profiler-de-code) de la barre de debug.
+Elle est déjà installée dans l'image Docker du framework. Hors Docker :
+
+````Bash
+pecl install excimer
+````
+Puis ajoutez la ligne `extension=excimer` dans votre fichier php.ini.
+
 ___
 
 ## :simple-composer: Gestionnaire de dépendance

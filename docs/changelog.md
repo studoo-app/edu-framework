@@ -2,6 +2,16 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## Prochaine version (non publiée)
+
+**new features**
+
+- Profiler de code dans la barre de debug : le temps passé dans chaque fonction PHP d'une requête HTTP est mesuré par l'extension [Excimer](https://www.mediawiki.org/wiki/Excimer) (profiler par échantillonnage toutes les 0,1 ms, compatible FrankenPHP en mode classique et worker). Le profilage est **à la demande** (`EDU_PROFILER=trigger` par défaut) : le nouveau bloc **Code** de la barre de debug pose le cookie `edu_profile=1` (ou paramètre `?_profile=1`) et reste actif jusqu'au clic sur **Désactiver** ; `EDU_PROFILER=on` profile chaque requête, `off` désactive le profiler. Le profil est rattaché au token de la requête et stocké compressé dans la table `serv_code_profiles` (`EDU_PROFILER_KEEP` profils conservés, 50 par défaut). Le bloc affiche le temps profilé et le top 3 des fonctions ; le nouvel onglet **Code** du profiler (`/_debug/profiler#code/{token}`) liste toutes les fonctions (temps propre / inclusif, filtre par origine `app` / `framework` / `vendor`), leurs appelants et appelés, et exporte le profil au format Speedscope pour un flamegraph. Nouvel endpoint interne `GET /edu-code-profile` (mode dev uniquement). L'image Docker installe Excimer (argument de build `EDU_PROFILER`, `EDU_PROFILER_BUILD=0` pour l'exclure) et `php bin/edu check:config` signale l'extension comme recommandée
+
+**documentation**
+
+- update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil, API)
+
 ## v2.7.3 - 17/10/2026
 
 **new features**
