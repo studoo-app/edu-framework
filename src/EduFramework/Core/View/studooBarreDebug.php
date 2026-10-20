@@ -485,6 +485,12 @@ HTML;
         return '<div class="' . $class . '">' . $inner . '</div>';
     }
 
+    /**
+     * Libellé du statut HTTP (Exemple : 404 => Not Found)
+     *
+     * @param int $status Code de statut HTTP
+     * @return string Libellé du statut, chaine vide si inconnu
+     */
     private function statusText(int $status): string
     {
         return match ($status) {
@@ -504,6 +510,12 @@ HTML;
         };
     }
 
+    /**
+     * Échappe une valeur pour un affichage HTML
+     *
+     * @param string $value Valeur à échapper
+     * @return string Valeur échappée
+     */
     private function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

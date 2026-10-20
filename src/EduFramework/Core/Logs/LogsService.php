@@ -15,6 +15,13 @@ use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Service\DatabaseSqlite;
 
+/**
+ * Class LogsService
+ * Accès à la base SQLite des logs (var/logs/core_logs.sqlite) : écriture et lecture
+ * des requêtes HTTP, des requêtes SQL et des profils de code du profiler
+ *
+ * @package Studoo\EduFramework\Core\Logs
+ */
 class LogsService
 {
     private string $dbNameLogs = 'core_logs';

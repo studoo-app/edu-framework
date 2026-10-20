@@ -24,6 +24,9 @@ class StudooBarreDebugTest extends TestCase
      */
     private array $envBackup = [];
 
+    /**
+     * Initialise la configuration du framework avant chaque test
+     */
     protected function setUp(): void
     {
         new ConfigCore([]);
@@ -68,6 +71,9 @@ class StudooBarreDebugTest extends TestCase
         }
     }
 
+    /**
+     * Vérifie que la barre affiche la route, le contrôleur et la version de PHP
+     */
     public function testToolbarDisplaysMethodRouteAndController(): void
     {
         ConfigCore::setRequest((new Request('/users/12', 'GET'))->setHander('App\\Controller\\UserController'));
@@ -81,6 +87,9 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('<span>PHP</span><em>' . PHP_VERSION . '</em>', $html);
     }
 
+    /**
+     * Vérifie que la route est échappée (pas d'injection HTML)
+     */
     public function testToolbarEscapesTheRoute(): void
     {
         ConfigCore::setRequest(new Request('/<script>alert(1)</script>', 'GET'));
@@ -91,6 +100,9 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
     }
 
+    /**
+     * Vérifie que la barre s'affiche sans contrôleur
+     */
     public function testToolbarWithoutControllerDoesNotFail(): void
     {
         ConfigCore::setRequest(new Request('/', 'GET'));

@@ -11,8 +11,20 @@
 
  namespace Studoo\EduFramework\Core\Logs;
 
+/**
+ * Class LogsInitialiser
+ * Crée la structure de la base SQLite des logs (var/logs/core_logs.sqlite) :
+ * tables des requêtes HTTP, des requêtes SQL et des profils de code
+ *
+ * @package Studoo\EduFramework\Core\Logs
+ */
 class LogsInitialiser
 {
+    /**
+     * Crée les tables de la base des logs si elles n'existent pas encore
+     *
+     * @return void
+     */
     public function exeStructure(): void
     {
         try {
