@@ -116,7 +116,11 @@ plugins:
       cards_layout_options:
         title: Light Education PHP framework
         description: "Documentation Edu Framework PHP Light Education"
-  - offline
+  # Héberge localement les ressources externes (Google Fonts, avatars, scripts)
+  - privacy
+  # Uniquement pour une consultation hors-ligne (file://) : OFFLINE=true properdocs build
+  - offline:
+      enabled: !ENV [OFFLINE, false]
   - search
   - literate-nav:
       nav_file: _summary.md
