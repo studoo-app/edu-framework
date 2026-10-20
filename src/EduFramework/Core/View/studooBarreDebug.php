@@ -68,7 +68,7 @@ class studooBarreDebug
     box-shadow: 0 -2px 8px rgba(0, 0, 0, .4); z-index: 1;
 }
 #edu-tb .edu-tb-group.right .edu-tb-panel { left: auto; right: 0; }
-#edu-tb .edu-tb-block:hover .edu-tb-panel { display: block; }
+#edu-tb .edu-tb-block:hover .edu-tb-panel, #edu-tb .edu-tb-block:focus-within .edu-tb-panel { display: block; }
 #edu-tb .edu-tb-panel h4 { margin: 0 0 6px; font-weight: 600; font-size: 12px; line-height: 1.4; color: #fff; text-transform: uppercase; letter-spacing: .5px; }
 #edu-tb .edu-tb-panel div { display: flex; justify-content: space-between; gap: 18px; }
 #edu-tb .edu-tb-panel span { color: #aaa; }
@@ -96,7 +96,11 @@ class studooBarreDebug
 #edu-tb .edu-tb-code .edu-tb-panel { min-width: 440px; }
 #edu-tb .edu-tb-panel .edu-tb-code-rows { display: block; }
 #edu-tb .edu-tb-panel .edu-tb-code-rows span { flex-shrink: 0; }
-#edu-tb .edu-tb-panel .edu-tb-action { color: #9fc6ff; cursor: pointer; text-decoration: underline; }
+#edu-tb .edu-tb-code > a { padding: 0; }
+#edu-tb .edu-tb-panel button.edu-tb-action {
+    display: inline; height: auto; padding: 0; line-height: inherit;
+    color: #9fc6ff; cursor: pointer; text-decoration: underline;
+}
 html.edu-tb-closed #edu-tb { display: none; }
 html.edu-tb-closed #edu-tb-mini { display: flex; }
 </style>
@@ -111,6 +115,13 @@ html.edu-tb-closed #edu-tb-mini { display: flex; }
     // Profiler de code : le cookie edu_profile active le profilage des requêtes suivantes
     window.eduProfileToggle = function (on) {
         document.cookie = 'edu_profile=' + (on ? '1' : '0') + '; path=/; SameSite=Lax' + (on ? '' : '; max-age=0');
+        // Le paramètre ?_profile=1 réactiverait le profilage : il est retiré de l'URL
+        var url = new URL(window.location.href);
+        if (on === false && url.searchParams.has('_profile')) {
+            url.searchParams.delete('_profile');
+            window.location.replace(url.href);
+            return;
+        }
         window.location.reload();
     };
     // Le profil est enregistré en fin de requête, parfois après l'affichage de la page :
@@ -363,18 +374,22 @@ HTML;
         $logId = HttpRequestLogger::getCurrentLogId();
 
         if (CodeProfiler::isActive() === true && $logId !== null) {
+            // Le bouton Désactiver est un vrai bouton, hors du lien vers le profiler
+            // (accessible au clavier : le panneau s'ouvre aussi au focus)
             $stop = (CodeProfiler::mode() === 'trigger')
-                ? '<div><span>Profilage</span><em><span class="edu-tb-action" role="button" '
-                    . 'onclick="event.preventDefault(); event.stopPropagation(); eduProfileToggle(false);">Désactiver</span></em></div>'
+                ? '<div><span>Profilage</span><em><button type="button" class="edu-tb-action" '
+                    . 'onclick="eduProfileToggle(false)">Désactiver</button></em></div>'
                 : '';
+            $href = '/_debug/profiler#code/' . $logId;
 
-            return '<a class="edu-tb-block edu-tb-code on" id="edu-tb-code" data-token="' . $logId . '"'
-                . ' href="/_debug/profiler#code/' . $logId . '" target="_blank" rel="noopener">'
-                . 'Code <span class="edu-tb-code-label">&hellip;</span>'
+            return '<div class="edu-tb-block edu-tb-code on" id="edu-tb-code" data-token="' . $logId . '">'
+                . '<a href="' . $href . '" target="_blank" rel="noopener">'
+                . 'Code <span class="edu-tb-code-label">&hellip;</span></a>'
                 . '<div class="edu-tb-panel">' . $title
                 . '<div class="edu-tb-code-rows"><div><span>Profil</span><em>enregistrement en cours&hellip;</em></div></div>'
-                . $stop . '<div><span>Profiler</span><em>Ouvrir l\'onglet Code</em></div>'
-                . '</div></a>';
+                . $stop
+                . '<div><span>Profiler</span><em><a href="' . $href . '" target="_blank" rel="noopener">Ouvrir l\'onglet Code</a></em></div>'
+                . '</div></div>';
         }
 
         // Profilage disponible mais inactif pour cette requête (mode trigger sans cookie)

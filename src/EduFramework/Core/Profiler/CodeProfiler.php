@@ -100,8 +100,9 @@ class CodeProfiler
         }
 
         try {
-            $data = self::driver()->stop();
+            // Temps mesuré avant stop() : le traitement du profil (agrégation) n'est pas compté
             $wallMs = round((microtime(true) - self::$startedAt) * 1000, 1);
+            $data = self::driver()->stop();
             CodeProfileLogger::save(
                 $requestId,
                 self::driver()->name(),

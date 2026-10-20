@@ -316,7 +316,7 @@ class StudooBarreDebugTest extends TestCase
         $this->assertStringContainsString('id="edu-tb-code" data-token="42"', $html);
         $this->assertStringContainsString('href="/_debug/profiler#code/42"', $html);
         // En mode trigger, le panneau permet de désactiver le profilage
-        $this->assertStringContainsString('eduProfileToggle(false)', $html);
+        $this->assertStringContainsString('<button type="button" class="edu-tb-action" onclick="eduProfileToggle(false)">', $html);
         $this->assertStringContainsString('eduLoadCodeProfile();', $html);
     }
 }

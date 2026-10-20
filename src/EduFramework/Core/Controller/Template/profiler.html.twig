@@ -262,8 +262,11 @@
         .code-fn { font-family: monospace; font-size: 13px; word-break: break-all; }
         .code-file { display: block; color: #888; font-size: 12px; font-family: monospace; word-break: break-all; }
         .code-bar { display: inline-block; height: 6px; background: #4f805d; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
-        .profiler-table th.sortable { cursor: pointer; user-select: none; }
-        .profiler-table th.sortable.sorted::after { content: ' \25BE'; }
+        .profiler-table th.sortable button { all: inherit; cursor: pointer; user-select: none; display: inline; padding: 0; border: 0; background: none; }
+        .profiler-table th.sortable button:focus-visible, .code-fn-btn:focus-visible { outline: 2px solid #4f805d; outline-offset: 2px; }
+        .profiler-table th.sortable.sorted button::after { content: ' \25BE'; }
+        .code-fn-btn { font-family: monospace; font-size: 13px; color: inherit; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; }
+        #codeGraph .code-fn-btn { color: #0b62a3; text-decoration: underline; }
         #codeGraph { margin-top: 24px; }
         #codeGraph h2 { font-size: 16px; margin: 0 0 10px; }
         .code-graph-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -444,8 +447,8 @@
                     <thead>
                         <tr>
                             <th>Fonction</th><th>Origine</th>
-                            <th class="sortable sorted" data-sort="self">Temps propre</th>
-                            <th class="sortable" data-sort="inclusive">Temps inclusif</th>
+                            <th class="sortable sorted" data-sort="self"><button type="button">Temps propre</button></th>
+                            <th class="sortable" data-sort="inclusive"><button type="button">Temps inclusif</button></th>
                         </tr>
                     </thead>
                     <tbody id="codeBody"></tbody>
@@ -984,7 +987,10 @@
                     document.cookie = 'edu_profile=1; path=/; SameSite=Lax';
                     query({ token: codeToken, limit: 1 }).then(function(data) {
                         var path = (data.logs.length > 0 && data.logs[0].event) ? data.logs[0].event.path : '/';
-                        window.open(path || '/', '_blank');
+                        // Seule une URL du site est rouverte (le chemin journalisé vient de la requête HTTP)
+                        var url = new URL(path || '/', window.location.origin);
+                        if (url.origin !== window.location.origin) { url = new URL('/', window.location.origin); }
+                        window.open(url.href, '_blank', 'noopener');
                     }).catch(fail);
                 });
                 td.appendChild(activate);
@@ -1019,7 +1025,11 @@
                     var tr = el('tr', fn.origin === 'app' ? 'app' : null);
                     if (fn.name === codeSelected) { tr.classList.add('selected'); }
                     var tdName = el('td');
-                    tdName.appendChild(el('span', 'code-fn', fn.name));
+                    // Bouton : la sélection est aussi accessible au clavier
+                    var nameButton = el('button', 'code-fn code-fn-btn', fn.name);
+                    nameButton.type = 'button';
+                    nameButton.addEventListener('click', function(event) { event.stopPropagation(); selectFunction(fn.name); });
+                    tdName.appendChild(nameButton);
                     if (fn.file) { tdName.appendChild(el('span', 'code-file', fn.file + (fn.line ? ':' + fn.line : ''))); }
                     tr.appendChild(tdName);
                     var tdOrigin = el('td');
@@ -1043,7 +1053,8 @@
                 edges.forEach(function(edge) {
                     var tr = el('tr');
                     var td = el('td');
-                    var link = el('a', 'code-fn', edge[key]);
+                    var link = el('button', 'code-fn code-fn-btn', edge[key]);
+                    link.type = 'button';
                     link.addEventListener('click', function() { selectFunction(edge[key]); });
                     td.appendChild(link);
                     tr.appendChild(td);
@@ -1091,10 +1102,13 @@
                     renderCode({ status: 'pending' });
                     return;
                 }
+                var requested = codeToken;
                 Promise.all([
-                    query({ token: codeToken, limit: 1 }),
-                    codeQuery({ token: codeToken, full: 1 })
+                    query({ token: requested, limit: 1 }),
+                    codeQuery({ token: requested, full: 1 })
                 ]).then(function(results) {
+                    // Réponse d'un profil qui n'est plus affiché : ignorée
+                    if (requested !== codeToken || window.location.hash.indexOf('#code/') !== 0) { return; }
                     var log = (results[0].logs.length > 0 ? results[0].logs[0] : null);
                     if (log !== null) {
                         renderSummary(log);
