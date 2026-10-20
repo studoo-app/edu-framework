@@ -2,21 +2,28 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## Prochaine version (non publiée)
+## v2.8.0 - 20/10/2026
 
 **new features**
 
 - Profiler de code dans la barre de debug : le temps passé dans chaque fonction PHP d'une requête HTTP est mesuré par l'extension [Excimer](https://www.mediawiki.org/wiki/Excimer) (profiler par échantillonnage toutes les 0,1 ms, compatible FrankenPHP en mode classique et worker). Le profilage est **à la demande** (`EDU_PROFILER=trigger` par défaut) : le nouveau bloc **Code** de la barre de debug pose le cookie `edu_profile=1` (ou paramètre `?_profile=1`) et reste actif jusqu'au clic sur **Désactiver** ; `EDU_PROFILER=on` profile chaque requête, `off` désactive le profiler. Le profil est rattaché au token de la requête et stocké compressé dans la table `serv_code_profiles` (`EDU_PROFILER_KEEP` profils conservés, 50 par défaut). Le bloc affiche le temps profilé et le top 3 des fonctions ; le nouvel onglet **Code** du profiler (`/_debug/profiler#code/{token}`) liste toutes les fonctions (temps propre / inclusif, filtre par origine `app` / `framework` / `vendor`), leurs appelants et appelés, et exporte le profil au format Speedscope pour un flamegraph. Nouvel endpoint interne `GET /edu-code-profile` (mode dev uniquement). L'image Docker installe Excimer (argument de build `EDU_PROFILER`, `EDU_PROFILER_BUILD=0` pour l'exclure) et `php bin/edu check:config` signale l'extension comme recommandée
+- Profiler : la section de résumé d'une requête n'affiche plus que l'URL ; les informations détaillées (méthode, statut HTTP, IP, SAPI, durée, mémoire, date, token) ont été retirées de l'en-tête pour alléger l'affichage
 
 **documentation**
 
 - update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil, API)
+- update [Installation avec Docker](installation/docker.md) : variables d'environnement `EDU_PROFILER`, `EDU_PROFILER_KEEP` et `EDU_PROFILER_BUILD`
+- update [Prérequis](installation/prerequis.md) : installation de l'extension optionnelle `excimer` hors Docker
 
 ## v2.7.3 - 17/10/2026
 
 **new features**
 
 - Profiler : la vue Recherche (`/_debug/profiler#search`) gagne les **mêmes onglets de filtrage par famille de statut que la vue des logs** — `Tous / 2xx / 3xx / 4xx / 5xx`, avec le nombre de requêtes par famille en badge. Un clic filtre les résultats sur la famille sélectionnée (l'onglet `Tous` affiche toutes les requêtes), l'onglet actif est mis en évidence et le champ **Statut** du formulaire de recherche est synchronisé ; les compteurs proviennent de l'API `/edu-logs` (calculés côté serveur, ils couvrent l'ensemble des requêtes correspondant aux autres filtres) et restent indépendants du filtre de statut, comme dans la vue des logs
+
+**bug Fixes**
+
+- Barre de debug : correction de l'alignement des colonnes contenant des liens (DbGate, phpMyAdmin, Mailpit) dans le panneau
 
 **documentation**
 
