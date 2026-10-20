@@ -126,8 +126,12 @@ class CodeProfiler
     }
 
     /**
-     * Indique si le profilage est demandé pour la requête en cours
+     * Indique si le profilage est demandé pour la requête en cours.
+     * Le déclencheur (cookie edu_profile, paramètre ?_profile=1) est lu dans les
+     * superglobales : le profilage démarre avant le routage, quand l'objet Request
+     * n'existe pas encore.
      *
+     * @SuppressWarnings(PHPMD.Superglobals)
      * @return bool
      */
     public static function isRequested(): bool

@@ -63,7 +63,11 @@ class CodeProfileAggregator
             ];
         }
 
-        usort($functions, static fn (array $a, array $b): int => [$b['self'], $b['inclusive']] <=> [$a['self'], $a['inclusive']]);
+        usort(
+            $functions,
+            static fn (array $left, array $right): int
+                => [$right['self'], $right['inclusive']] <=> [$left['self'], $left['inclusive']]
+        );
 
         return $functions;
     }
@@ -77,7 +81,7 @@ class CodeProfileAggregator
      */
     public static function top(array $functions, int $limit = 20): array
     {
-        $functions = array_values(array_filter($functions, static fn (array $f): bool => $f['self'] > 0));
+        $functions = array_values(array_filter($functions, static fn (array $function): bool => $function['self'] > 0));
 
         return array_slice($functions, 0, $limit);
     }
@@ -122,7 +126,7 @@ class CodeProfileAggregator
         foreach ($edges as $key => $edge) {
             $edges[$key]['ms'] = round($edge['samples'] * $periodMs, 2);
         }
-        usort($edges, static fn (array $a, array $b): int => $b['samples'] <=> $a['samples']);
+        usort($edges, static fn (array $left, array $right): int => $right['samples'] <=> $left['samples']);
 
         return $edges;
     }

@@ -71,15 +71,7 @@ class DebugCodeProfileController implements ControllerInterface
         }
 
         if ($speedscope === true) {
-            if (headers_sent() === false) {
-                header('Content-Disposition: attachment; filename="edu-profile-' . $tokenId . '.speedscope.json"');
-            }
-            $data = $profile['data']['speedscope'] ?? [];
-            if (is_array($data) === true && isset($data['profiles'][0]) === true) {
-                $data['name'] = 'Edu Framework #' . $tokenId;
-                $data['profiles'][0]['name'] = 'Requête #' . $tokenId;
-            }
-            return json_encode($data);
+            return $this->speedscope($tokenId, $profile);
         }
 
         $response = [
@@ -97,14 +89,47 @@ class DebugCodeProfileController implements ControllerInterface
         ];
 
         if ($full === true) {
-            $data = $profile['data'];
-            $response['functions'] = CodeProfileAggregator::byFunction($data);
-            $response['edges'] = CodeProfileAggregator::callGraph(
-                (is_array($data['speedscope'] ?? null) === true ? $data['speedscope'] : []),
-                (float) ($data['period_ms'] ?? $profile['period_ms'])
-            );
+            $response += $this->details($profile);
         }
 
         return json_encode($response);
+    }
+
+    /**
+     * Retourne les piles d'appels du profil au format Speedscope (fichier téléchargé)
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @param array<string, mixed> $profile Profil avec ses données (LogsService::getCodeProfile)
+     * @return string
+     */
+    private function speedscope(int $tokenId, array $profile): string
+    {
+        if (headers_sent() === false) {
+            header('Content-Disposition: attachment; filename="edu-profile-' . $tokenId . '.speedscope.json"');
+        }
+        $data = $profile['data']['speedscope'] ?? [];
+        if (is_array($data) === true && isset($data['profiles'][0]) === true) {
+            $data['name'] = 'Edu Framework #' . $tokenId;
+            $data['profiles'][0]['name'] = 'Requête #' . $tokenId;
+        }
+
+        return (string) json_encode($data);
+    }
+
+    /**
+     * Détail complet du profil : toutes les fonctions et le graphe d'appels
+     *
+     * @param array<string, mixed> $profile Profil avec ses données (LogsService::getCodeProfile)
+     * @return array{functions: array<int, array<string, mixed>>, edges: array<int, array<string, mixed>>}
+     */
+    private function details(array $profile): array
+    {
+        $data = $profile['data'];
+        $speedscope = (is_array($data['speedscope'] ?? null) === true ? $data['speedscope'] : []);
+
+        return [
+            'functions' => CodeProfileAggregator::byFunction($data),
+            'edges' => CodeProfileAggregator::callGraph($speedscope, (float) ($data['period_ms'] ?? $profile['period_ms'])),
+        ];
     }
 }
