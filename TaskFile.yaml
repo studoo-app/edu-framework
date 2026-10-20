@@ -41,6 +41,11 @@ vars:
   PHPQA: jakzal/phpqa:php8.4-alpine
   PHPQA_RUN: "{{.DOCKER_RUN}} --init -it --rm -v {{.PWD}}:/project -w /project {{.PHPQA}}"
   MYSQL_TESTING_RUN: "{{.DOCKER_RUN}} --init -it --rm -e MYSQL_ROOT_PASSWORD=studoo -e MYSQL_DATABASE=app_db -p 3309:3306 -d mysql:8.0 --name mysql-testing"
+  #
+  # DOCUMENTATION (properdocs)
+  DOCS_VENV: venv
+  DOCS_ADDR: 127.0.0.1:8000
+  DOCS_URL: "http://{{.DOCS_ADDR}}/edu-framework/"
 
 ##
 ## ===   TASKS ==================================================
@@ -65,6 +70,7 @@ tasks:
       - echo "* start               Start project exemple"
       - echo "* stop                Stop project exemple"
       - echo "* docker-status       Check if Docker is up and show services with ports"
+      - echo "* start-docs          Start the documentation ({{.DOCS_URL}})"
       - echo "* before-commit       Analyse project before commit"
       - echo " ";
       - echo " 🎛️ OTHER TASK ----------------------------------------------------------"
@@ -298,8 +304,16 @@ tasks:
           task docker-stop
         fi
 
-  start-doc:
+  start-docs:
+    desc: "Start the documentation (properdocs serve)"
+    aliases: [start-doc]
     cmds:
       - |
-        source venv/bin/activate
-        properdocs serve
+        # Environnement Python de la documentation (créé au premier lancement)
+        if [ ! -x {{.DOCS_VENV}}/bin/properdocs ]; then
+          echo " 📦 Installation de l'environnement de la documentation ({{.DOCS_VENV}})"
+          python3 -m venv {{.DOCS_VENV}}
+          {{.DOCS_VENV}}/bin/pip install -q -r requirements.txt
+        fi
+        echo " 📖 Documentation : {{.DOCS_URL}}"
+        {{.DOCS_VENV}}/bin/properdocs serve -a {{.DOCS_ADDR}}
