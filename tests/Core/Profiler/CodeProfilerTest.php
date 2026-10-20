@@ -25,6 +25,9 @@ class CodeProfilerTest extends TestCase
      */
     private array $backup = [];
 
+    /**
+     * Crée le dossier temporaire dédié aux logs avant l'ensemble des tests
+     */
     public static function setUpBeforeClass(): void
     {
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-profiler-test/';
@@ -33,6 +36,9 @@ class CodeProfilerTest extends TestCase
         }
     }
 
+    /**
+     * Réinitialise les états statiques et sauvegarde les variables modifiées par les tests
+     */
     protected function setUp(): void
     {
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
@@ -48,6 +54,9 @@ class CodeProfilerTest extends TestCase
         unset($_ENV['EDU_PROFILER'], $_COOKIE[CodeProfiler::COOKIE], $_GET['_profile']);
     }
 
+    /**
+     * Réinitialise le profiler et restaure les variables modifiées par le test
+     */
     protected function tearDown(): void
     {
         CodeProfiler::reset();
@@ -70,6 +79,9 @@ class CodeProfilerTest extends TestCase
         ini_set('error_log', (string) $this->backup['error_log']);
     }
 
+    /**
+     * Supprime la base SQLite des logs et le dossier temporaire des tests
+     */
     public static function tearDownAfterClass(): void
     {
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
@@ -89,25 +101,43 @@ class CodeProfilerTest extends TestCase
         return new class ($available, $failOnStop) implements ProfilerDriverInterface {
             public int $starts = 0;
 
+            /**
+             * @param bool $available Driver disponible ou non
+             * @param bool $failOnStop stop() lève une exception
+             */
             public function __construct(private bool $available, private bool $failOnStop)
             {
             }
 
+            /**
+             * @return string Nom du driver factice
+             */
             public function name(): string
             {
                 return 'fake';
             }
 
+            /**
+             * @return bool Disponibilité du driver factice
+             */
             public function isAvailable(): bool
             {
                 return $this->available;
             }
 
+            /**
+             * Compte les démarrages
+             *
+             * @return void
+             */
             public function start(): void
             {
                 $this->starts++;
             }
 
+            /**
+             * @return array<string, mixed> Profil fixe (ou exception si failOnStop)
+             */
             public function stop(): array
             {
                 if ($this->failOnStop === true) {

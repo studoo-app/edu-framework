@@ -36,16 +36,27 @@ class ExcimerDriver implements ProfilerDriverInterface
      */
     private ?\ExcimerProfiler $profiler = null;
 
+    /**
+     * @return string Nom du driver (excimer)
+     */
     public function name(): string
     {
         return 'excimer';
     }
 
+    /**
+     * @return bool Indique si l'extension excimer est chargée
+     */
     public function isAvailable(): bool
     {
         return \extension_loaded('excimer');
     }
 
+    /**
+     * Démarre l'échantillonnage de la requête en cours (toutes les 0,1 ms, temps réel)
+     *
+     * @return void
+     */
     public function start(): void
     {
         $this->profiler ??= new \ExcimerProfiler();
@@ -55,6 +66,11 @@ class ExcimerDriver implements ProfilerDriverInterface
         $this->profiler->start();
     }
 
+    /**
+     * Arrête l'échantillonnage et retourne le profil de la requête
+     *
+     * @return array<string, mixed> period_ms, samples, functions (agrégées par fonction) et speedscope
+     */
     public function stop(): array
     {
         if ($this->profiler === null) {

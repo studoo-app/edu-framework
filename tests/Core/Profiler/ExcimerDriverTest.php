@@ -11,6 +11,9 @@ use Studoo\EduFramework\Core\Profiler\ExcimerDriver;
  */
 class ExcimerDriverTest extends TestCase
 {
+    /**
+     * Ignore les tests si l'extension Excimer n'est pas installée
+     */
     protected function setUp(): void
     {
         if (\extension_loaded('excimer') === false) {

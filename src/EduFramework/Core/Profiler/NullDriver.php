@@ -20,20 +20,34 @@ namespace Studoo\EduFramework\Core\Profiler;
  */
 class NullDriver implements ProfilerDriverInterface
 {
+    /**
+     * @return string Nom du driver (none)
+     */
     public function name(): string
     {
         return 'none';
     }
 
+    /**
+     * @return bool Toujours false : aucune extension de profilage n'est installée
+     */
     public function isAvailable(): bool
     {
         return false;
     }
 
+    /**
+     * Ne fait rien : aucune extension de profilage
+     *
+     * @return void
+     */
     public function start(): void
     {
     }
 
+    /**
+     * @return array<string, mixed> Profil vide
+     */
     public function stop(): array
     {
         return [];

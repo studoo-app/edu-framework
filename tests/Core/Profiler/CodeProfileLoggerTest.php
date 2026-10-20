@@ -18,6 +18,9 @@ class CodeProfileLoggerTest extends TestCase
 {
     private static string $logsPath;
 
+    /**
+     * Crée le dossier temporaire dédié aux logs avant l'ensemble des tests
+     */
     public static function setUpBeforeClass(): void
     {
         self::$logsPath = sys_get_temp_dir() . '/edu-framework-profile-logger-test/';
@@ -26,6 +29,9 @@ class CodeProfileLoggerTest extends TestCase
         }
     }
 
+    /**
+     * Pointe les logs vers le dossier de test et vide la table des profils
+     */
     protected function setUp(): void
     {
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
@@ -34,6 +40,9 @@ class CodeProfileLoggerTest extends TestCase
         LogsService::getConnect()->exec('DELETE FROM serv_code_profiles');
     }
 
+    /**
+     * Supprime la base SQLite des logs et le dossier temporaire des tests
+     */
     public static function tearDownAfterClass(): void
     {
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);

@@ -225,24 +225,41 @@ class StudooBarreDebugTest extends TestCase
     private function fakeDriver(bool $available): ProfilerDriverInterface
     {
         return new class ($available) implements ProfilerDriverInterface {
+            /**
+             * @param bool $available Driver disponible ou non
+             */
             public function __construct(private bool $available)
             {
             }
 
+            /**
+             * @return string Nom du driver factice
+             */
             public function name(): string
             {
                 return 'fake';
             }
 
+            /**
+             * @return bool Disponibilité du driver factice
+             */
             public function isAvailable(): bool
             {
                 return $this->available;
             }
 
+            /**
+             * Ne fait rien
+             *
+             * @return void
+             */
             public function start(): void
             {
             }
 
+            /**
+             * @return array<string, mixed> Profil vide
+             */
             public function stop(): array
             {
                 return [];

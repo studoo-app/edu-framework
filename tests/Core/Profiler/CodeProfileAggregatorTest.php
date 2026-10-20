@@ -12,6 +12,9 @@ use Studoo\EduFramework\Core\Profiler\CodeProfileAggregator;
  */
 class CodeProfileAggregatorTest extends TestCase
 {
+    /**
+     * Racine du projet utilisée pour calculer les chemins relatifs et les origines
+     */
     protected function setUp(): void
     {
         new ConfigCore(['base_path' => '/projet/']);
