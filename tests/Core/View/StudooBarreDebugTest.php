@@ -165,16 +165,17 @@ class StudooBarreDebugTest extends TestCase
         $html = (new studooBarreDebug())->generateBarDebug();
 
         // Les interfaces web sont des liens cliquables ouverts dans un nouvel onglet
+        // (le texte du lien n'affiche pas le protocole)
         $this->assertStringContainsString(
-            '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">http://localhost:8025</a></em>',
+            '<span>Mailpit</span><em><a href="http://localhost:8025" target="_blank" rel="noopener">localhost:8025</a></em>',
             $html
         );
         $this->assertStringContainsString(
-            '<span>DbGate</span><em><a href="http://localhost:8082" target="_blank" rel="noopener">http://localhost:8082</a></em>',
+            '<span>DbGate</span><em><a href="http://localhost:8082" target="_blank" rel="noopener">localhost:8082</a></em>',
             $html
         );
         $this->assertStringContainsString(
-            '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">http://localhost:8081</a></em>',
+            '<span>phpMyAdmin</span><em><a href="http://localhost:8081" target="_blank" rel="noopener">localhost:8081</a></em>',
             $html
         );
         // La base de données et le SMTP de Mailpit sont des services TCP : simple texte

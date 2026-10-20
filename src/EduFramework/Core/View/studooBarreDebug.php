@@ -73,7 +73,7 @@ class studooBarreDebug
 #edu-tb .edu-tb-panel div { display: flex; justify-content: space-between; gap: 18px; }
 #edu-tb .edu-tb-panel span { color: #aaa; }
 #edu-tb .edu-tb-panel em { font-style: normal; color: #fff; word-break: break-all; text-align: right; }
-#edu-tb .edu-tb-panel em a { color: #9fc6ff; }
+#edu-tb .edu-tb-panel em a { color: #9fc6ff; display: inline; line-height: 1.5; }
 #edu-tb .edu-tb-panel em a:hover { color: #c3d9ff; text-decoration: underline; }
 #edu-tb .edu-tb-panel a { display: inline; padding: 0; margin: 0; }
 #edu-tb .edu-tb-close { 
@@ -405,7 +405,7 @@ HTML;
         $get = static fn (string $key): string => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : '—');
         $env = static fn (string $key, string $default): string
             => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
-        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
+        $link = static fn (string $name, string $url): array => ['text' => $name, 'href' => $url];
 
         return [
             '---- database ----' => "--------",
@@ -413,8 +413,8 @@ HTML;
             'DB_TYPE' => $get('DB_TYPE'),
             'DB_HOST' => $env('DB_HOST', 'localhost') . ':' . $env('DB_SOCKET', '3306'),
             'DB_NAME' => $get('DB_NAME'),
-            'DbGate' => $link('http://localhost:' . $env('DBGATE_PORT', '8082')),
-            'phpMyAdmin' => $link('http://localhost:' . $env('PMA_PORT', '8081')),
+            'DbGate' => $link('localhost:' . $env('DBGATE_PORT', '8082') ,'http://localhost:' . $env('DBGATE_PORT', '8082')),
+            'phpMyAdmin' => $link('localhost:' . $env('PMA_PORT', '8081'), 'http://localhost:' . $env('PMA_PORT', '8081')),
         ];
     }
 
@@ -430,11 +430,11 @@ HTML;
     {
         $env = static fn (string $key, string $default): string
             => (ConfigCore::existEnv($key) === true ? (string) ConfigCore::getEnv($key) : $default);
-        $link = static fn (string $url): array => ['text' => $url, 'href' => $url];
+        $link = static fn (string $name, string $url): array => ['text' => $name, 'href' => $url];
 
         return [
             '---- smtp ----' => "--------",
-            'Mailpit' => $link('http://localhost:' . $env('MAILER_UI_PORT', '8025')),
+            'Mailpit' => $link('localhost:' . $env('MAILER_UI_PORT', '8025'), 'http://localhost:' . $env('MAILER_UI_PORT', '8025')),
             'Mailpit SMTP' => 'localhost:' . $env('MAILER_SMTP_PORT', '1025')
         ];
     }
