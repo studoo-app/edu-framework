@@ -370,11 +370,37 @@ class LogsService
         ];
 
         if ($withData === true) {
-            $raw = @gzuncompress((string) $row['data']);
-            $data = ($raw === false ? null : json_decode($raw, true));
+            $raw = self::uncompress((string) $row['data']);
+            $data = ($raw === null ? null : json_decode($raw, true));
             $profile['data'] = (is_array($data) === true ? $data : []);
         }
 
         return $profile;
+    }
+
+    /**
+     * Décompresse les données d'un profil de code (gzcompress)
+     * Un profil corrompu ne doit pas faire échouer le profiler : l'erreur
+     * de gzuncompress() est convertie en exception puis envoyée dans les logs PHP
+     *
+     * @param string $payload Données compressées
+     * @return string|null Données décompressées, null si elles sont invalides
+     */
+    private static function uncompress(string $payload): ?string
+    {
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
+
+        try {
+            $raw = gzuncompress($payload);
+        } catch (\ErrorException $exception) {
+            error_log('[EduFramework Profiler] Profil illisible : ' . $exception->getMessage());
+            $raw = false;
+        } finally {
+            restore_error_handler();
+        }
+
+        return ($raw === false ? null : $raw);
     }
 }

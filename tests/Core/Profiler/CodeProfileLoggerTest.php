@@ -82,6 +82,26 @@ class CodeProfileLoggerTest extends TestCase
     }
 
     /**
+     * Vérifie qu'un profil corrompu est lu sans erreur, avec des données vides
+     */
+    public function testCorruptedProfileDataIsReadAsEmpty(): void
+    {
+        CodeProfileLogger::save(6, 'excimer', 2.5, 4.0, $this->data());
+        LogsService::getConnect()->exec("UPDATE serv_code_profiles SET data = 'pas du gzip' WHERE request_id = 6");
+
+        $errorLog = ini_get('error_log');
+        ini_set('error_log', '/dev/null');
+        try {
+            $full = LogsService::getCodeProfile(6, true);
+        } finally {
+            ini_set('error_log', (string) $errorLog);
+        }
+
+        $this->assertSame('excimer', $full['driver']);
+        $this->assertSame([], $full['data']);
+    }
+
+    /**
      * Vérifie qu'un token sans profil retourne null
      */
     public function testUnknownTokenHasNoProfile(): void
