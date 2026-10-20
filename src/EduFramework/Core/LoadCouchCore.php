@@ -11,7 +11,6 @@
 
 namespace Studoo\EduFramework\Core;
 
-use Dotenv\Dotenv;
 use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugCodeProfileController;
@@ -44,9 +43,8 @@ class LoadCouchCore
      */
     public function run(): void
     {
-        // Gestion du fichier des variables d'environnement (.env)
-        $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
-        $dotenv->load();
+        // Gestion des variables d'environnement (environnement, .env.local, .env)
+        ConfigCore::loadEnv(ConfigCore::getConfig('base_path'));
 
         // Gestion de la couche View
         TwigCore::setEnvironment();

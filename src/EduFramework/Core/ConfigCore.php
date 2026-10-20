@@ -11,6 +11,7 @@
 
 namespace Studoo\EduFramework\Core;
 
+use Dotenv\Dotenv;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -132,13 +133,95 @@ class ConfigCore
     }
 
     /**
+     * Charge les variables d'environnement du projet
+     * Ordre de priorité (la première valeur trouvée est conservée) :
+     *     1. les variables d'environnement du processus (Docker, serveur web)
+     *     2. le fichier .env.local (secrets de production, jamais versionné)
+     *     3. le fichier .env
+     * Les fichiers sont optionnels : en production (image Docker), le .env est absent
+     * et la configuration provient de l'environnement et du .env.local
+     * Si DATABASE_URL est définie, les variables DB_* manquantes en sont déduites
+     * @param string $basePath Dossier contenant les fichiers .env
+     * @return void
+     */
+    public static function loadEnv(string $basePath): void
+    {
+        // Fichiers lus dans l'ordre : une valeur du .env.local remplace celle du .env,
+        // mais jamais une variable déjà présente dans l'environnement (mode immutable)
+        Dotenv::createImmutable($basePath, ['.env', '.env.local'], false)->safeLoad();
+        self::loadDatabaseUrl();
+    }
+
+    /**
+     * Déduit les variables DB_* de la variable DATABASE_URL
+     * Format : mysql://user:password@host:3306/db_name?serverVersion=11
+     * (format utilisé par FrankenDeploy et Symfony pour une base gérée)
+     * Une variable DB_* déjà définie n'est jamais écrasée
+     * @return void
+     */
+    private static function loadDatabaseUrl(): void
+    {
+        if (self::existEnv('DATABASE_URL') === false) {
+            return;
+        }
+
+        $url = parse_url(self::getEnv('DATABASE_URL'));
+        if ($url === false || isset($url['scheme']) === false) {
+            return;
+        }
+
+        $types = [
+            'mysql' => 'mysql',
+            'mysql2' => 'mysql',
+            'mariadb' => 'mariadb',
+            'pgsql' => 'pgsql',
+            'postgres' => 'pgsql',
+            'postgresql' => 'pgsql',
+        ];
+        if (isset($types[$url['scheme']]) === false) {
+            return;
+        }
+
+        $values = [
+            'DB_HOST_STATUS' => 'true',
+            'DB_TYPE' => $types[$url['scheme']],
+            'DB_HOST' => $url['host'] ?? null,
+            'DB_SOCKET' => isset($url['port']) ? (string) $url['port'] : null,
+            'DB_USER' => isset($url['user']) ? rawurldecode($url['user']) : null,
+            'DB_PASSWORD' => isset($url['pass']) ? rawurldecode($url['pass']) : null,
+            'DB_NAME' => isset($url['path']) ? rawurldecode(ltrim($url['path'], '/')) : null,
+        ];
+        foreach ($values as $key => $value) {
+            if ($value !== null && self::existEnv($key) === false) {
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+
+    /**
+     * Lit une variable d'environnement : $_ENV (fichiers .env) puis l'environnement
+     * du processus (variables passées par Docker, absentes de $_ENV lorsque
+     * variables_order ne contient pas "E", comme avec php.ini-production)
+     * @param string $key Clé de la variable
+     * @return string|null
+     */
+    private static function readEnv(string $key): ?string
+    {
+        if (isset($_ENV[$key]) === true) {
+            return (string) $_ENV[$key];
+        }
+        $value = getenv($key);
+        return $value === false ? null : $value;
+    }
+
+    /**
      * Permet de récupérer la configuration du fichier .env à la racine du projet
      * @param string $key Clé de la configuration
      * @return mixed
      */
     public static function getEnv(string $key): mixed
     {
-        return strip_tags($_ENV[$key]);
+        return strip_tags(self::readEnv($key) ?? '');
     }
 
     /**
@@ -148,7 +231,7 @@ class ConfigCore
      */
     public static function existEnv(string $key): bool
     {
-        return isset($_ENV[$key]);
+        return self::readEnv($key) !== null;
     }
 
     /**
