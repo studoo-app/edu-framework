@@ -2,13 +2,13 @@
 
 namespace Core\View;
 
+use Core\Profiler\FakeProfilerDriver;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Profiler\CodeProfiler;
-use Studoo\EduFramework\Core\Profiler\ProfilerDriverInterface;
 use Studoo\EduFramework\Core\View\studooBarreDebug;
 
 /**
@@ -232,60 +232,12 @@ class StudooBarreDebugTest extends TestCase
     }
 
     /**
-     * Driver de profilage factice : disponible ou non, sans extension installée
-     */
-    private function fakeDriver(bool $available): ProfilerDriverInterface
-    {
-        return new class ($available) implements ProfilerDriverInterface {
-            /**
-             * @param bool $available Driver disponible ou non
-             */
-            public function __construct(private bool $available)
-            {
-            }
-
-            /**
-             * @return string Nom du driver factice
-             */
-            public function name(): string
-            {
-                return 'fake';
-            }
-
-            /**
-             * @return bool Disponibilité du driver factice
-             */
-            public function isAvailable(): bool
-            {
-                return $this->available;
-            }
-
-            /**
-             * Ne fait rien
-             *
-             * @return void
-             */
-            public function start(): void
-            {
-            }
-
-            /**
-             * @return array<string, mixed> Profil vide
-             */
-            public function stop(): array
-            {
-                return [];
-            }
-        };
-    }
-
-    /**
      * Le bloc Code est masqué quand le profiler est désactivé (EDU_PROFILER=off)
      */
     public function testCodeBlockIsHiddenWhenTheProfilerIsOff(): void
     {
         $this->setEnv(['EDU_PROFILER' => 'off']);
-        CodeProfiler::setDriver($this->fakeDriver(true));
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
         ConfigCore::setRequest(new Request('/', 'GET'));
 
         $html = (new studooBarreDebug())->generateBarDebug();
@@ -299,7 +251,7 @@ class StudooBarreDebugTest extends TestCase
     public function testCodeBlockShowsTheMissingExtension(): void
     {
         $this->setEnv(['EDU_PROFILER' => null]);
-        CodeProfiler::setDriver($this->fakeDriver(false));
+        CodeProfiler::setDriver(new FakeProfilerDriver(false));
         ConfigCore::setRequest(new Request('/', 'GET'));
 
         $html = (new studooBarreDebug())->generateBarDebug();
@@ -315,7 +267,7 @@ class StudooBarreDebugTest extends TestCase
     public function testCodeBlockIsAButtonWhenProfilingIsInactive(): void
     {
         $this->setEnv(['EDU_PROFILER' => 'trigger']);
-        CodeProfiler::setDriver($this->fakeDriver(true));
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
         ConfigCore::setRequest(new Request('/', 'GET'));
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
 
@@ -335,7 +287,7 @@ class StudooBarreDebugTest extends TestCase
     {
         $this->setEnv(['EDU_PROFILER' => 'trigger']);
         $_COOKIE[CodeProfiler::COOKIE] = '1';
-        CodeProfiler::setDriver($this->fakeDriver(true));
+        CodeProfiler::setDriver(new FakeProfilerDriver(true));
         ConfigCore::setRequest(new Request('/', 'GET'));
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, 42);
         CodeProfiler::start();
