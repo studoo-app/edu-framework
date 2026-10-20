@@ -11,6 +11,8 @@
 
 **documentation**
 
+- new [Les fonctionnalités](docs/features.md) : toutes les fonctionnalités du framework regroupées par thème d'apprentissage, avec la notion travaillée et son équivalent dans Symfony
+- new [Migrer de la version 2.3 à la version 2.8](docs/migrate/migration-2_3-2_8.md) : étapes de migration (sauvegarde et passage de MySQL à MariaDB, templates d'erreur, cache Twig, variables du `.env`, fichiers Docker), changements et nouveautés des versions 2.4 à 2.8
 - update [La barre de debug et le profiler](docs/boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil avec captures d'écran, lecture du flamegraph avec Speedscope, API)
 - update [Installation avec Docker](docs/installation/docker.md) : variables d'environnement `EDU_PROFILER`, `EDU_PROFILER_KEEP` et `EDU_PROFILER_BUILD`
 - update [Prérequis](docs/installation/prerequis.md) : installation de l'extension optionnelle `excimer` hors Docker

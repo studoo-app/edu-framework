@@ -212,6 +212,13 @@ Exemple de réponse :
 
 Le profiler de code mesure **le temps passé dans chaque fonction PHP** pendant une requête HTTP, pour repérer ce qui ralentit une page. Il s'appuie sur l'extension [Excimer](https://www.mediawiki.org/wiki/Excimer){:target="_blank"} (Wikimedia), un profiler **par échantillonnage** : toutes les 0,1 ms, Excimer relève la pile d'appels en cours. Une fonction présente dans 30 % des relevés a consommé environ 30 % du temps de la requête. Le coût reste faible (quelques %) et fonctionne avec FrankenPHP, y compris en mode worker.
 
+!!! warning "Déjà disponible avec FrankenPHP dans Docker"
+
+    Si votre application tourne sur le serveur d'exécution **FrankenPHP dans Docker** (service `frankenphp`, voir [« L'application dans Docker »](../installation/docker.md)), le profiler de code est **déjà prêt** : l'extension Excimer est installée dans l'image et le profilage à la demande est activé par défaut (`EDU_PROFILER=trigger`).
+    Il n'y a rien à installer ni à configurer : ouvrez l'application (`https://localhost`) et cliquez sur le bloc **Code** de la barre de debug.
+
+    L'installation décrite ci-dessous ne concerne que l'exécution **hors Docker** (serveur PHP intégré, par exemple `http://localhost:8042`).
+
 !!! info "Un résultat statistique"
 
     Une fonction très courte (moins de 0,1 ms) peut ne jamais apparaître dans le profil. Les temps affichés sont des estimations : `nombre de relevés × 0,1 ms`.
