@@ -24,3 +24,8 @@ var/
 site/
 docs/
 *.md
+
+# Secrets de production : montés par FrankenDeploy depuis le serveur
+.env.local
+.env.*.local
+*.sql.gz

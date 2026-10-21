@@ -39,6 +39,7 @@ Voici les commandes disponibles par version :
 | make:command    | génération d'un commande line                 | v2.0                   |
 | make:entity     | génération d'une entité et son repository     | v2.5.0                 |
 | cache:clear     | suppression du cache de l'application        | v2.4.0                 |
+| make:deploy     | génération de la configuration de déploiement | v2.9.0                 |
 
 !!! info "Pour aller plus loin"
 
@@ -82,6 +83,18 @@ Si le dossier `var/cache` n'existe pas, un message vous indique qu'il n'y a aucu
 
     Les templates modifiés sont automatiquement recompilés (option `auto_reload` de Twig).
     La commande `cache:clear` reste utile pour repartir d'un cache vierge, par exemple après un déploiement.
+
+### La commande make:deploy
+
+La commande `make:deploy` génère le fichier `frankendeploy.yaml` qui décrit le déploiement de l'application sur un serveur Debian ou Ubuntu avec [FrankenDeploy](https://yoanbernabeu.github.io/frankendeploy/){:target="_blank"} (à partir de la version v2.9.0) :
+
+```bash
+php bin/edu make:deploy --domain=mon-app.fr
+```
+
+!!! info "Pour aller plus loin"
+
+    Vous pouvez consulter la page [Déployer son application](../deploy/index.md) pour le détail des options et des étapes du déploiement.
 
 ### La commande make:entity
 

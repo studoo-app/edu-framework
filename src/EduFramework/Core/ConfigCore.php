@@ -11,6 +11,11 @@
 
 namespace Studoo\EduFramework\Core;
 
+use Dotenv\Dotenv;
+use Dotenv\Repository\Adapter\EnvConstAdapter;
+use Dotenv\Repository\Adapter\PutenvAdapter;
+use Dotenv\Repository\RepositoryBuilder;
+use Dotenv\Repository\RepositoryInterface;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -30,6 +35,18 @@ class ConfigCore
     private static array $config;
 
     private static Request $resquest;
+
+    /**
+     * Schémas de DATABASE_URL reconnus => valeur de DB_TYPE
+     */
+    private const DATABASE_URL_TYPES = [
+        'mysql' => 'mysql',
+        'mysql2' => 'mysql',
+        'mariadb' => 'mariadb',
+        'pgsql' => 'pgsql',
+        'postgres' => 'pgsql',
+        'postgresql' => 'pgsql',
+    ];
 
     /**
      * ConfigCore constructor.
@@ -132,13 +149,110 @@ class ConfigCore
     }
 
     /**
+     * Charge les variables d'environnement du projet
+     * Ordre de priorité (la première valeur trouvée est conservée) :
+     *     1. les variables d'environnement du processus (Docker, serveur web)
+     *     2. le fichier .env.local (secrets de production, jamais versionné)
+     *     3. le fichier .env
+     * Les fichiers sont optionnels : en production (image Docker), le .env est absent
+     * et la configuration provient de l'environnement et du .env.local
+     * Si DATABASE_URL est définie, les variables DB_* manquantes en sont déduites
+     * @param string $basePath Dossier contenant les fichiers .env
+     * @return void
+     */
+    public static function loadEnv(string $basePath): void
+    {
+        // Fichiers lus dans l'ordre : une valeur du .env.local remplace celle du .env,
+        // mais jamais une variable déjà présente dans l'environnement (mode immutable),
+        // y compris une variable visible uniquement par getenv() (php -S, mod_php)
+        $repository = RepositoryBuilder::createWithDefaultAdapters()
+            ->addReader(PutenvAdapter::class)
+            ->immutable()
+            ->make();
+        Dotenv::create($repository, $basePath, ['.env', '.env.local'], false)->safeLoad();
+        self::loadDatabaseUrl();
+    }
+
+    /**
+     * Déduit les variables DB_* de la variable DATABASE_URL
+     * Format : mysql://user:password@host:3306/db_name?serverVersion=11
+     * (format utilisé par FrankenDeploy et Symfony pour une base gérée)
+     * Une variable DB_* déjà définie n'est jamais écrasée
+     * Une DATABASE_URL d'un autre type (Exemple: sqlite:///...) est ignorée
+     * @return void
+     * @throws ErrorConfigException Si la DATABASE_URL MySQL / MariaDB / PostgreSQL est mal formée
+     */
+    private static function loadDatabaseUrl(): void
+    {
+        $databaseUrl = self::readEnv('DATABASE_URL') ?? '';
+        $type = self::DATABASE_URL_TYPES[strstr($databaseUrl, '://', true) ?: ''] ?? null;
+        if ($type === null) {
+            return;
+        }
+
+        // Exemple : un mot de passe contenant # est tronqué à la lecture du fichier .env.local
+        $url = parse_url($databaseUrl);
+        if ($url === false || isset($url['host']) === false) {
+            throw new ErrorConfigException(
+                "La variable DATABASE_URL est invalide. Format attendu : "
+                . "mysql://utilisateur:motdepasse@hote:3306/base. Les caractères spéciaux "
+                . "de l'utilisateur et du mot de passe doivent être encodés (# => %23, @ => %40, / => %2F)"
+            );
+        }
+
+        $values = [
+            'DB_HOST_STATUS' => 'true',
+            'DB_TYPE' => $type,
+            'DB_HOST' => $url['host'] ?? '',
+            'DB_SOCKET' => (string) ($url['port'] ?? ''),
+            'DB_USER' => $url['user'] ?? '',
+            'DB_PASSWORD' => $url['pass'] ?? '',
+            'DB_NAME' => ltrim($url['path'] ?? '', '/'),
+        ];
+
+        // Dépôt "immutable" : une variable déjà définie n'est pas écrasée
+        $repository = self::envRepository();
+        foreach (array_filter($values, 'strlen') as $key => $value) {
+            $repository->set($key, rawurldecode($value));
+        }
+    }
+
+    /**
+     * Dépôt des variables d'environnement (librairie phpdotenv) :
+     *     - lecture : $_ENV (fichiers .env) puis l'environnement du processus
+     *       (variables passées par Docker, absentes de $_ENV lorsque variables_order
+     *       ne contient pas "E", comme avec php.ini-production)
+     *     - écriture : $_ENV, sans écraser une variable déjà définie
+     * @return RepositoryInterface
+     */
+    private static function envRepository(): RepositoryInterface
+    {
+        return RepositoryBuilder::createWithNoAdapters()
+            ->addReader(EnvConstAdapter::class)
+            ->addReader(PutenvAdapter::class)
+            ->addWriter(EnvConstAdapter::class)
+            ->immutable()
+            ->make();
+    }
+
+    /**
+     * Lit une variable d'environnement brute (sans filtrage)
+     * @param string $key Clé de la variable
+     * @return string|null
+     */
+    private static function readEnv(string $key): ?string
+    {
+        return self::envRepository()->get($key);
+    }
+
+    /**
      * Permet de récupérer la configuration du fichier .env à la racine du projet
      * @param string $key Clé de la configuration
      * @return mixed
      */
     public static function getEnv(string $key): mixed
     {
-        return strip_tags($_ENV[$key]);
+        return strip_tags(self::readEnv($key) ?? '');
     }
 
     /**
@@ -148,7 +262,7 @@ class ConfigCore
      */
     public static function existEnv(string $key): bool
     {
-        return isset($_ENV[$key]);
+        return self::readEnv($key) !== null;
     }
 
     /**
