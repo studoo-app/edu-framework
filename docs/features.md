@@ -177,7 +177,7 @@ En mode développement (`APP_ENV=dev`), Edu Framework fournit des outils inspir�
 | **Barre de debug** | Lire d'un coup d'œil le statut, la route, le temps et la mémoire d'une requête | Web Debug Toolbar |
 | **Profiler et historique des requêtes** | Retrouver et filtrer les requêtes passées, avec leurs erreurs | Profiler (`/_profiler`) |
 | **Requêtes SQL par requête HTTP** | Repérer une requête SQL lente ou répétée (problème « N+1 ») | Panneau Doctrine du profiler |
-| **Profiler de code** (Excimer, flamegraph) | Mesurer le temps passé dans chaque fonction, lire un flamegraph | Blackfire, panneau *Performance* |
+| **Profiler de code** (Excimer, flamegraph intégré) | Mesurer le temps passé dans chaque fonction, lire et comparer des flamegraphs | Blackfire, panneau *Performance* |
 
 Pour aller plus loin : [La barre de debug et le profiler](boost/debug-bar.md).
 

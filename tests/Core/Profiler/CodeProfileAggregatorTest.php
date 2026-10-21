@@ -128,5 +128,135 @@ class CodeProfileAggregatorTest extends TestCase
     {
         $this->assertSame([], CodeProfileAggregator::byFunction([]));
         $this->assertSame([], CodeProfileAggregator::callGraph([], 0.1));
+
+        $tree = CodeProfileAggregator::flameTree([]);
+        $this->assertSame(0, $tree['value']);
+        $this->assertSame([], $tree['children']);
+    }
+
+    /**
+     * Piles d'appels d'une page : index.php appelle HomeController::execute,
+     * qui appelle Twig ou une petite fonction ; frames et échantillons dans l'ordre chronologique
+     * @return array<string, mixed>
+     */
+    private function flameData(): array
+    {
+        return [
+            'period_ms' => 0.1,
+            'functions' => [
+                'Controller\\HomeController::execute' => ['file' => '/projet/app/Controller/HomeController.php', 'line' => 12],
+            ],
+            'speedscope' => [
+                'shared' => ['frames' => [
+                    ['name' => '/projet/public/index.php', 'file' => '/projet/public/index.php', 'line' => 1],
+                    ['name' => 'Controller\\HomeController::execute'],
+                    ['name' => 'Twig\\Environment::render', 'file' => '/projet/vendor/twig/twig/src/Environment.php', 'line' => 40],
+                    ['name' => 'tiny'],
+                ]],
+                'profiles' => [[
+                    // Twig, contrôleur seul, Twig (2 périodes), tiny, index.php seul
+                    'samples' => [[0, 1, 2], [0, 1], [0, 1, 2], [0, 1, 3], [0]],
+                    'weights' => [100000, 100000, 200000, 100000, 100000],
+                ]],
+            ],
+        ];
+    }
+
+    /**
+     * Left Heavy : les appels identiques sont fusionnés, triés du plus coûteux au moins
+     * coûteux, avec les temps, l'origine et la position de chaque nœud
+     */
+    public function testFlameTreeMergesIdenticalStacksHeaviestFirst(): void
+    {
+        $tree = CodeProfileAggregator::flameTree($this->flameData(), 'heavy', 0);
+
+        $this->assertSame('Requête', $tree['name']);
+        $this->assertSame(6, $tree['value']);
+        $this->assertEquals(100.0, $tree['pct']);
+
+        $index = $tree['children'][0];
+        $this->assertSame('public/index.php', $index['name']);
+        $this->assertSame('framework', $index['origin']);
+        $this->assertSame(1, $index['self']);
+
+        $controller = $index['children'][0];
+        $this->assertSame('Controller\\HomeController::execute', $controller['name']);
+        $this->assertSame('app', $controller['origin']);
+        $this->assertSame('app/Controller/HomeController.php', $controller['file']);
+        $this->assertSame(12, $controller['line']);
+        $this->assertSame(5, $controller['value']);
+        $this->assertEquals(0.5, $controller['ms']);
+        $this->assertEquals(0.1, $controller['self_ms']);
+
+        // Twig (3 échantillons en 2 piles fusionnées) à gauche, puis tiny
+        $this->assertSame(['Twig\\Environment::render', 'tiny'], array_column($controller['children'], 'name'));
+        $this->assertSame([3, 1], array_column($controller['children'], 'value'));
+        $this->assertSame([0, 3], array_column($controller['children'], 'start'));
+        $this->assertSame('vendor', $controller['children'][0]['origin']);
+        $this->assertEquals(50.0, $controller['children'][0]['pct']);
+    }
+
+    /**
+     * Time Order : seuls les échantillons consécutifs sont fusionnés,
+     * chaque appel garde sa position dans le temps
+     */
+    public function testFlameTreeInTimeOrderKeepsTheChronology(): void
+    {
+        $tree = CodeProfileAggregator::flameTree($this->flameData(), 'time', 0);
+
+        $controller = $tree['children'][0]['children'][0];
+        $this->assertSame(
+            ['Twig\\Environment::render', 'Twig\\Environment::render', 'tiny'],
+            array_column($controller['children'], 'name')
+        );
+        $this->assertSame([0, 2, 4], array_column($controller['children'], 'start'));
+        $this->assertSame([1, 2, 1], array_column($controller['children'], 'value'));
+    }
+
+    /**
+     * Élagage : en Left Heavy les petits appels sont regroupés dans "… (autres)"
+     * (la largeur reste exacte), en Time Order ils sont retirés ; la profondeur est limitée
+     */
+    public function testFlameTreePrunesSmallCallsAndLimitsDepth(): void
+    {
+        // tiny = 1 échantillon sur 6 (16,7 %) : sous le seuil de 20 %
+        $heavy = CodeProfileAggregator::flameTree($this->flameData(), 'heavy', 0.2);
+        $children = $heavy['children'][0]['children'][0]['children'];
+        $this->assertSame(['Twig\\Environment::render', '… (autres)'], array_column($children, 'name'));
+        $this->assertSame(1, $children[1]['value']);
+        $this->assertSame(3, $children[1]['start']);
+
+        $time = CodeProfileAggregator::flameTree($this->flameData(), 'time', 0.2);
+        $this->assertSame([2], array_column($time['children'][0]['children'][0]['children'], 'value'));
+
+        $shallow = CodeProfileAggregator::flameTree($this->flameData(), 'heavy', 0, 2);
+        $this->assertSame([], $shallow['children'][0]['children'][0]['children']);
+        // Le temps inclusif reste celui de toute la pile
+        $this->assertSame(5, $shallow['children'][0]['children'][0]['value']);
+    }
+
+    /**
+     * Flamegraph différentiel : temps de la référence et écart pour chaque chemin d'appels
+     */
+    public function testDiffTreeComparesTheSameCallPaths(): void
+    {
+        $base = $this->flameData();
+        // Référence : Twig 1 seule période au lieu de 3, pas d'appel à tiny
+        $base['speedscope']['profiles'][0]['samples'] = [[0, 1, 2], [0, 1], [0]];
+        $base['speedscope']['profiles'][0]['weights'] = [100000, 100000, 100000];
+
+        $tree = CodeProfileAggregator::diffTree($this->flameData(), $base, 0);
+
+        $this->assertEquals(0.3, $tree['base_ms']);
+        $this->assertEquals(0.3, $tree['delta_ms']);
+        $controller = $tree['children'][0]['children'][0];
+        $this->assertEquals(0.2, $controller['base_ms']);
+        $this->assertEquals(0.3, $controller['delta_ms']);
+        [$twig, $tiny] = $controller['children'];
+        $this->assertEquals(0.1, $twig['base_ms']);
+        $this->assertEquals(0.2, $twig['delta_ms']);
+        // Chemin absent de la référence : tout son temps est un écart
+        $this->assertEquals(0.0, $tiny['base_ms']);
+        $this->assertEquals(0.1, $tiny['delta_ms']);
     }
 }

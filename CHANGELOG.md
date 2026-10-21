@@ -2,6 +2,18 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## Non publié
+
+**new features**
+
+- Profiler : **flamegraph intégré** à l'onglet **Code**, sans fichier à télécharger. Trois vues s'ajoutent au tableau des fonctions : **Flamegraph** (appels regroupés, le plus coûteux à gauche, `#code/{token}/flame`), **Chronologique** (ordre des appels avec axe du temps, `#code/{token}/time`) et **Comparer** (flamegraph différentiel de deux requêtes profilées, en rouge ce qui est plus lent et en bleu ce qui est plus rapide, `#code/{token}/diff/{autre}`). Les couleurs indiquent l'origine du code (`app` / `framework` / `vendor`). On peut zoomer d'un clic, remonter par le chemin d'appels ou avec Échap, rechercher une fonction (avec le temps total trouvé), afficher une infobulle et le détail de la fonction, avec un lien vers ses appelants et ses appelés. Les appels de moins de 0,1 % sont regroupés dans « … (autres) »
+- Barre de debug : **mini-flamegraph** dans le panneau du bloc **Code** ; un clic l'ouvre en grand dans le profiler
+- Endpoint `GET /edu-code-profile` : nouveau `format=flame` avec les paramètres `order` (`heavy` / `time`), `compare` (token de référence), `min` (élagage) et `depth` (profondeur) ; nouvelles méthodes `CodeProfileAggregator::flameTree()` et `CodeProfileAggregator::diffTree()`
+
+**documentation**
+
+- update [La barre de debug et le profiler](docs/boost/debug-bar.md) : nouvelles sections « Le flamegraph intégré » et « Comparer deux requêtes » (avec captures d'écran), mini-flamegraph de la barre de debug, paramètres `format=flame`, `order`, `compare`, `min` et `depth` de l'API
+
 ## v2.8.0 - 20/10/2026
 
 **new features**

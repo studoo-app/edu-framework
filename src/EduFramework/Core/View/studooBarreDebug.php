@@ -97,6 +97,13 @@ class studooBarreDebug
 #edu-tb .edu-tb-panel .edu-tb-code-rows { display: block; }
 #edu-tb .edu-tb-panel .edu-tb-code-rows span { flex-shrink: 0; }
 #edu-tb .edu-tb-code > a { padding: 0; }
+#edu-tb .edu-tb-panel a.edu-tb-flame {
+    display: block; position: relative; height: auto; margin: 8px 0 2px; padding: 0;
+    line-height: 0; background: #333; cursor: pointer;
+}
+#edu-tb .edu-tb-panel a.edu-tb-flame:hover { outline: 1px solid #9fc6ff; }
+#edu-tb .edu-tb-panel .edu-tb-flame span { position: absolute; display: block; height: 9px; border-right: 1px solid #333; }
+#edu-tb .edu-tb-panel .edu-tb-flame-caption { display: block; color: #999; font-size: 11px; }
 #edu-tb .edu-tb-panel button.edu-tb-action {
     display: inline; height: auto; padding: 0; line-height: inherit;
     color: #9fc6ff; cursor: pointer; text-decoration: underline;
@@ -175,6 +182,48 @@ html.edu-tb-closed #edu-tb-mini { display: flex; }
         data.top.slice(0, 3).forEach(function (fn, index) {
             row('Top ' + (index + 1), fn.name + ' — ' + ms(fn.self_ms) + ' ms (' + ms(fn.self_pct) + ' %)');
         });
+        eduLoadMiniFlame(block);
+    };
+    // Mini-flamegraph du panneau : appels de plus de 1 % du temps, 12 niveaux au plus ;
+    // un clic ouvre le flamegraph complet dans le profiler
+    window.eduLoadMiniFlame = function (block) {
+        var token = block.getAttribute('data-token');
+        fetch('/edu-code-profile?token=' + encodeURIComponent(token) + '&format=flame&min=0.01&depth=12')
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.status !== 'ready' || !data.tree || data.tree.value === 0) { return; }
+                var ms = function (value) { return String(Math.round(value * 100) / 100).replace('.', ','); };
+                var colors = { app: '#e0b93f', framework: '#5d9bd5', vendor: '#9b82c9', other: '#888' };
+                var link = document.createElement('a');
+                link.className = 'edu-tb-flame';
+                link.href = '/_debug/profiler#code/' + token + '/flame';
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.setAttribute('aria-label', 'Ouvrir le flamegraph de la requête dans le profiler');
+                var total = data.tree.value;
+                var depthMax = 0;
+                (function walk(node, depth) {
+                    if (depth > 0) {
+                        var bar = document.createElement('span');
+                        bar.style.left = (node.start * 100 / total) + '%';
+                        bar.style.width = (node.value * 100 / total) + '%';
+                        bar.style.top = ((depth - 1) * 10) + 'px';
+                        bar.style.background = colors[node.origin] || colors.other;
+                        bar.title = node.name + ' — ' + ms(node.ms) + ' ms (' + String(node.pct).replace('.', ',') + ' %)';
+                        link.appendChild(bar);
+                        depthMax = Math.max(depthMax, depth);
+                    }
+                    node.children.forEach(function (child) { walk(child, depth + 1); });
+                })(data.tree, 0);
+                link.style.height = (depthMax * 10) + 'px';
+                var caption = document.createElement('small');
+                caption.className = 'edu-tb-flame-caption';
+                caption.textContent = 'Flamegraph — jaune : mon code, bleu : framework, violet : vendor. Cliquer pour l’ouvrir.';
+                var rows = block.querySelector('.edu-tb-code-rows');
+                rows.appendChild(link);
+                rows.appendChild(caption);
+            })
+            .catch(function () {});
     };
 })();
 </script>
