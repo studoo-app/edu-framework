@@ -87,8 +87,8 @@ class LoadEnvTest extends TestCase
 
     public function testEnvironnementProcessusPrioritaireSurFichiers(): void
     {
+        // Variable visible uniquement par getenv() (php -S ou mod_php avec variables_order=GPCS)
         putenv('EDU_TEST_VAR=depuis-docker');
-        $_SERVER['EDU_TEST_VAR'] = 'depuis-docker';
         file_put_contents($this->envPath . '.env.local', "EDU_TEST_VAR=depuis-env-local\n");
         ConfigCore::loadEnv($this->envPath);
 
@@ -143,5 +143,25 @@ class LoadEnvTest extends TestCase
 
         $this->assertFalse(ConfigCore::existEnv('DB_TYPE'));
         $this->assertFalse(ConfigCore::existEnv('DB_HOST_STATUS'));
+    }
+
+    public function testDatabaseUrlTronqueeParUnDiese(): void
+    {
+        // FrankenDeploy n'entoure pas de guillemets une valeur contenant # :
+        // phpdotenv coupe la valeur au # (mysql://app:Xy7), l'erreur doit être explicite
+        file_put_contents($this->envPath . '.env.local', "DATABASE_URL=mysql://app:Xy7#kP@db-host:3306/app\n");
+
+        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
+        $this->expectExceptionMessage('DATABASE_URL est invalide');
+        ConfigCore::loadEnv($this->envPath);
+    }
+
+    public function testDatabaseUrlMotDePasseEncode(): void
+    {
+        file_put_contents($this->envPath . '.env.local', "DATABASE_URL=mysql://app:Xy7%23kP@db-host:3306/app\n");
+        ConfigCore::loadEnv($this->envPath);
+
+        $this->assertEquals('Xy7#kP', ConfigCore::getEnv('DB_PASSWORD'));
+        $this->assertEquals('db-host', ConfigCore::getEnv('DB_HOST'));
     }
 }

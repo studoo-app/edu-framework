@@ -110,6 +110,7 @@ ENTRYPOINT ["docker-entrypoint"]
 CMD ["--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]
 
 # Sonde applicative : vérifie que l'application répond, pas seulement Caddy
+# (même URL que healthcheck_path dans frankendeploy.yaml)
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:8080/ || exit 1
 
 USER app

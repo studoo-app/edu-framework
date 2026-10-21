@@ -77,51 +77,42 @@ class CreateDeployCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $console = new SymfonyStyle($input, $output);
         $basePath = (string) ConfigCore::getConfig('base_path');
 
-        $name = $this->formatName((string) ($input->getOption('name') ?? basename((string) realpath($basePath))));
+        $name = $this->resolveName($input->getOption('name'), $basePath);
         if ($name === '') {
-            $io->error("Nom d'application invalide : utilisez des minuscules, des chiffres et des tirets");
+            $console->error("Nom d'application invalide : utilisez des minuscules, des chiffres et des tirets. "
+                . "Dans le conteneur Docker (dossier /app), précisez le nom : --name=mon-app");
             return Command::FAILURE;
         }
 
         $database = (string) $input->getOption('database');
         if (array_key_exists($database, self::DATABASES) === false) {
-            $io->error('Base de données inconnue : ' . $database
+            $console->error('Base de données inconnue : ' . $database
                 . ' (valeurs possibles : ' . implode(', ', array_keys(self::DATABASES)) . ')');
             return Command::FAILURE;
         }
 
         $domain = $input->getOption('domain');
         if ($domain !== null && preg_match('/^(?!-)[a-z0-9.-]+\.[a-z]{2,}$/', strtolower($domain)) !== 1) {
-            $io->error('Nom de domaine invalide : ' . $domain);
+            $console->error('Nom de domaine invalide : ' . $domain);
             return Command::FAILURE;
         }
 
         $configPath = $basePath . self::CONFIG_FILE;
         if (file_exists($configPath) === true && $input->getOption('force') === false) {
-            $io->error('Le fichier ' . self::CONFIG_FILE . ' existe déjà (utilisez --force pour l\'écraser)');
+            $console->error('Le fichier ' . self::CONFIG_FILE . ' existe déjà (utilisez --force pour l\'écraser)');
             return Command::FAILURE;
         }
 
         file_put_contents($configPath, $this->generateConfig($name, $domain, $database));
-        $io->success('Fichier ' . self::CONFIG_FILE . ' généré');
+        $console->success('Fichier ' . self::CONFIG_FILE . ' généré (application : ' . $name . ')');
 
-        // L'image de production repose sur les fichiers Docker du framework
-        $missing = array_filter(
-            self::REQUIRED_FILES,
-            static fn (string $file): bool => file_exists($basePath . $file) === false
-        );
-        if ($missing !== []) {
-            $io->warning('Fichiers manquants pour construire l\'image : ' . implode(', ', $missing)
-                . '. FrankenDeploy générerait des fichiers prévus pour Symfony, incompatibles avec Edu-Framework.');
-        } elseif (str_contains((string) file_get_contents($basePath . 'Dockerfile'), 'AS frankenphp_prod') === false) {
-            $io->warning('Le Dockerfile ne contient pas de stage "frankenphp_prod", requis par FrankenDeploy.');
-        }
+        $this->checkDockerFiles($console, $basePath);
 
-        $io->section('Étapes suivantes');
-        $io->listing([
+        $console->section('Étapes suivantes');
+        $console->listing([
             'Préparer le serveur : frankendeploy server add prod deploy@mon-serveur.fr',
             'Puis : frankendeploy server setup prod --email moi@exemple.fr',
             'Vérifier : frankendeploy doctor prod',
@@ -129,6 +120,53 @@ class CreateDeployCommand extends Command
         ]);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Nom de l'application : option --name, sinon nom du dossier du projet
+     * Dans le conteneur Docker de développement, le dossier du projet est /app :
+     * le nom n'est pas déduit, sinon tous les projets s'appelleraient "app" sur le serveur
+     * @param string|null $option Valeur de l'option --name
+     * @param string $basePath Dossier du projet
+     * @return string Nom formaté, vide si invalide ou impossible à déduire
+     */
+    private function resolveName(?string $option, string $basePath): string
+    {
+        if ($option !== null) {
+            return $this->formatName($option);
+        }
+
+        $folder = basename((string) realpath($basePath));
+        return $folder === 'app' ? '' : $this->formatName($folder);
+    }
+
+    /**
+     * Vérifie la présence des fichiers Docker du framework nécessaires à l'image de production
+     * Sans eux, FrankenDeploy génère des fichiers prévus pour Symfony (bin/console),
+     * incompatibles avec Edu-Framework
+     * @param SymfonyStyle $console Sortie de la commande
+     * @param string $basePath Dossier du projet
+     * @return void
+     */
+    private function checkDockerFiles(SymfonyStyle $console, string $basePath): void
+    {
+        $missing = array_filter(
+            self::REQUIRED_FILES,
+            static fn (string $file): bool => file_exists($basePath . $file) === false
+        );
+        $hasProdStage = $missing === []
+            && str_contains((string) file_get_contents($basePath . 'Dockerfile'), 'AS frankenphp_prod');
+        if ($hasProdStage === true) {
+            return;
+        }
+
+        $console->warning(
+            ($missing !== []
+                ? 'Fichiers manquants pour construire l\'image : ' . implode(', ', $missing) . '. '
+                : 'Le Dockerfile ne contient pas de stage "frankenphp_prod", requis par FrankenDeploy. ')
+            . 'Copiez les fichiers ' . implode(', ', self::REQUIRED_FILES)
+            . ' depuis vendor/studoo/edu-framework/ (voir la doc "Déployer son application").'
+        );
     }
 
     /**
@@ -170,7 +208,10 @@ class CreateDeployCommand extends Command
             'sqlite' => <<<YAML
 
                 # Base SQLite : fichier stocké dans var/sqlite (dossier partagé)
-                # Variables à définir : frankendeploy env set prod DB_HOST_STATUS=true DB_TYPE=sqlite DB_NAME=app_db
+                # Variables à définir (une commande par variable) :
+                #   frankendeploy env set prod DB_HOST_STATUS=true
+                #   frankendeploy env set prod DB_TYPE=sqlite
+                #   frankendeploy env set prod DB_NAME=app_db
                 database:
                   driver: sqlite
                   path: var/sqlite/app_db.sqlite
@@ -187,6 +228,8 @@ class CreateDeployCommand extends Command
             #
             # L'image de production est construite avec le Dockerfile du projet
             # (stage frankenphp_prod) : FrankenDeploy ne le régénère pas.
+            # Ne lancez pas frankendeploy build, init --force ou dev : ces commandes écrasent
+            # Dockerfile, docker-entrypoint.sh, .dockerignore et compose.yaml par des versions Symfony.
             # Les secrets ne vont jamais dans ce fichier : frankendeploy env set prod CLE=valeur
 
             name: {$name}
@@ -203,6 +246,8 @@ class CreateDeployCommand extends Command
             {$databaseBlock}
             deploy:
             {$domainLine}
+              # Page testée avant de basculer le trafic : doit répondre 200 sans connexion.
+              # Si vous la changez, changez aussi la ligne HEALTHCHECK du Dockerfile.
               healthcheck_path: /
               keep_releases: 5
               # Fichiers et dossiers conservés d'un déploiement à l'autre

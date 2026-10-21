@@ -52,6 +52,16 @@ Vérifiez l'installation :
 frankendeploy --version
 ```
 
+!!! warning "Projet créé avant la version 2.9.0"
+
+    L'image de production repose sur trois fichiers à la racine du projet : le `Dockerfile` (avec le stage `frankenphp_prod`), `docker-entrypoint.sh` et `.dockerignore`. Si votre projet a été créé avant la version 2.9.0, récupérez-les depuis le framework installé par Composer :
+
+    ```bash
+    cp vendor/studoo/edu-framework/Dockerfile vendor/studoo/edu-framework/docker-entrypoint.sh vendor/studoo/edu-framework/.dockerignore .
+    ```
+
+    Vérifiez aussi que le fichier `composer.lock` est versionné (il ne doit pas figurer dans le `.gitignore`) : l'image de production installe exactement les versions qu'il contient.
+
 ## Étape 1 : décrire le déploiement
 
 La commande `make:deploy` génère le fichier `frankendeploy.yaml` à la racine du projet :
@@ -63,9 +73,17 @@ php bin/edu make:deploy --domain=mon-app.fr
 | Option         | Description                                                    | Défaut              |
 |----------------|----------------------------------------------------------------|---------------------|
 | `--domain`     | nom de domaine de l'application                                | aucun               |
-| `--name`       | nom de l'application sur le serveur (minuscules, tirets)       | nom du dossier      |
+| `--name`       | nom de l'application sur le serveur (minuscules, tirets), unique sur le serveur | nom du dossier (obligatoire dans le conteneur Docker) |
 | `--database`   | base de données : `mariadb`, `mysql`, `sqlite` ou `none`       | `mariadb`           |
 | `--force`      | écrase un fichier `frankendeploy.yaml` existant                |                     |
+
+!!! info "Dans le conteneur Docker de développement"
+
+    Dans le [flux 100 % Docker](../installation/docker.md), le projet est monté dans le dossier `/app` du conteneur : précisez le nom de l'application, sinon tous les projets s'appelleraient `app` sur le serveur.
+
+    ```bash
+    docker compose exec frankenphp php bin/edu make:deploy --name=mon-app --domain=mon-app.fr
+    ```
 
 Le fichier généré ressemble à ceci :
 
@@ -97,7 +115,9 @@ deploy:
 
 !!! info "Le healthcheck"
 
-    Avant de basculer le trafic, FrankenDeploy vérifie que la page `healthcheck_path` (par défaut `/`) répond avec un code HTTP 200. Si votre page d'accueil nécessite d'être connecté, indiquez une autre route publique.
+    Avant de basculer le trafic, FrankenDeploy vérifie que la page `healthcheck_path` (par défaut `/`) répond avec un code HTTP 200. Docker surveille aussi l'application avec la ligne `HEALTHCHECK` du `Dockerfile`, utilisée notamment par `frankendeploy env set ... --reload`.
+
+    Si votre page d'accueil nécessite d'être connecté, choisissez une autre route publique et modifiez **les deux** : `healthcheck_path` dans `frankendeploy.yaml` et l'URL de la ligne `HEALTHCHECK` du `Dockerfile` (`http://localhost:8080/...`).
 
 Versionnez ce fichier avec votre projet :
 
@@ -138,11 +158,23 @@ Pour un mot de passe ou une clé d'API, utilisez la saisie masquée :
 frankendeploy env set prod MAILER_DSN --from-stdin
 ```
 
+`env set` n'accepte **qu'une variable par commande**. Pour en définir plusieurs, répétez la commande ou envoyez un fichier :
+
+```bash
+frankendeploy env push prod .env.prod
+```
+
 Consultez les variables définies :
 
 ```bash
 frankendeploy env list prod
 ```
+
+!!! danger "Le caractère # dans une valeur"
+
+    FrankenDeploy écrit les valeurs sans guillemets dans le `.env.local` : à la lecture, tout ce qui suit un `#` est ignoré (`S3cr#t` devient `S3cr`). Évitez le `#` dans les mots de passe. Dans une URL (`DATABASE_URL`, `MAILER_DSN`), encodez les caractères spéciaux de l'utilisateur et du mot de passe : `#` => `%23`, `@` => `%40`, `/` => `%2F`, `?` => `%3F`.
+
+    Une `DATABASE_URL` mal formée arrête l'application avec le message « La variable DATABASE_URL est invalide ».
 
 !!! info "La base de données est configurée automatiquement"
 
@@ -153,6 +185,30 @@ frankendeploy env list prod
     ```
 
     Edu-Framework en déduit automatiquement les variables `DB_HOST_STATUS`, `DB_TYPE`, `DB_HOST`, `DB_SOCKET`, `DB_USER`, `DB_PASSWORD` et `DB_NAME`. Une variable `DB_*` définie dans le `.env.local` reste prioritaire.
+
+    Cette `DATABASE_URL` n'est pas stockée dans le `.env.local` : `frankendeploy env list prod` ne l'affiche pas. Pour la consulter :
+
+    ```bash
+    frankendeploy exec prod printenv DATABASE_URL
+    ```
+
+!!! info "Avec une base SQLite (`--database=sqlite`)"
+
+    Aucune `DATABASE_URL` n'est transmise : définissez les variables une par une.
+
+    ```bash
+    frankendeploy env set prod DB_HOST_STATUS=true
+    ```
+
+    ```bash
+    frankendeploy env set prod DB_TYPE=sqlite
+    ```
+
+    ```bash
+    frankendeploy env set prod DB_NAME=app_db
+    ```
+
+    Le fichier `var/sqlite/app_db.sqlite` est conservé entre les déploiements (dossier partagé). Au premier déploiement, il est vide.
 
 ### Ordre de lecture des variables
 
@@ -190,17 +246,29 @@ Pour chaque nouvelle version, il suffit de relancer `frankendeploy deploy prod`.
 
 ## Importer sa base de données
 
-Au premier déploiement, la base MariaDB est vide. Pour importer le contenu de votre base de développement, exportez-la depuis votre poste (phpMyAdmin ou dbgate), puis récupérez les identifiants de la base de production :
+Au premier déploiement, la base MariaDB est vide. Pour importer le contenu de votre base de développement, exportez-la depuis votre poste (phpMyAdmin ou dbgate) dans un fichier `app_db.sql`, puis envoyez-le sur le serveur :
 
 ```bash
-frankendeploy env get prod DATABASE_URL
+scp app_db.sql deploy@mon-serveur.fr:
 ```
 
-Envoyez le fichier SQL sur le serveur, connectez-vous en SSH et importez-le dans le conteneur `mon-app-db` :
+Connectez-vous en SSH au serveur et importez le fichier dans le conteneur `mon-app-db`. Les identifiants sont lus dans les variables du conteneur : aucun mot de passe à saisir.
 
-```bash
-docker exec -i mon-app-db mariadb -umon-app -p mon_app < app_db.sql
-```
+=== "MariaDB"
+
+    ```bash
+    docker exec -i mon-app-db sh -c 'exec mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"' < app_db.sql
+    ```
+
+=== "MySQL"
+
+    ```bash
+    docker exec -i mon-app-db sh -c 'exec mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"' < app_db.sql
+    ```
+
+!!! info "Les identifiants de la base"
+
+    FrankenDeploy les enregistre sur le serveur dans le fichier `/opt/frankendeploy/apps/mon-app/shared/.db_credentials` (lisible avec `sudo cat`).
 
 !!! warning "Sauvegardes"
 
@@ -262,19 +330,25 @@ docker build --target frankenphp_prod -t mon-app .
 docker run --rm -p 8080:8080 mon-app
 ```
 
-!!! warning "Ne supprimez pas les fichiers Docker du projet"
+!!! warning "Ne supprimez pas et ne régénérez pas les fichiers Docker du projet"
 
     Si le `Dockerfile`, `docker-entrypoint.sh` ou `.dockerignore` sont absents, FrankenDeploy en génère de nouveaux, prévus pour Symfony : la construction de l'image échouera (commande `bin/console` introuvable).
+
+    Pour la même raison, ne lancez pas `frankendeploy build`, `frankendeploy init --force` ni `frankendeploy dev` dans un projet Edu-Framework : ces commandes écrasent `Dockerfile`, `docker-entrypoint.sh`, `.dockerignore` et `compose.yaml`. Pour restaurer les fichiers :
+
+    ```bash
+    git checkout -- Dockerfile docker-entrypoint.sh .dockerignore compose.yaml
+    ```
 
 ## Si vous rencontrez une erreur
 
 ### Le healthcheck échoue
 
-FrankenDeploy affiche les 50 dernières lignes de logs du conteneur. Vérifiez que la route `healthcheck_path` répond sans connexion à la base ni authentification, et que les variables d'environnement sont définies (`frankendeploy env list prod`).
+FrankenDeploy affiche les 50 dernières lignes de logs du conteneur. Vérifiez que la route `healthcheck_path` répond sans authentification, et que les variables d'environnement sont définies (`frankendeploy env list prod`).
 
 ### Base de données injoignable
 
-Le conteneur attend la base de données 60 secondes au démarrage. Vérifiez la variable `DATABASE_URL` ou les variables `DB_*` avec `frankendeploy env list prod`.
+Le conteneur attend la base de données 60 secondes au démarrage. Vérifiez les variables `DB_*` avec `frankendeploy env list prod` et la `DATABASE_URL` d'une base gérée avec `frankendeploy exec prod printenv DATABASE_URL`.
 
 ### Le certificat HTTPS n'est pas délivré
 

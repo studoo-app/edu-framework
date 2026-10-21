@@ -11,12 +11,13 @@
 - Endpoint `GET /edu-code-profile` : nouveau `format=flame` avec les paramètres `order` (`heavy` / `time`), `compare` (token de référence), `min` (élagage) et `depth` (profondeur) ; nouvelles méthodes `CodeProfileAggregator::flameTree()` et `CodeProfileAggregator::diffTree()`
 - Déploiement sur un serveur Debian / Ubuntu avec [FrankenDeploy](https://yoanbernabeu.github.io/frankendeploy/) : nouvelle commande `php bin/edu make:deploy` qui génère le fichier `frankendeploy.yaml` (options `--domain`, `--name`, `--database=mariadb|mysql|sqlite|none`, `--force`) avec les dossiers partagés entre les déploiements (`.env.local`, `var/logs`, `var/sessions`, `var/sqlite`, `public/upload`)
 - `Dockerfile` multi-stage : `frankenphp_base` (socle commun), `frankenphp_prod` (image de production : HTTP sur le port 8080, utilisateur non-root `app`, `php.ini-production`, OPcache sans revalidation, sessions dans `var/sessions`, sans Excimer ni dépendances de dev, healthcheck) et `frankenphp_dev` (image de développement, ciblée explicitement par `compose.yaml`). Nouveau script `docker-entrypoint.sh` qui attend la base de données avant de démarrer FrankenPHP
-- Variables d'environnement : nouvelle méthode `ConfigCore::loadEnv()` utilisée par l'application et par `bin/edu`. Les fichiers `.env` et `.env.local` sont optionnels (le `.env.local` est prioritaire sur le `.env`), les variables de l'environnement du processus (Docker) sont prioritaires et lues par `ConfigCore::getEnv()` / `existEnv()` même lorsque `variables_order` ne contient pas `E` (cas de `php.ini-production`). Si `DATABASE_URL` est définie (`mysql://user:pass@host:3306/db`), les variables `DB_*` manquantes en sont déduites
+- Variables d'environnement : nouvelle méthode `ConfigCore::loadEnv()` utilisée par l'application et par `bin/edu`. Les fichiers `.env` et `.env.local` sont optionnels (le `.env.local` est prioritaire sur le `.env`), les variables de l'environnement du processus (Docker) sont prioritaires et lues par `ConfigCore::getEnv()` / `existEnv()` même lorsque `variables_order` ne contient pas `E` (cas de `php.ini-production`). Si `DATABASE_URL` est définie (`mysql://user:pass@host:3306/db`), les variables `DB_*` manquantes en sont déduites ; une `DATABASE_URL` MySQL / MariaDB / PostgreSQL mal formée (Exemple: mot de passe contenant `#` non encodé) lève une `ErrorConfigException` explicite
 
 **bug Fixes**
 
 - `ConfigCore::getEnv()` ne lève plus d'avertissement pour une variable absente (retourne une chaîne vide)
 - `bin/edu` démarre sans fichier `.env`
+- Tests : `APP_ENV` hérité du shell ou du conteneur de développement n'influence plus les tests (`tests/bootstrap.php`)
 
 **documentation**
 

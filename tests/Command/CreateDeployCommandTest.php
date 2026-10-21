@@ -57,7 +57,37 @@ class CreateDeployCommandTest extends TestCase
     public function testFichiersDockerManquants(): void
     {
         $this->commandeTester->execute([]);
-        $this->assertStringContainsString('Fichiers manquants', $this->commandeTester->getDisplay());
+        $output = $this->commandeTester->getDisplay();
+        $this->assertStringContainsString('Fichiers manquants', $output);
+        // Le message indique où récupérer les fichiers Docker du framework
+        $this->assertStringContainsString('vendor/studoo/edu-framework/', $output);
+    }
+
+    public function testDockerfileSansStageProd(): void
+    {
+        foreach (['Dockerfile', 'docker-entrypoint.sh', 'Caddyfile', '.dockerignore'] as $file) {
+            file_put_contents($this->projectPath . $file, '');
+        }
+        file_put_contents($this->projectPath . 'Dockerfile', "FROM dunglas/frankenphp:php8.4\n");
+
+        $this->commandeTester->execute([]);
+        $this->assertStringContainsString('frankenphp_prod', $this->commandeTester->getDisplay());
+    }
+
+    public function testNomRequisDansLeConteneur(): void
+    {
+        // Dans le conteneur de développement, le projet est monté dans /app :
+        // le nom "app" ne doit pas être déduit du dossier
+        $appPath = dirname($this->projectPath) . '/app/';
+        mkdir($appPath);
+        (new ConfigCore(['base_path' => $appPath]));
+
+        $this->assertEquals(Command::FAILURE, $this->commandeTester->execute([]));
+        $this->assertStringContainsString('--name', $this->commandeTester->getDisplay());
+        $this->assertFileDoesNotExist($appPath . 'frankendeploy.yaml');
+
+        $this->assertEquals(Command::SUCCESS, $this->commandeTester->execute(['--name' => 'mon-app']));
+        $this->assertEquals('mon-app', Yaml::parseFile($appPath . 'frankendeploy.yaml')['name']);
     }
 
     public function testSansDomaineNiBase(): void
@@ -77,6 +107,11 @@ class CreateDeployCommandTest extends TestCase
         $config = Yaml::parseFile($this->projectPath . 'frankendeploy.yaml');
         $this->assertEquals('sqlite', $config['database']['driver']);
         $this->assertStringStartsWith('var/sqlite/', $config['database']['path']);
+
+        // frankendeploy env set n'accepte qu'une variable par commande
+        $content = file_get_contents($this->projectPath . 'frankendeploy.yaml');
+        $this->assertDoesNotMatchRegularExpression('/env set prod \S+=\S+ \S+=/', $content);
+        $this->assertStringContainsString('env set prod DB_TYPE=sqlite', $content);
     }
 
     public function testBaseInconnue(): void
