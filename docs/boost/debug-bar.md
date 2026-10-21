@@ -275,11 +275,75 @@ En mode `trigger`, un clic sur le bloc **Code** pose le cookie `edu_profile=1` e
 <figcaption>Après un clic sur une fonction : ses appelants (Appelée par) et ses appelés (Appelle)</figcaption>
 </figure>
 
-- Le bouton **Télécharger le flamegraph (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour obtenir un *flamegraph* (voir ci-dessous).
+- Les onglets **Flamegraph**, **Chronologique** et **Comparer** de l'onglet **Code** affichent le *flamegraph* de la requête directement dans le profiler (voir ci-dessous).
+- Le panneau du bloc **Code** de la barre de debug affiche un **mini-flamegraph** de la requête : un clic l'ouvre en grand dans le profiler.
+
+<figure markdown="span">
+![Mini-flamegraph du bloc Code](../assets/screen-profiler-code-bar-flame.png){width="360"}
+<figcaption>Le mini-flamegraph du panneau du bloc Code : les appels de plus de 1 % du temps, colorés selon leur origine</figcaption>
+</figure>
+
+- Le bouton **Télécharger le flamegraph (Speedscope)** exporte les piles d'appels, à ouvrir sur [speedscope.app](https://www.speedscope.app){:target="_blank"} pour une analyse plus poussée (voir plus bas).
+
+### Le flamegraph intégré
+
+Le tableau de l'onglet **Code** additionne les temps par fonction, mais il ne montre pas **l'enchaînement des appels**. Le *flamegraph* le montre : on voit d'un coup d'œil quel chemin dans le code consomme le temps.
+
+Le profiler dessine le flamegraph **sans quitter la page et sans télécharger de fichier**. Choisissez une vue avec les onglets placés au-dessus du tableau :
+
+| Onglet            | URL                                   | Ce qu'il montre |
+|-------------------|---------------------------------------|-----------------|
+| **Tableau**       | `/_debug/profiler#code/{token}`       | Le tableau des fonctions (temps propre et temps inclusif) |
+| **Flamegraph**    | `/_debug/profiler#code/{token}/flame` | Les appels identiques **regroupés** et triés, le plus coûteux à gauche (la vue *Left Heavy* de Speedscope) |
+| **Chronologique** | `/_debug/profiler#code/{token}/time`  | Les appels dans **l'ordre où ils ont eu lieu** : l'axe horizontal est le temps écoulé depuis le début de la requête (la vue *Time Order* de Speedscope) |
+| **Comparer**      | `/_debug/profiler#code/{token}/diff/{autre}` | Le flamegraph **différentiel** de deux requêtes profilées (voir ci-dessous) |
+
+<figure markdown="span">
+![Flamegraph intégré au profiler](../assets/screen-profiler-flamegraph.png)
+<figcaption>Le flamegraph d'une requête vers /medecin/new : sous Twig\Environment::compileSource, la compilation du template occupe la plus grande partie de la largeur</figcaption>
+</figure>
+
+**Lire le graphe.** Chaque rectangle est une fonction :
+
+- **la largeur** est le temps passé dans la fonction **et dans tout ce qu'elle appelle** (le temps inclusif) ;
+- **de haut en bas**, on descend dans la pile d'appels : la première ligne est la requête entière, puis le point d'entrée (`public/index.php`), puis les fonctions qu'il appelle, et ainsi de suite ;
+- **la couleur** indique l'origine du code : **jaune** pour votre code (`app/`), **bleu** pour le framework, **violet** pour les dépendances (`vendor/`), **gris** pour le reste. La nuance varie d'une fonction à l'autre pour distinguer deux rectangles voisins.
+
+Cherchez **les rectangles jaunes larges** : c'est le temps consommé par votre propre code.
+
+**Naviguer.**
+
+- Le **survol** d'un rectangle affiche le nom de la fonction, son fichier, son temps inclusif et son temps propre.
+- Un **clic** zoome sur la fonction : elle prend toute la largeur, ses parents restent affichés en atténué au-dessus. Le **chemin d'appels** au-dessus du graphe permet de remonter d'un clic, la touche ++esc++ remonte d'un niveau et le bouton **Réinitialiser le zoom** revient à la requête entière.
+- Sous le graphe, le **détail** de la fonction zoomée donne son fichier, son origine, ses temps et le lien **Voir les appelants et les appelés**, qui affiche les mêmes tableaux que l'onglet **Tableau**.
+- Le champ **Rechercher une fonction** surligne les fonctions dont le nom contient le texte saisi et indique le temps total qu'elles représentent (Exemple : `Twig` ou `Repository`).
+
+!!! info "Appels regroupés dans « … (autres) »"
+
+    Pour que le graphe reste lisible et léger, les appels qui représentent moins de **0,1 %** du temps de la requête sont regroupés dans un rectangle **… (autres)** (vue Flamegraph) ou ne sont pas dessinés (vue Chronologique). Le fichier Speedscope, lui, contient toutes les piles d'appels.
+
+### Comparer deux requêtes
+
+L'onglet **Comparer** répond à la question : « *Pourquoi cette page est-elle plus lente que tout à l'heure ?* ».
+
+1. Profilez **deux fois** la page : par exemple avant et après une modification, ou au premier chargement puis au suivant.
+2. Ouvrez l'onglet **Code** de l'une des deux requêtes, puis l'onglet **Comparer**.
+3. Choisissez la requête de **référence** dans la liste **Comparer avec**. Les requêtes profilées sur **la même URL** sont proposées en premier, et la précédente est choisie par défaut.
+
+La **forme** du graphe est celle de la requête affichée. La **couleur** indique l'écart avec la référence pour le même chemin d'appels : **rouge** si la requête est plus lente, **bleu** si elle est plus rapide, **gris** si le temps est identique. Plus la couleur est foncée, plus l'écart est grand. Le survol et le détail affichent le temps de la référence et l'écart en ms.
+
+<figure markdown="span">
+![Flamegraph différentiel](../assets/screen-profiler-flamegraph-diff.png)
+<figcaption>Premier chargement de /medecin/new comparé au suivant : la compilation du template Twig (en rouge) n'existe pas dans la référence</figcaption>
+</figure>
+
+!!! tip "Un chemin qui a disparu"
+
+    Un appel présent seulement dans la référence n'est pas dessiné, puisque la forme est celle de la requête affichée : son temps apparaît dans l'écart de la fonction qui l'appelait. Pour le voir, inversez la comparaison en ouvrant l'onglet **Comparer** de l'autre requête.
 
 ### Lire le flamegraph avec Speedscope
 
-Le tableau de l'onglet **Code** additionne les temps par fonction, mais il ne montre pas **l'enchaînement des appels**. Le *flamegraph* le montre : chaque relevé de la pile d'appels est dessiné, et l'on voit d'un coup d'œil quel chemin dans le code consomme le temps.
+Le flamegraph intégré suffit dans la plupart des cas. Pour aller plus loin (toutes les piles d'appels sans regroupement, zoom à la molette, vue *Sandwich*), exportez le profil vers Speedscope.
 
 [Speedscope](https://github.com/jlfwong/speedscope){:target="_blank"} est un visualiseur de flamegraph open source qui fonctionne dans le navigateur.
 
@@ -336,9 +400,13 @@ GET /edu-code-profile?token=42
 |-----------|---------------------------------------------------------------------|--------|
 | `token`   | Identifiant du log de la requête HTTP (`#42` accepté)               | requis |
 | `full`    | `1` : ajoute toutes les fonctions (`functions`) et le graphe d'appels (`edges`) | — |
-| `format`  | `speedscope` : retourne le fichier Speedscope de la requête         | —      |
+| `format`  | `speedscope` : retourne le fichier Speedscope de la requête ; `flame` : retourne l'arbre du flamegraph intégré (clé `tree`) | —      |
+| `order`   | Avec `format=flame` : `heavy` (appels regroupés) ou `time` (ordre chronologique) | `heavy` |
+| `compare` | Avec `format=flame` : token d'une autre requête profilée, pour le flamegraph différentiel (clés `compare`, `compare_summary`, et `base_ms` / `delta_ms` dans chaque nœud) | — |
+| `min`     | Avec `format=flame` : part minimale du temps total pour garder un appel (de `0` à `0.1`) | `0.001` |
+| `depth`   | Avec `format=flame` : profondeur maximale de l'arbre (`0` : illimitée) | `0` |
 
-La réponse contient `status` (`ready`, ou `pending` tant que le profil n'est pas enregistré), `summary` (`driver`, `period_ms`, `samples`, `wall_ms`, `peak_mb`, `functions_count`) et `top` (fonctions les plus coûteuses). Les profils sont stockés, compressés, dans la table `serv_code_profiles` de la base des logs.
+La réponse contient `status` (`ready`, ou `pending` tant que le profil n'est pas enregistré), `summary` (`driver`, `period_ms`, `samples`, `wall_ms`, `peak_mb`, `functions_count`) et `top` (fonctions les plus coûteuses). Avec `format=flame`, chaque nœud de `tree` contient `name`, `origin`, `file`, `line`, `start` et `value` (position et largeur en échantillons), `self`, `ms`, `self_ms`, `pct` et `children`. Les profils sont stockés, compressés, dans la table `serv_code_profiles` de la base des logs.
 
 ## Le stockage des logs
 

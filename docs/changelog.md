@@ -2,6 +2,30 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.9.0 - 21/10/2026
+
+**new features**
+
+- Profiler : **flamegraph intégré** à l'onglet **Code**, sans fichier à télécharger. Trois vues s'ajoutent au tableau des fonctions : **Flamegraph** (appels regroupés, le plus coûteux à gauche, `#code/{token}/flame`), **Chronologique** (ordre des appels avec axe du temps, `#code/{token}/time`) et **Comparer** (flamegraph différentiel de deux requêtes profilées, en rouge ce qui est plus lent et en bleu ce qui est plus rapide, `#code/{token}/diff/{autre}`). Les couleurs indiquent l'origine du code (`app` / `framework` / `vendor`). On peut zoomer d'un clic, remonter par le chemin d'appels ou avec Échap, rechercher une fonction (avec le temps total trouvé), afficher une infobulle et le détail de la fonction, avec un lien vers ses appelants et ses appelés. Les appels de moins de 0,1 % sont regroupés dans « … (autres) »
+- Barre de debug : **mini-flamegraph** dans le panneau du bloc **Code** ; un clic l'ouvre en grand dans le profiler
+- Endpoint `GET /edu-code-profile` : nouveau `format=flame` avec les paramètres `order` (`heavy` / `time`), `compare` (token de référence), `min` (élagage) et `depth` (profondeur) ; nouvelles méthodes `CodeProfileAggregator::flameTree()` et `CodeProfileAggregator::diffTree()`
+- Déploiement sur un serveur Debian / Ubuntu avec [FrankenDeploy](https://yoanbernabeu.github.io/frankendeploy/) : nouvelle commande `php bin/edu make:deploy` qui génère le fichier `frankendeploy.yaml` (options `--domain`, `--name`, `--database=mariadb|mysql|sqlite|none`, `--force`) avec les dossiers partagés entre les déploiements (`.env.local`, `var/logs`, `var/sessions`, `var/sqlite`, `public/upload`)
+- `Dockerfile` multi-stage : `frankenphp_base` (socle commun), `frankenphp_prod` (image de production : HTTP sur le port 8080, utilisateur non-root `app`, `php.ini-production`, OPcache sans revalidation, sessions dans `var/sessions`, sans Excimer ni dépendances de dev, healthcheck) et `frankenphp_dev` (image de développement, ciblée explicitement par `compose.yaml`). Nouveau script `docker-entrypoint.sh` qui attend la base de données avant de démarrer FrankenPHP
+- Variables d'environnement : nouvelle méthode `ConfigCore::loadEnv()` utilisée par l'application et par `bin/edu`. Les fichiers `.env` et `.env.local` sont optionnels (le `.env.local` est prioritaire sur le `.env`), les variables de l'environnement du processus (Docker) sont prioritaires et lues par `ConfigCore::getEnv()` / `existEnv()` même lorsque `variables_order` ne contient pas `E` (cas de `php.ini-production`). Si `DATABASE_URL` est définie (`mysql://user:pass@host:3306/db`), les variables `DB_*` manquantes en sont déduites ; une `DATABASE_URL` MySQL / MariaDB / PostgreSQL mal formée (Exemple: mot de passe contenant `#` non encodé) lève une `ErrorConfigException` explicite
+
+**bug Fixes**
+
+- `ConfigCore::getEnv()` ne lève plus d'avertissement pour une variable absente (retourne une chaîne vide)
+- `bin/edu` démarre sans fichier `.env`
+- Tests : `APP_ENV` hérité du shell ou du conteneur de développement n'influence plus les tests (`tests/bootstrap.php`)
+
+**documentation**
+
+- update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelles sections « Le flamegraph intégré » et « Comparer deux requêtes » (avec captures d'écran), mini-flamegraph de la barre de debug, paramètres `format=flame`, `order`, `compare`, `min` et `depth` de l'API
+- new [Déployer son application](deploy/index.md) : préparation du serveur, `make:deploy`, variables d'environnement, déploiement, import de la base, dossiers partagés, commandes du quotidien, image de production
+- update [La commande bin/edu](installation/command-edu.md) : commande `make:deploy`
+- update [L'application dans Docker](installation/docker.md) : lien vers l'image de production
+
 ## v2.8.0 - 20/10/2026
 
 **new features**

@@ -274,6 +274,42 @@
         .code-graph-cols a { cursor: pointer; }
         .profiled-badge { display: inline-block; margin-left: 6px; padding: 1px 5px; border-radius: 2px; font-size: 11px; background: #fff1c2; color: #7a5b00; text-decoration: none; }
         @media (max-width: 800px) { .code-graph-cols { grid-template-columns: 1fr; } }
+
+        /* Onglet Code : flamegraph intégré */
+        #codeModes { margin-bottom: 16px; }
+        .flame-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 14px; }
+        .flame-toolbar input[type=search] { padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; min-width: 240px; font-size: 13px; }
+        .flame-toolbar select { padding: 5px; margin-left: 4px; font-size: 13px; max-width: 420px; }
+        .flame-match { font-size: 13px; color: #555; }
+        .flame-crumbs { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; font-size: 12px; color: #999; }
+        .flame-crumbs button { font-family: monospace; font-size: 12px; color: #0b62a3; text-decoration: underline; background: none; border: 0; padding: 0; cursor: pointer; }
+        .flame-crumbs b { font-family: monospace; color: #222; }
+        .flame-axis { position: relative; height: 18px; font-size: 11px; color: #888; border: 1px solid #ddd; border-bottom: 0; background: #fafafa; }
+        .flame-axis span { position: absolute; top: 2px; padding-left: 3px; border-left: 1px solid #ccc; white-space: nowrap; }
+        .flame-chart { position: relative; overflow: hidden; background: #fff; border: 1px solid #ddd; }
+        .flame-node {
+            position: absolute; height: 18px; margin: 0; padding: 0 4px; box-sizing: border-box;
+            border: 0; border-right: 1px solid #fff; border-bottom: 1px solid #fff; border-radius: 0;
+            font: 12px/17px monospace; color: #222; text-align: left;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+        }
+        .flame-node:hover { filter: brightness(.92); }
+        .flame-node:focus-visible { outline: 2px solid #222; outline-offset: -2px; z-index: 1; }
+        .flame-node.ancestor { opacity: .55; }
+        .flame-node.dim { opacity: .25; }
+        .flame-node.match { box-shadow: inset 0 0 0 2px #b0413e; }
+        .flame-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 8px; font-size: 12px; color: #555; }
+        .flame-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; border-radius: 2px; vertical-align: -2px; }
+        #flameEmpty { padding: 30px 0; text-align: center; color: #999; background: #fff; border: 1px solid #ddd; margin: 0; }
+        #flameDetail { margin-top: 6px; }
+        #flameDetail .req-label { width: 180px; }
+        .flame-tooltip {
+            position: fixed; z-index: 10; max-width: 460px; padding: 8px 10px; pointer-events: none;
+            background: #222; color: #ddd; font-size: 12px; line-height: 1.5; border-radius: 3px; box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+        }
+        .flame-tooltip b { display: block; color: #fff; font-family: monospace; word-break: break-all; }
+        .flame-tooltip .slower { color: #ff9b94; }
+        .flame-tooltip .faster { color: #9fc6ff; }
     </style>
 </head>
 <body>
@@ -427,6 +463,33 @@
                     <a class="btn" id="codeSpeedscope" href="#" download>T&eacute;l&eacute;charger le flamegraph (Speedscope)</a>
                     <a class="btn" href="https://www.speedscope.app" target="_blank" rel="noopener">Ouvrir speedscope.app</a>
                 </div>
+                <div class="tabs" id="codeModes">
+                    <button type="button" data-mode="table" class="active">Tableau</button>
+                    <button type="button" data-mode="heavy">Flamegraph</button>
+                    <button type="button" data-mode="time">Chronologique</button>
+                    <button type="button" data-mode="diff">Comparer</button>
+                </div>
+                <!-- Flamegraph intégré : Left Heavy, chronologique ou différentiel -->
+                <div id="codeFlame" class="hidden">
+                    <div class="flame-toolbar">
+                        <label class="flame-compare hidden" id="flameCompare">Comparer avec
+                            <select id="flameCompareSelect"></select>
+                        </label>
+                        <input type="search" id="flameSearch" placeholder="Rechercher une fonction" aria-label="Rechercher une fonction dans le flamegraph">
+                        <span class="flame-match" id="flameMatch"></span>
+                        <button type="button" class="btn" id="flameReset">R&eacute;initialiser le zoom</button>
+                    </div>
+                    <div class="sql-meta" id="flameMeta"></div>
+                    <nav class="flame-crumbs" id="flameCrumbs" aria-label="Chemin d'appels du zoom"></nav>
+                    <div class="flame-axis hidden" id="flameAxis"></div>
+                    <div class="flame-chart" id="flameChart"></div>
+                    <p class="empty-state hidden" id="flameEmpty"></p>
+                    <div class="flame-legend" id="flameLegend"></div>
+                    <p class="code-note">Chaque rectangle est une fonction : sa <b>largeur</b> est son temps inclusif, la ligne du dessous contient les fonctions qu'elle appelle. Un clic zoome sur la fonction, &Eacute;chap revient au niveau pr&eacute;c&eacute;dent.</p>
+                    <table class="profiler-table hidden" id="flameDetail"><tbody id="flameDetailBody"></tbody></table>
+                    <div class="flame-tooltip hidden" id="flameTooltip" role="tooltip"></div>
+                </div>
+                <div id="codeTableView">
                 <div class="code-filters" id="codeFilters">
                     <label><input type="checkbox" value="app" checked> Mon code (app/)</label>
                     <label><input type="checkbox" value="framework"> Framework</label>
@@ -443,6 +506,7 @@
                     </thead>
                     <tbody id="codeBody"></tbody>
                 </table>
+                </div>
                 <div id="codeGraph" class="hidden">
                     <h2 id="codeGraphTitle"></h2>
                     <div class="code-graph-cols">
@@ -465,6 +529,13 @@
             var codeData = null;
             var codeSort = 'self';
             var codeSelected = null;
+            var codeMode = 'table';
+            var codeCompare = '';
+            var codeLoaded = '';
+            var codeLog = null;
+            var flameCache = {};
+            var flame = { data: null, zoom: null, nodes: [], maxDelta: 0, compareFor: '', compareOptions: null };
+            var FLAME_ROW = 18;
             var logsStatus = '';
             var searchFilters = { limit: 20 };
 
@@ -1061,6 +1132,7 @@
                 $('codeTitle').textContent = 'Profil du code \u2014 requ\u00eate #' + codeToken;
                 if (data.status !== 'ready') {
                     codeData = null;
+                    showCodeMode();
                     renderCodeEmpty('Cette requ\u00eate n\'a pas \u00e9t\u00e9 profil\u00e9e (ou le profil a \u00e9t\u00e9 supprim\u00e9 : seuls les derniers sont conserv\u00e9s).');
                     return;
                 }
@@ -1075,6 +1147,7 @@
                 $('codeActions').classList.remove('hidden');
                 $('codeSpeedscope').href = '/edu-code-profile?token=' + encodeURIComponent(codeToken) + '&format=speedscope';
                 $('codeSpeedscope').setAttribute('download', 'edu-profile-' + codeToken + '.speedscope.json');
+                showCodeMode();
                 renderCodeTable();
             }
 
@@ -1082,6 +1155,13 @@
                 if (codeToken === '') {
                     $('summary').classList.add('hidden');
                     renderCode({ status: 'pending' });
+                    return;
+                }
+                // Même requête (changement d'onglet Tableau / Flamegraph) : pas de rechargement
+                if (codeLoaded === codeToken) {
+                    if (codeLog !== null) { renderSummary(codeLog); }
+                    showCodeMode();
+                    if (codeMode !== 'table' && codeData !== null) { loadFlame(); }
                     return;
                 }
                 var requested = codeToken;
@@ -1092,13 +1172,408 @@
                     // Réponse d'un profil qui n'est plus affiché : ignorée
                     if (requested !== codeToken || window.location.hash.indexOf('#code/') !== 0) { return; }
                     var log = (results[0].logs.length > 0 ? results[0].logs[0] : null);
+                    // Profil pas encore enregistré : il sera redemandé à la prochaine visite
+                    codeLoaded = (results[1].status === 'ready' ? requested : '');
+                    codeLog = log;
                     if (log !== null) {
                         renderSummary(log);
                     } else {
                         $('summary').classList.add('hidden');
                     }
                     renderCode(results[1]);
+                    if (codeMode !== 'table' && codeData !== null) { loadFlame(); }
                 }).catch(fail);
+            }
+
+            // ----- Flamegraph intégré (onglet Code) -----
+            // Modes : heavy (appels regroupés, le plus coûteux à gauche), time (ordre
+            // chronologique) et diff (comparaison avec une autre requête profilée)
+            function codeHash(mode, compare) {
+                var suffix = { table: '', heavy: '/flame', time: '/time', diff: '/diff' }[mode];
+                return '#code/' + codeToken + suffix + (mode === 'diff' && compare ? '/' + compare : '');
+            }
+
+            function showCodeMode() {
+                var ready = codeData !== null;
+                var isTable = codeMode === 'table';
+                $('codeModes').classList.toggle('hidden', !ready);
+                document.querySelectorAll('#codeModes button').forEach(function(node) {
+                    node.classList.toggle('active', node.getAttribute('data-mode') === codeMode);
+                });
+                $('codeTableView').classList.toggle('hidden', ready && !isTable);
+                $('codeFlame').classList.toggle('hidden', !ready || isTable);
+                $('flameCompare').classList.toggle('hidden', codeMode !== 'diff');
+                if (isTable) { hideFlameTooltip(); }
+            }
+
+            function flameMessage(message) {
+                flame.data = null;
+                flame.nodes = [];
+                $('flameChart').innerHTML = '';
+                $('flameChart').classList.toggle('hidden', message !== null);
+                $('flameAxis').classList.add('hidden');
+                $('flameCrumbs').innerHTML = '';
+                $('flameMeta').innerHTML = '';
+                $('flameLegend').innerHTML = '';
+                $('flameMatch').textContent = '';
+                $('flameDetail').classList.add('hidden');
+                $('flameEmpty').classList.toggle('hidden', message === null);
+                $('flameEmpty').textContent = message || '';
+            }
+
+            function loadFlame() {
+                if (codeMode === 'diff') {
+                    loadCompareOptions().then(function(options) {
+                        if (codeMode !== 'diff') { return; }
+                        fillCompareSelect(options);
+                        if (codeCompare === '') {
+                            if (options.length === 0) {
+                                flameMessage('Aucune autre requête profilée à comparer : profilez une seconde fois cette page (ou une autre), puis revenez sur cet onglet.');
+                                return;
+                            }
+                            // Par défaut : la requête profilée précédente sur la même URL
+                            window.location.replace(codeHash('diff', options[0].id));
+                            return;
+                        }
+                        fetchFlame();
+                    }).catch(fail);
+                    return;
+                }
+                fetchFlame();
+            }
+
+            function fetchFlame() {
+                var key = codeToken + '/' + codeMode + '/' + codeCompare;
+                if (flameCache[key] !== undefined) { setFlame(flameCache[key]); return; }
+                flameMessage('Chargement du flamegraph…');
+                var params = { token: codeToken, format: 'flame' };
+                if (codeMode === 'time') { params.order = 'time'; }
+                if (codeMode === 'diff') { params.compare = codeCompare; }
+                codeQuery(params).then(function(data) {
+                    flameCache[key] = data;
+                    // Réponse d'un mode qui n'est plus affiché : gardée en cache seulement
+                    if (key !== codeToken + '/' + codeMode + '/' + codeCompare) { return; }
+                    setFlame(data);
+                }).catch(fail);
+            }
+
+            // Requêtes profilées proposées pour la comparaison : la même URL d'abord
+            function loadCompareOptions() {
+                if (flame.compareFor === codeToken && flame.compareOptions !== null) {
+                    return Promise.resolve(flame.compareOptions);
+                }
+                var path = (codeLog && codeLog.event) ? (codeLog.event.path || '') : '';
+                var requested = codeToken;
+                return Promise.all([
+                    path !== '' ? query({ url: path, limit: 100 }) : Promise.resolve({ logs: [] }),
+                    query({ limit: 100 })
+                ]).then(function(results) {
+                    var seen = {};
+                    var same = [];
+                    var others = [];
+                    results[0].logs.concat(results[1].logs).forEach(function(log) {
+                        if (log.profiled !== true || String(log.id) === requested || seen[log.id]) { return; }
+                        seen[log.id] = true;
+                        var option = { id: String(log.id), log: log, same: isHttp(log) && log.event.path === path };
+                        (option.same ? same : others).push(option);
+                    });
+                    // Même URL : la requête précédente d'abord, puis les suivantes
+                    same.sort(function(a, b) {
+                        var aBefore = Number(a.id) < Number(requested);
+                        var bBefore = Number(b.id) < Number(requested);
+                        return (aBefore === bBefore) ? Number(b.id) - Number(a.id) : (aBefore ? -1 : 1);
+                    });
+                    flame.compareFor = requested;
+                    flame.compareOptions = same.concat(others);
+                    return flame.compareOptions;
+                });
+            }
+
+            function fillCompareSelect(options) {
+                var select = $('flameCompareSelect');
+                select.innerHTML = '';
+                var groups = [['Même URL', true], ['Autres requêtes profilées', false]];
+                groups.forEach(function(group) {
+                    var list = options.filter(function(option) { return option.same === group[1]; });
+                    if (list.length === 0) { return; }
+                    var optgroup = el('optgroup');
+                    optgroup.label = group[0];
+                    list.forEach(function(option) {
+                        var log = option.log;
+                        var label = '#' + option.id + ' — ' + (isHttp(log) ? log.event.method + ' ' + (log.event.path || '') : '')
+                            + ' — ' + timeOf(log) + ' — ' + prettyDuration(log.event.execution_time_ms);
+                        var node = el('option', null, label);
+                        node.value = option.id;
+                        optgroup.appendChild(node);
+                    });
+                    select.appendChild(optgroup);
+                });
+                select.value = codeCompare;
+            }
+
+            // Prépare l'arbre : parent et profondeur de chaque nœud, plus grand écart du diff
+            function annotateFlame(node, parent, depth) {
+                node._parent = parent;
+                node._depth = depth;
+                if (parent !== null && typeof node.delta_ms === 'number') {
+                    flame.maxDelta = Math.max(flame.maxDelta, Math.abs(node.delta_ms));
+                }
+                node.children.forEach(function(child) { annotateFlame(child, node, depth + 1); });
+            }
+
+            function setFlame(data) {
+                if (data.status !== 'ready' || !data.tree) {
+                    flameMessage(codeMode === 'diff'
+                        ? 'La requête #' + codeCompare + ' n\'a pas de profil de code (ou il a été supprimé).'
+                        : 'Le profil de cette requête n\'est pas disponible.');
+                    return;
+                }
+                if (data.tree.value === 0) {
+                    flameMessage('Aucune pile d\'appels enregistrée pour cette requête (requête trop courte pour la période d\'échantillonnage).');
+                    return;
+                }
+                flameMessage(null);
+                flame.data = data;
+                flame.maxDelta = 0;
+                annotateFlame(data.tree, null, 0);
+                flame.maxDelta = Math.max(flame.maxDelta, 0.01);
+                flame.zoom = data.tree;
+                renderFlameMeta();
+                renderFlameLegend();
+                renderFlame();
+            }
+
+            function renderFlameMeta() {
+                var meta = $('flameMeta');
+                var data = flame.data;
+                meta.innerHTML = '';
+                if (codeMode === 'diff') {
+                    var delta = data.summary.wall_ms - data.compare_summary.wall_ms;
+                    meta.appendChild(document.createTextNode('Requête #' + data.token + ' : '));
+                    meta.appendChild(el('b', null, prettyNumber(data.summary.wall_ms, 1) + ' ms'));
+                    meta.appendChild(document.createTextNode(' — référence #' + data.compare + ' : '));
+                    meta.appendChild(el('b', null, prettyNumber(data.compare_summary.wall_ms, 1) + ' ms'));
+                    meta.appendChild(document.createTextNode(' — écart : ' + (delta > 0 ? '+' : '') + prettyNumber(delta, 1)
+                        + ' ms. La forme est celle de la requête #' + data.token + ', la couleur indique l\'écart avec la référence.'));
+                    return;
+                }
+                meta.appendChild(document.createTextNode(codeMode === 'time'
+                    ? 'Ordre chronologique : l\'axe horizontal est le temps écoulé depuis le début de la requête.'
+                    : 'Appels regroupés : les appels identiques sont additionnés, le plus coûteux à gauche.'));
+            }
+
+            function renderFlameLegend() {
+                var legend = $('flameLegend');
+                legend.innerHTML = '';
+                var items = (codeMode === 'diff')
+                    ? [['hsl(0, 75%, 62%)', 'plus lent que la référence'], ['hsl(210, 75%, 62%)', 'plus rapide'], ['#e4e4e4', 'identique ou non comparable']]
+                    : [[flameColor({ origin: 'app', name: '' }), 'mon code (app/)'], [flameColor({ origin: 'framework', name: '' }), 'framework'],
+                        [flameColor({ origin: 'vendor', name: '' }), 'dépendances (vendor/)'], [flameColor({ origin: 'other', name: '' }), 'autre']];
+                items.forEach(function(item) {
+                    var span = el('span');
+                    var swatch = el('i');
+                    swatch.style.background = item[0];
+                    span.appendChild(swatch);
+                    span.appendChild(document.createTextNode(item[1]));
+                    legend.appendChild(span);
+                });
+            }
+
+            // Couleur d'un rectangle : selon l'origine du code (teinte) et le nom de la
+            // fonction (nuance), ou selon l'écart avec la référence pour un diff
+            function flameColor(node) {
+                if (codeMode === 'diff') {
+                    if (typeof node.delta_ms !== 'number') { return '#e4e4e4'; }
+                    var ratio = Math.min(1, Math.abs(node.delta_ms) / flame.maxDelta);
+                    if (ratio < 0.05) { return '#e4e4e4'; }
+                    return 'hsl(' + (node.delta_ms > 0 ? 0 : 210) + ', 75%, ' + Math.round(92 - ratio * 30) + '%)';
+                }
+                var hash = 0;
+                for (var i = 0; i < node.name.length; i++) { hash = (hash * 31 + node.name.charCodeAt(i)) | 0; }
+                var light = 72 + Math.abs(hash) % 12;
+                var colors = { app: [45, 90], framework: [212, 65], vendor: [268, 45] };
+                var color = colors[node.origin];
+                return color ? 'hsl(' + color[0] + ', ' + color[1] + '%, ' + light + '%)' : 'hsl(0, 0%, ' + light + '%)';
+            }
+
+            function flameMs(ms) { return prettyNumber(ms, 2) + ' ms'; }
+
+            function renderFlame() {
+                var chart = $('flameChart');
+                var zoom = flame.zoom;
+                var width = chart.clientWidth || 800;
+                var scale = width / Math.max(zoom.value, 1);
+                var depthMax = zoom._depth;
+                chart.innerHTML = '';
+                flame.nodes = [];
+
+                function draw(node, x, w, ancestor) {
+                    var button = el('button', 'flame-node' + (ancestor ? ' ancestor' : ''));
+                    button.type = 'button';
+                    button.style.left = x + 'px';
+                    button.style.width = Math.max(w, 1) + 'px';
+                    button.style.top = (node._depth * FLAME_ROW) + 'px';
+                    button.style.background = flameColor(node);
+                    if (w > 30) { button.textContent = node.name; }
+                    button.setAttribute('aria-label', node.name + ' — ' + flameMs(node.ms) + ' (' + prettyNumber(node.pct, 1) + ' %)');
+                    button.setAttribute('data-i', String(flame.nodes.length));
+                    // Les rectangles étroits ne sont pas atteignables au clavier (trop nombreux)
+                    if (w < 30) { button.tabIndex = -1; }
+                    flame.nodes.push(node);
+                    chart.appendChild(button);
+                }
+
+                // Parents du zoom : sur toute la largeur, atténués
+                for (var parent = zoom._parent; parent !== null; parent = parent._parent) { draw(parent, 0, width, true); }
+                (function walk(node) {
+                    var w = node.value * scale;
+                    // Moins d'un pixel : ni le nœud ni ses enfants (plus petits) ne sont visibles
+                    if (w < 1) { return; }
+                    draw(node, (node.start - zoom.start) * scale, w, false);
+                    depthMax = Math.max(depthMax, node._depth);
+                    node.children.forEach(walk);
+                })(zoom);
+                chart.style.height = ((depthMax + 1) * FLAME_ROW) + 'px';
+
+                renderFlameAxis(width);
+                renderFlameCrumbs();
+                renderFlameDetail(zoom);
+                applyFlameSearch();
+            }
+
+            // Mode chronologique : graduations en ms sur la plage affichée
+            function renderFlameAxis(width) {
+                var axis = $('flameAxis');
+                axis.classList.toggle('hidden', codeMode !== 'time');
+                axis.innerHTML = '';
+                if (codeMode !== 'time') { return; }
+                var period = flame.data.summary.period_ms;
+                var ticks = Math.max(2, Math.min(10, Math.floor(width / 110)));
+                for (var i = 0; i < ticks; i++) {
+                    var samples = flame.zoom.start + flame.zoom.value * i / ticks;
+                    var tick = el('span', null, prettyNumber(samples * period, 1) + ' ms');
+                    tick.style.left = (width * i / ticks) + 'px';
+                    axis.appendChild(tick);
+                }
+            }
+
+            function renderFlameCrumbs() {
+                var crumbs = $('flameCrumbs');
+                crumbs.innerHTML = '';
+                var path = [];
+                for (var node = flame.zoom; node !== null; node = node._parent) { path.unshift(node); }
+                path.forEach(function(node, index) {
+                    if (index > 0) { crumbs.appendChild(document.createTextNode('›')); }
+                    if (node === flame.zoom) {
+                        crumbs.appendChild(el('b', null, node.name));
+                        return;
+                    }
+                    var button = el('button', null, node.name);
+                    button.type = 'button';
+                    button.addEventListener('click', function() { zoomFlame(node); });
+                    crumbs.appendChild(button);
+                });
+            }
+
+            function zoomFlame(node) {
+                flame.zoom = node;
+                hideFlameTooltip();
+                renderFlame();
+            }
+
+            // Détail du nœud zoomé, avec le lien vers ses appelants / appelés (tableau existant)
+            function renderFlameDetail(node) {
+                var body = $('flameDetailBody');
+                body.innerHTML = '';
+                $('flameDetail').classList.remove('hidden');
+                function row(label, value) {
+                    var tr = el('tr');
+                    tr.appendChild(el('td', 'req-label', label));
+                    var td = el('td');
+                    td.appendChild(typeof value === 'string' ? document.createTextNode(value) : value);
+                    tr.appendChild(td);
+                    body.appendChild(tr);
+                }
+                row('Fonction', el('span', 'code-fn', node.name));
+                if (node.file) { row('Fichier', el('span', 'code-fn', node.file + (node.line ? ':' + node.line : ''))); }
+                if (node._parent !== null) { row('Origine', originBadge(node.origin)); }
+                row('Temps inclusif', flameMs(node.ms) + ' (' + prettyNumber(node.pct, 1) + ' %)');
+                row('Temps propre', flameMs(node.self_ms));
+                if (codeMode === 'time') { row('Début', flameMs(node.start * flame.data.summary.period_ms)); }
+                if (codeMode === 'diff' && typeof node.delta_ms === 'number') {
+                    row('Référence #' + flame.data.compare, flameMs(node.base_ms));
+                    row('Écart', (node.delta_ms > 0 ? '+' : '') + flameMs(node.delta_ms));
+                }
+                var hasGraph = codeData !== null && codeData.edges.some(function(edge) { return edge.caller === node.name || edge.callee === node.name; });
+                if (hasGraph) {
+                    var button = el('button', 'code-fn-btn', 'Voir les appelants et les appelés');
+                    button.type = 'button';
+                    button.style.color = '#0b62a3';
+                    button.style.textDecoration = 'underline';
+                    button.addEventListener('click', function() { selectFunction(node.name); });
+                    row('Graphe d\'appels', button);
+                }
+            }
+
+            // Recherche : surligne les fonctions dont le nom contient le texte saisi
+            function applyFlameSearch() {
+                var term = $('flameSearch').value.trim().toLowerCase();
+                var buttons = $('flameChart').querySelectorAll('.flame-node');
+                buttons.forEach(function(button) {
+                    var node = flame.nodes[Number(button.getAttribute('data-i'))];
+                    var hit = term !== '' && node._parent !== null && node.name.toLowerCase().indexOf(term) !== -1;
+                    button.classList.toggle('match', hit);
+                    button.classList.toggle('dim', term !== '' && !hit);
+                });
+                if (term === '' || flame.data === null) {
+                    $('flameMatch').textContent = '';
+                    return;
+                }
+                // Temps total des correspondances : un appel imbriqué dans un autre n'est compté qu'une fois
+                var total = 0;
+                (function walk(node) {
+                    if (node._parent !== null && node.name.toLowerCase().indexOf(term) !== -1) {
+                        total += node.value;
+                        return;
+                    }
+                    node.children.forEach(walk);
+                })(flame.data.tree);
+                var root = flame.data.tree;
+                $('flameMatch').textContent = (total === 0)
+                    ? 'Aucune fonction trouvée'
+                    : flameMs(total * root.ms / root.value) + ' (' + prettyNumber(total * 100 / root.value, 1) + ' %) dans les fonctions trouvées';
+            }
+
+            function showFlameTooltip(node, event) {
+                var tip = $('flameTooltip');
+                tip.innerHTML = '';
+                tip.appendChild(el('b', null, node.name));
+                if (node.file) { tip.appendChild(el('div', null, node.file + (node.line ? ':' + node.line : ''))); }
+                tip.appendChild(el('div', null, 'Temps inclusif : ' + flameMs(node.ms) + ' (' + prettyNumber(node.pct, 1) + ' %)'));
+                tip.appendChild(el('div', null, 'Temps propre : ' + flameMs(node.self_ms)));
+                if (codeMode === 'diff' && typeof node.delta_ms === 'number') {
+                    tip.appendChild(el('div', null, 'Référence #' + flame.data.compare + ' : ' + flameMs(node.base_ms)));
+                    tip.appendChild(el('div', node.delta_ms > 0 ? 'slower' : 'faster', 'Écart : ' + (node.delta_ms > 0 ? '+' : '') + flameMs(node.delta_ms)));
+                }
+                tip.classList.remove('hidden');
+                moveFlameTooltip(event);
+            }
+
+            function moveFlameTooltip(event) {
+                var tip = $('flameTooltip');
+                var x = event.clientX + 14;
+                var y = event.clientY + 14;
+                if (x + tip.offsetWidth > window.innerWidth - 8) { x = event.clientX - tip.offsetWidth - 14; }
+                if (y + tip.offsetHeight > window.innerHeight - 8) { y = event.clientY - tip.offsetHeight - 14; }
+                tip.style.left = Math.max(4, x) + 'px';
+                tip.style.top = Math.max(4, y) + 'px';
+            }
+
+            function hideFlameTooltip() { $('flameTooltip').classList.add('hidden'); }
+
+            function flameNodeOf(event) {
+                var button = event.target.closest('.flame-node');
+                return button === null ? null : flame.nodes[Number(button.getAttribute('data-i'))];
             }
 
             // ----- Navigation entre les vues -----
@@ -1144,6 +1619,8 @@
                     loadSql();
                 } else if (hash[0] === 'code') {
                     codeToken = hash[1] || '';
+                    codeMode = { flame: 'heavy', time: 'time', diff: 'diff' }[hash[2]] || 'table';
+                    codeCompare = (codeMode === 'diff' && /^\d+$/.test(hash[3] || '')) ? hash[3] : '';
                     updateCodeNav(codeToken);
                     if (codeToken !== '') { $('codeBackLink').setAttribute('href', '#request/' + codeToken); }
                     show('code');
@@ -1220,6 +1697,51 @@
                 if (th === null || codeData === null) { return; }
                 codeSort = th.getAttribute('data-sort');
                 renderCodeTable();
+            });
+
+            // ----- Flamegraph : onglets, zoom, recherche et infobulle -----
+            $('codeModes').addEventListener('click', function(event) {
+                var button = event.target.closest('button');
+                if (button === null || codeToken === '') { return; }
+                window.location.hash = codeHash(button.getAttribute('data-mode'), codeCompare);
+            });
+
+            $('flameCompareSelect').addEventListener('change', function() {
+                window.location.hash = codeHash('diff', this.value);
+            });
+
+            $('flameChart').addEventListener('click', function(event) {
+                var node = flameNodeOf(event);
+                if (node !== null && node !== flame.zoom) { zoomFlame(node); }
+            });
+            $('flameChart').addEventListener('mouseover', function(event) {
+                var node = flameNodeOf(event);
+                if (node !== null) { showFlameTooltip(node, event); }
+            });
+            $('flameChart').addEventListener('mousemove', function(event) {
+                if (!$('flameTooltip').classList.contains('hidden')) { moveFlameTooltip(event); }
+            });
+            $('flameChart').addEventListener('mouseleave', hideFlameTooltip);
+
+            $('flameReset').addEventListener('click', function() {
+                if (flame.data !== null) { zoomFlame(flame.data.tree); }
+            });
+            $('flameSearch').addEventListener('input', function() { if (flame.data !== null) { applyFlameSearch(); } });
+
+            // Échap : revient au niveau précédent (sauf dans un champ de saisie)
+            document.addEventListener('keydown', function(event) {
+                if (event.key !== 'Escape' || view !== 'code' || codeMode === 'table' || flame.zoom === null || flame.data === null) { return; }
+                if (event.target.closest('input, select, textarea') !== null) { return; }
+                if (flame.zoom._parent !== null) { zoomFlame(flame.zoom._parent); }
+            });
+
+            // Largeur de la fenêtre modifiée : le flamegraph est redessiné
+            var flameResize = null;
+            window.addEventListener('resize', function() {
+                clearTimeout(flameResize);
+                flameResize = setTimeout(function() {
+                    if (view === 'code' && codeMode !== 'table' && flame.data !== null) { renderFlame(); }
+                }, 150);
             });
 
             window.addEventListener('hashchange', route);
