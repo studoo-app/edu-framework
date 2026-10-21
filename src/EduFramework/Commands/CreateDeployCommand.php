@@ -55,6 +55,10 @@ class CreateDeployCommand extends Command
      */
     private const REQUIRED_FILES = ['Dockerfile', 'docker-entrypoint.sh', 'Caddyfile', '.dockerignore'];
 
+    /**
+     * Déclare les options de la commande : --name, --domain, --database et --force
+     * @return void
+     */
     protected function configure(): void
     {
         $this

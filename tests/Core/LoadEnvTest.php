@@ -25,10 +25,14 @@ class LoadEnvTest extends TestCase
 
     private string $envPath;
 
+    /**
+     * Crée un dossier temporaire et retire les variables testées de l'environnement
+     * @return void
+     */
     protected function setUp(): void
     {
         $this->envPath = sys_get_temp_dir() . '/edu-framework-test-env-' . uniqid() . '/';
-        mkdir($this->envPath);
+        mkdir($this->envPath, 0700);
 
         foreach (self::KEYS as $key) {
             if (array_key_exists($key, $_ENV) === true) {
@@ -40,6 +44,10 @@ class LoadEnvTest extends TestCase
         (new ConfigCore([]));
     }
 
+    /**
+     * Restaure les variables d'environnement et supprime le dossier temporaire
+     * @return void
+     */
     protected function tearDown(): void
     {
         foreach (self::KEYS as $key) {
@@ -52,6 +60,10 @@ class LoadEnvTest extends TestCase
         (new Filesystem())->remove($this->envPath);
     }
 
+    /**
+     * Sans fichier .env (image de production), le chargement ne lève pas d'exception
+     * @return void
+     */
     public function testSansFichierEnv(): void
     {
         // En production, l'image Docker ne contient pas de .env : pas d'exception
@@ -59,6 +71,10 @@ class LoadEnvTest extends TestCase
         $this->assertFalse(ConfigCore::existEnv('EDU_TEST_VAR'));
     }
 
+    /**
+     * Les variables du fichier .env sont chargées
+     * @return void
+     */
     public function testFichierEnv(): void
     {
         file_put_contents($this->envPath . '.env', "EDU_TEST_VAR=depuis-env\n");
@@ -66,6 +82,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('depuis-env', ConfigCore::getEnv('EDU_TEST_VAR'));
     }
 
+    /**
+     * Le fichier .env.local est prioritaire sur le fichier .env
+     * @return void
+     */
     public function testEnvLocalPrioritaireSurEnv(): void
     {
         file_put_contents($this->envPath . '.env', "EDU_TEST_VAR=depuis-env\nEDU_TEST_LOCAL=env\n");
@@ -77,6 +97,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('env', ConfigCore::getEnv('EDU_TEST_LOCAL'));
     }
 
+    /**
+     * Une variable passée par Docker (absente de $_ENV) est lue par getenv()
+     * @return void
+     */
     public function testEnvironnementProcessus(): void
     {
         // Variable passée par Docker (docker run -e) : absente de $_ENV
@@ -85,6 +109,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('depuis-docker', ConfigCore::getEnv('EDU_TEST_VAR'));
     }
 
+    /**
+     * Une variable de l'environnement du processus est prioritaire sur les fichiers .env
+     * @return void
+     */
     public function testEnvironnementProcessusPrioritaireSurFichiers(): void
     {
         // Variable visible uniquement par getenv() (php -S ou mod_php avec variables_order=GPCS)
@@ -95,12 +123,20 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('depuis-docker', ConfigCore::getEnv('EDU_TEST_VAR'));
     }
 
+    /**
+     * Une variable absente n'existe pas et vaut une chaîne vide
+     * @return void
+     */
     public function testVariableAbsente(): void
     {
         $this->assertFalse(ConfigCore::existEnv('EDU_TEST_VAR'));
         $this->assertEquals('', ConfigCore::getEnv('EDU_TEST_VAR'));
     }
 
+    /**
+     * Les variables DB_* sont déduites de la DATABASE_URL fournie par FrankenDeploy
+     * @return void
+     */
     public function testDatabaseUrl(): void
     {
         // Format de l'URL générée par FrankenDeploy pour une base MariaDB gérée
@@ -116,6 +152,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('mon_app', ConfigCore::getEnv('DB_NAME'));
     }
 
+    /**
+     * Une variable DB_* déjà définie n'est pas écrasée par la DATABASE_URL
+     * @return void
+     */
     public function testDatabaseUrlNEcrasePasLesVariablesDb(): void
     {
         putenv('DATABASE_URL=mysql://user:pass@db-host:3306/db_name');
@@ -127,6 +167,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('db-host', ConfigCore::getEnv('DB_HOST'));
     }
 
+    /**
+     * Une DATABASE_URL PostgreSQL donne DB_TYPE=pgsql
+     * @return void
+     */
     public function testDatabaseUrlPostgresql(): void
     {
         putenv('DATABASE_URL=postgresql://user:pass@db-host:5432/db_name?serverVersion=16');
@@ -136,6 +180,10 @@ class LoadEnvTest extends TestCase
         $this->assertEquals('5432', ConfigCore::getEnv('DB_SOCKET'));
     }
 
+    /**
+     * Une DATABASE_URL d'un autre type (SQLite) est ignorée
+     * @return void
+     */
     public function testDatabaseUrlSchemaInconnu(): void
     {
         putenv('DATABASE_URL=sqlite:///var/data.db');
@@ -145,6 +193,10 @@ class LoadEnvTest extends TestCase
         $this->assertFalse(ConfigCore::existEnv('DB_HOST_STATUS'));
     }
 
+    /**
+     * Une DATABASE_URL tronquée par un # lève une erreur de configuration explicite
+     * @return void
+     */
     public function testDatabaseUrlTronqueeParUnDiese(): void
     {
         // FrankenDeploy n'entoure pas de guillemets une valeur contenant # :
@@ -156,6 +208,10 @@ class LoadEnvTest extends TestCase
         ConfigCore::loadEnv($this->envPath);
     }
 
+    /**
+     * Un mot de passe encodé (%23) est décodé dans DB_PASSWORD
+     * @return void
+     */
     public function testDatabaseUrlMotDePasseEncode(): void
     {
         file_put_contents($this->envPath . '.env.local', "DATABASE_URL=mysql://app:Xy7%23kP@db-host:3306/app\n");
