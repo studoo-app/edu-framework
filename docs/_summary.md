@@ -27,6 +27,7 @@
 * [Déployer](deploy/index.md)
     * [Déployer son application](deploy/index.md)
 * [Migrer](migrate/major.md)
+    * [Migrer de la version 2.8 à la version 2.9](migrate/migration-2_8-2_9.md)
     * [Migrer de la version 2.3 à la version 2.8](migrate/migration-2_3-2_8.md)
     * [Migrer de la version 2.2 à la version 2.3](migrate/migration-2_2-2_3.md)
     * [Migrer de la version 1.0 à la version 2.0](migrate/migration-1_2-2_0.md)

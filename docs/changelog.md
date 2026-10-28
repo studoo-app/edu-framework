@@ -22,6 +22,7 @@
 **documentation**
 
 - update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelles sections « Le flamegraph intégré » et « Comparer deux requêtes » (avec captures d'écran), mini-flamegraph de la barre de debug, paramètres `format=flame`, `order`, `compare`, `min` et `depth` de l'API
+- new [Migrer de la version 2.8 à la version 2.9](migrate/migration-2_8-2_9.md) : mise à jour du framework, fichiers Docker (`Dockerfile` multi-stage, `docker-entrypoint.sh`, `.dockerignore`, `target` dans `compose.yaml`), `.gitignore` (`.env.local`, `composer.lock`), `.gitattributes` pour les scripts shell, changements du chargement des variables d'environnement
 - new [Déployer son application](deploy/index.md) : préparation du serveur, `make:deploy`, variables d'environnement, déploiement, import de la base, dossiers partagés, commandes du quotidien, image de production
 - update [La commande bin/edu](installation/command-edu.md) : commande `make:deploy`
 - update [L'application dans Docker](installation/docker.md) : lien vers l'image de production
