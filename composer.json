@@ -28,8 +28,8 @@
     "symfony/console": "6.3.*",
     "nette/php-generator": "^4.1@dev",
     "zircote/swagger-php": "5.8.*",
-    "symfony/filesystem": "7.2.x-dev",
-    "symfony/process": "7.3.x-dev"
+    "symfony/filesystem": "7.4.x-dev",
+    "symfony/process": "7.4.x-dev"
   }
   ,
   "require-dev": {
@@ -38,7 +38,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.4.1"
+      "php": "8.4.27"
     }
   },
   "autoload": {
