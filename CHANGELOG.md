@@ -2,6 +2,12 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.9.1 - 05/11/2026
+
+**bug Fixes**
+
+- Correction du package symfony/filesystem[7.2.x-dev] 
+
 ## v2.9.0 - 21/10/2026
 
 **new features**
