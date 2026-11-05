@@ -40,6 +40,7 @@ Les migrations majeures peuvent être complexes et nécessitent une planificatio
 
 Voici la liste des migrations majeures du projet Edu Framework :
 
+- [Migration de la version 2.8 à la version 2.9](migration-2_8-2_9.md)
 - [Migration de la version 2.3 à la version 2.8](migration-2_3-2_8.md)
 - [Migration de la version 2.2 à la version 2.3](migration-2_2-2_3.md)
 - [Migration de la version 1.2 à la version 2.0](migration-1_2-2_0.md)

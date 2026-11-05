@@ -11,7 +11,6 @@
 
 namespace Studoo\EduFramework\Commands\Extends;
 
-use Dotenv\Dotenv;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 use Symfony\Component\Console\Application;
@@ -30,15 +29,12 @@ class AppCommand extends Application
         ));
         parent::__construct(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
 
-        // Gestion du fichier des variables d'environnement (.env)
-        if (file_exists(ConfigCore::getConfig('base_path') . '.env') === true) {
-            $dotenv = Dotenv::createImmutable(ConfigCore::getConfig('base_path'));
-            $dotenv->load();
+        // Gestion des variables d'environnement (environnement, .env.local, .env)
+        ConfigCore::loadEnv(ConfigCore::getConfig('base_path'));
 
-            // Gestion de la couche Model et de la connexion à la base de données
-            if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
-                (new DatabaseService());
-            }
+        // Gestion de la couche Model et de la connexion à la base de données
+        if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
+            (new DatabaseService());
         }
 
         $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
@@ -49,6 +45,7 @@ class AppCommand extends Application
         $this->add(new \Studoo\EduFramework\Commands\CreateApiCommand());
         $this->add(new \Studoo\EduFramework\Commands\CreateEntityCommand());
         $this->add(new \Studoo\EduFramework\Commands\ClearCacheCommand());
+        $this->add(new \Studoo\EduFramework\Commands\CreateDeployCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {
             $commandList = Yaml::parseFile(ConfigCore::getConfig('command_config_path') . 'commands.yaml');

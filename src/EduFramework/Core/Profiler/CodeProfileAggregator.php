@@ -33,6 +33,11 @@ use Studoo\EduFramework\Core\ConfigCore;
 class CodeProfileAggregator
 {
     /**
+     * Part minimale du temps total pour qu'un appel soit gardé dans le flamegraph (0,1 %)
+     */
+    public const FLAME_MIN_RATIO = 0.001;
+
+    /**
      * Calcule le détail par fonction, trié par temps propre décroissant
      *
      * @param array<string, mixed> $data Données du driver (period_ms, samples, functions)
@@ -129,6 +134,229 @@ class CodeProfileAggregator
         usort($edges, static fn (array $left, array $right): int => $right['samples'] <=> $left['samples']);
 
         return $edges;
+    }
+
+    /**
+     * Construit l'arbre du flamegraph depuis les piles d'appels au format Speedscope.
+     * Deux ordres sont possibles, comme dans Speedscope :
+     * - heavy (Left Heavy) : les appels identiques sont regroupés et triés,
+     *   le chemin le plus coûteux à gauche ;
+     * - time (Time Order) : les piles sont gardées dans l'ordre chronologique,
+     *   seuls les échantillons consécutifs identiques sont regroupés.
+     *
+     * Chaque nœud contient : name, origin, file, line, start et value (position et
+     * largeur en échantillons), self, ms, self_ms, pct et children.
+     * Les nœuds plus petits que $minRatio du total sont élagués pour garder un JSON
+     * léger : regroupés dans un nœud "… (autres)" en Left Heavy, retirés en Time Order
+     * (ils laissent un vide, l'axe du temps reste juste).
+     *
+     * @param array<string, mixed> $data Données du driver (period_ms, functions, speedscope)
+     * @param string $order heavy ou time
+     * @param float $minRatio Part minimale du temps total pour garder un nœud (0 : aucun élagage)
+     * @param int $maxDepth Profondeur maximale exportée (0 : illimitée)
+     * @return array<string, mixed> Nœud racine (la requête entière)
+     */
+    public static function flameTree(array $data, string $order = 'heavy', float $minRatio = self::FLAME_MIN_RATIO, int $maxDepth = 0): array
+    {
+        $tree = self::buildTree($data, $order);
+
+        return self::exportNode($tree, 0, 0, 0, [
+            'total' => max(1, $tree['nodes'][0]['value']),
+            'min' => $tree['nodes'][0]['value'] * max(0.0, $minRatio),
+            'max_depth' => $maxDepth,
+            'order' => $order,
+            'base' => null,
+        ], 0);
+    }
+
+    /**
+     * Construit le flamegraph différentiel de deux profils (vue Left Heavy) :
+     * la forme est celle du profil comparé ($data), chaque nœud indique aussi
+     * le temps du même chemin d'appels dans le profil de référence ($baseData).
+     * Ajoute à chaque nœud : base_ms (temps dans la référence) et delta_ms
+     * (positif : plus lent que la référence, négatif : plus rapide).
+     * Un chemin absent du profil comparé n'est pas dessiné : son temps
+     * apparaît dans le delta de son parent.
+     *
+     * @param array<string, mixed> $data Données du driver du profil comparé
+     * @param array<string, mixed> $baseData Données du driver du profil de référence
+     * @param float $minRatio Part minimale du temps total pour garder un nœud
+     * @param int $maxDepth Profondeur maximale exportée (0 : illimitée)
+     * @return array<string, mixed> Nœud racine
+     */
+    public static function diffTree(array $data, array $baseData, float $minRatio = self::FLAME_MIN_RATIO, int $maxDepth = 0): array
+    {
+        $tree = self::buildTree($data, 'heavy');
+        $base = self::buildTree($baseData, 'heavy');
+
+        return self::exportNode($tree, 0, 0, 0, [
+            'total' => max(1, $tree['nodes'][0]['value']),
+            'min' => $tree['nodes'][0]['value'] * max(0.0, $minRatio),
+            'max_depth' => $maxDepth,
+            'order' => 'heavy',
+            'base' => $base,
+        ], 0);
+    }
+
+    /**
+     * Fusionne les piles d'appels en un arbre à plat (tableau de nœuds reliés par leurs indices).
+     * Le nœud 0 est la racine : la requête entière.
+     *
+     * @param array<string, mixed> $data Données du driver (period_ms, functions, speedscope)
+     * @param string $order heavy (fusion de tous les appels identiques) ou time (fusion des seuls appels consécutifs)
+     * @return array{nodes: array<int, array<string, mixed>>, info: array<string, array{file: string|null, line: int|null}>, period: float}
+     */
+    private static function buildTree(array $data, string $order): array
+    {
+        $speedscope = (is_array($data['speedscope'] ?? null) === true ? $data['speedscope'] : []);
+        $frames = $speedscope['shared']['frames'] ?? [];
+        $profile = $speedscope['profiles'][0] ?? [];
+        $samples = $profile['samples'] ?? [];
+        $weights = $profile['weights'] ?? [];
+        $periodMs = (float) ($data['period_ms'] ?? 0);
+        $periodNs = $periodMs * 1000000;
+        $functions = $data['functions'] ?? [];
+
+        // Nom affiché et emplacement de chaque frame, calculés une seule fois
+        $names = [];
+        $info = [];
+        foreach ($frames as $index => $frame) {
+            $raw = (string) ($frame['name'] ?? '?');
+            $name = self::displayName($raw);
+            $names[$index] = $name;
+            $file = $frame['file'] ?? ($functions[$raw]['file'] ?? null);
+            $line = $frame['line'] ?? ($functions[$raw]['line'] ?? null);
+            $info[$name] ??= [
+                'file' => ($file === null || $file === '' ? null : (string) $file),
+                'line' => ($line === null ? null : (int) $line),
+            ];
+        }
+
+        $nodes = [['name' => null, 'start' => 0, 'value' => 0, 'self' => 0, 'children' => []]];
+        $time = 0;
+        foreach ($samples as $index => $stack) {
+            // Un échantillon peut représenter plusieurs périodes (dépassement du timer)
+            $count = ($periodNs > 0 ? max(1, (int) round(($weights[$index] ?? $periodNs) / $periodNs)) : 1);
+            $current = 0;
+            $nodes[0]['value'] += $count;
+            foreach ($stack as $frameIndex) {
+                $name = $names[$frameIndex] ?? '?';
+                $child = null;
+                if ($order === 'time') {
+                    // Chronologique : on ne prolonge que le dernier appel, s'il vient de se terminer
+                    $last = end($nodes[$current]['children']);
+                    if ($last !== false && $nodes[$last]['name'] === $name
+                        && $nodes[$last]['start'] + $nodes[$last]['value'] === $time) {
+                        $child = $last;
+                    }
+                } else {
+                    $child = $nodes[$current]['children'][$name] ?? null;
+                }
+                if ($child === null) {
+                    $child = count($nodes);
+                    $nodes[] = ['name' => $name, 'start' => $time, 'value' => 0, 'self' => 0, 'children' => []];
+                    if ($order === 'time') {
+                        $nodes[$current]['children'][] = $child;
+                    } else {
+                        $nodes[$current]['children'][$name] = $child;
+                    }
+                }
+                $nodes[$child]['value'] += $count;
+                $current = $child;
+            }
+            $nodes[$current]['self'] += $count;
+            $time += $count;
+        }
+
+        return ['nodes' => $nodes, 'info' => $info, 'period' => $periodMs];
+    }
+
+    /**
+     * Exporte un nœud de l'arbre et ses enfants (tri, élagage, temps en ms et en %)
+     *
+     * @param array{nodes: array<int, array<string, mixed>>, info: array<string, array{file: string|null, line: int|null}>, period: float} $tree Arbre construit par buildTree()
+     * @param int $index Indice du nœud exporté
+     * @param int $start Position du nœud (en échantillons) dans la vue Left Heavy
+     * @param int $depth Profondeur du nœud (0 : la racine)
+     * @param array<string, mixed> $context total, min, max_depth, order et base (arbre de référence du diff)
+     * @param int|null $baseIndex Indice du même chemin d'appels dans l'arbre de référence
+     * @return array<string, mixed>
+     */
+    private static function exportNode(array $tree, int $index, int $start, int $depth, array $context, ?int $baseIndex): array
+    {
+        $node = $tree['nodes'][$index];
+        $name = ($node['name'] ?? 'Requête');
+        $file = ($node['name'] === null ? null : ($tree['info'][$name]['file'] ?? null));
+        $periodMs = $tree['period'];
+        $exported = [
+            'name' => $name,
+            'origin' => ($node['name'] === null ? 'other' : self::origin($file)),
+            'file' => ($file === null ? null : self::relativePath($file)),
+            'line' => ($node['name'] === null ? null : ($tree['info'][$name]['line'] ?? null)),
+            'start' => ($context['order'] === 'time' ? $node['start'] : $start),
+            'value' => $node['value'],
+            'self' => $node['self'],
+            'ms' => round($node['value'] * $periodMs, 2),
+            'self_ms' => round($node['self'] * $periodMs, 2),
+            'pct' => round($node['value'] * 100 / $context['total'], 1),
+        ];
+
+        $base = $context['base'];
+        if ($base !== null) {
+            $baseMs = ($baseIndex === null ? 0.0 : round($base['nodes'][$baseIndex]['value'] * $base['period'], 2));
+            $exported['base_ms'] = $baseMs;
+            $exported['delta_ms'] = round($exported['ms'] - $baseMs, 2);
+        }
+
+        $children = array_values($node['children']);
+        if ($context['max_depth'] > 0 && $depth >= $context['max_depth']) {
+            $exported['children'] = [];
+            return $exported;
+        }
+        if ($context['order'] !== 'time') {
+            usort($children, static fn (int $left, int $right): int
+                => $tree['nodes'][$right]['value'] <=> $tree['nodes'][$left]['value']);
+        }
+
+        $exported['children'] = [];
+        $offset = $start;
+        $others = 0;
+        foreach ($children as $child) {
+            $value = $tree['nodes'][$child]['value'];
+            if ($value < $context['min']) {
+                $others += $value;
+                continue;
+            }
+            $childBase = null;
+            if ($base !== null && $baseIndex !== null) {
+                $childBase = $base['nodes'][$baseIndex]['children'][$tree['nodes'][$child]['name']] ?? null;
+            }
+            $exported['children'][] = self::exportNode($tree, $child, $offset, $depth + 1, $context, $childBase);
+            $offset += $value;
+        }
+
+        // Left Heavy : les petits appels sont regroupés à droite pour garder la largeur exacte
+        if ($others > 0 && $context['order'] !== 'time') {
+            $exported['children'][] = [
+                'name' => '… (autres)',
+                'origin' => 'other',
+                'file' => null,
+                'line' => null,
+                'start' => $offset,
+                'value' => $others,
+                'self' => 0,
+                'ms' => round($others * $periodMs, 2),
+                'self_ms' => 0.0,
+                'pct' => round($others * 100 / $context['total'], 1),
+                'children' => [],
+            ];
+            if ($base !== null) {
+                // Appels regroupés : pas de chemin unique à comparer
+                $exported['children'][count($exported['children']) - 1] += ['base_ms' => null, 'delta_ms' => null];
+            }
+        }
+
+        return $exported;
     }
 
     /**

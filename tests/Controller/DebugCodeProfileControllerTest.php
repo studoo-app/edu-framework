@@ -12,7 +12,7 @@ use Studoo\EduFramework\Core\Profiler\CodeProfileLogger;
 
 /**
  * Tests de l'endpoint /edu-code-profile : profil de code d'une requête HTTP
- * (résumé, détail complet, export Speedscope)
+ * (résumé, détail complet, export Speedscope, flamegraph)
  */
 class DebugCodeProfileControllerTest extends TestCase
 {
@@ -168,5 +168,54 @@ class DebugCodeProfileControllerTest extends TestCase
         $this->assertSame('Edu Framework #23', $response['name']);
         $this->assertSame('Requête #23', $response['profiles'][0]['name']);
         $this->assertSame([[0, 1], [0, 1], [0]], $response['profiles'][0]['samples']);
+    }
+
+    /**
+     * format=flame retourne l'arbre du flamegraph (Left Heavy par défaut, ou chronologique)
+     */
+    public function testFlameTree(): void
+    {
+        $this->saveProfile(24);
+
+        $response = $this->runController(['token' => '24', 'format' => 'flame']);
+
+        $this->assertSame('ready', $response['status']);
+        $this->assertSame('heavy', $response['order']);
+        $this->assertSame(3, $response['summary']['samples']);
+        $this->assertSame('Requête #24', $response['tree']['name']);
+        $this->assertSame(3, $response['tree']['value']);
+        $main = $response['tree']['children'][0];
+        $this->assertSame('main', $main['name']);
+        $this->assertSame('work', $main['children'][0]['name']);
+        $this->assertSame('app', $main['children'][0]['origin']);
+        $this->assertSame(2, $main['children'][0]['value']);
+
+        $time = $this->runController(['token' => '24', 'format' => 'flame', 'order' => 'time']);
+        $this->assertSame('time', $time['order']);
+
+        $shallow = $this->runController(['token' => '24', 'format' => 'flame', 'depth' => '1']);
+        $this->assertSame([], $shallow['tree']['children'][0]['children']);
+    }
+
+    /**
+     * format=flame&compare=token retourne le flamegraph différentiel des deux requêtes
+     */
+    public function testFlameDiff(): void
+    {
+        $this->saveProfile(25);
+        $this->saveProfile(26);
+
+        $response = $this->runController(['token' => '25', 'format' => 'flame', 'compare' => '#26']);
+
+        $this->assertSame('ready', $response['status']);
+        $this->assertSame(26, $response['compare']);
+        $this->assertSame(3, $response['compare_summary']['samples']);
+        $this->assertSame('Requête #25 / #26', $response['tree']['name']);
+        $this->assertEquals(0.0, $response['tree']['children'][0]['delta_ms']);
+
+        $missing = $this->runController(['token' => '25', 'format' => 'flame', 'compare' => '404']);
+        $this->assertSame('pending', $missing['status']);
+        $this->assertSame(404, $missing['compare']);
+        $this->assertNull($missing['tree']);
     }
 }

@@ -35,6 +35,11 @@ class DebugCodeProfileController implements ControllerInterface
      * - full=1 : ajoute le détail de toutes les fonctions et le graphe d'appels
      * - format=speedscope : retourne les piles d'appels au format Speedscope
      *   (fichier à ouvrir sur https://www.speedscope.app pour le flamegraph)
+     * - format=flame : retourne l'arbre du flamegraph intégré au profiler (clé tree), avec :
+     *   - order=heavy (défaut, appels regroupés) ou time (ordre chronologique) ;
+     *   - compare=token : flamegraph différentiel par rapport à une autre requête ;
+     *   - min : part minimale du temps pour garder un appel (défaut 0.001, soit 0,1 %) ;
+     *   - depth : profondeur maximale de l'arbre (défaut : illimitée)
      *
      * Réponse :
      * - token : identifiant du log de la requête HTTP (null si invalide)
@@ -50,6 +55,7 @@ class DebugCodeProfileController implements ControllerInterface
     public function execute(Request $request): string|null
     {
         $speedscope = ((string) $request->get('format') === 'speedscope');
+        $flame = ((string) $request->get('format') === 'flame');
 
         // L'en-tête n'est envoyé que si la sortie n'a pas déjà commencé
         // (Exemple : exécution dans un contexte de test)
@@ -64,7 +70,7 @@ class DebugCodeProfileController implements ControllerInterface
 
         $tokenId = (int) $token;
         $full = ((string) $request->get('full') === '1');
-        $profile = LogsService::getCodeProfile($tokenId, ($full === true || $speedscope === true));
+        $profile = LogsService::getCodeProfile($tokenId, ($full === true || $speedscope === true || $flame === true));
 
         if ($profile === null) {
             return json_encode(['token' => $tokenId, 'status' => 'pending', 'summary' => null, 'top' => []]);
@@ -73,18 +79,14 @@ class DebugCodeProfileController implements ControllerInterface
         if ($speedscope === true) {
             return $this->speedscope($tokenId, $profile);
         }
+        if ($flame === true) {
+            return (string) json_encode($this->flame($tokenId, $profile, $request));
+        }
 
         $response = [
             'token' => $tokenId,
             'status' => 'ready',
-            'summary' => [
-                'driver' => $profile['driver'],
-                'period_ms' => $profile['period_ms'],
-                'samples' => $profile['samples'],
-                'wall_ms' => $profile['wall_ms'],
-                'peak_mb' => $profile['peak_mb'],
-                'functions_count' => $profile['functions_count'],
-            ],
+            'summary' => $this->summary($profile),
             'top' => $profile['top'],
         ];
 
@@ -93,6 +95,70 @@ class DebugCodeProfileController implements ControllerInterface
         }
 
         return json_encode($response);
+    }
+
+    /**
+     * Résumé d'un profil : driver, période, échantillons, durée, mémoire et nombre de fonctions
+     *
+     * @param array<string, mixed> $profile Profil (LogsService::getCodeProfile)
+     * @return array<string, mixed>
+     */
+    private function summary(array $profile): array
+    {
+        return [
+            'driver' => $profile['driver'],
+            'period_ms' => $profile['period_ms'],
+            'samples' => $profile['samples'],
+            'wall_ms' => $profile['wall_ms'],
+            'peak_mb' => $profile['peak_mb'],
+            'functions_count' => $profile['functions_count'],
+        ];
+    }
+
+    /**
+     * Arbre du flamegraph intégré au profiler (format=flame) :
+     * Left Heavy, chronologique, ou différentiel avec compare=token
+     *
+     * @param int $tokenId Identifiant du log de la requête HTTP
+     * @param array<string, mixed> $profile Profil avec ses données (LogsService::getCodeProfile)
+     * @param Request $request Requête HTTP (order, compare, min, depth)
+     * @return array<string, mixed> token, status, order, summary, tree (et compare, compare_summary pour un diff)
+     */
+    private function flame(int $tokenId, array $profile, Request $request): array
+    {
+        $order = ((string) $request->get('order') === 'time' ? 'time' : 'heavy');
+        $min = (is_numeric($request->get('min')) === true
+            ? min(0.1, max(0.0, (float) $request->get('min')))
+            : CodeProfileAggregator::FLAME_MIN_RATIO);
+        $depth = (is_numeric($request->get('depth')) === true ? min(500, max(0, (int) $request->get('depth'))) : 0);
+        $compare = ltrim((string) $request->get('compare'), '#');
+
+        if ($compare === '') {
+            $tree = CodeProfileAggregator::flameTree($profile['data'], $order, $min, $depth);
+            $tree['name'] = 'Requête #' . $tokenId;
+
+            return ['token' => $tokenId, 'status' => 'ready', 'order' => $order, 'summary' => $this->summary($profile), 'tree' => $tree];
+        }
+
+        // Flamegraph différentiel : toujours en Left Heavy (les chemins d'appels sont comparés)
+        $compareId = (preg_match('/^\d{1,18}$/', $compare) === 1 ? (int) $compare : null);
+        $base = ($compareId === null ? null : LogsService::getCodeProfile($compareId, true));
+        if ($base === null) {
+            return ['token' => $tokenId, 'compare' => $compareId, 'status' => 'pending', 'order' => 'heavy', 'summary' => null, 'tree' => null];
+        }
+
+        $tree = CodeProfileAggregator::diffTree($profile['data'], $base['data'], $min, $depth);
+        $tree['name'] = 'Requête #' . $tokenId . ' / #' . $compareId;
+
+        return [
+            'token' => $tokenId,
+            'compare' => $compareId,
+            'status' => 'ready',
+            'order' => 'heavy',
+            'summary' => $this->summary($profile),
+            'compare_summary' => $this->summary($base),
+            'tree' => $tree,
+        ];
     }
 
     /**

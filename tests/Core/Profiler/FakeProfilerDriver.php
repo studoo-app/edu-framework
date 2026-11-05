@@ -63,7 +63,10 @@ class FakeProfilerDriver implements ProfilerDriverInterface
             'period_ms' => 0.1,
             'samples' => 10,
             'functions' => ['f' => ['file' => '/tmp/f.php', 'line' => 1, 'self' => 10, 'inclusive' => 10]],
-            'speedscope' => [],
+            'speedscope' => [
+                'shared' => ['frames' => [['name' => 'f', 'file' => '/tmp/f.php', 'line' => 1]]],
+                'profiles' => [['type' => 'sampled', 'unit' => 'nanoseconds', 'samples' => [[0]], 'weights' => [1000000]]],
+            ],
         ];
     }
 }

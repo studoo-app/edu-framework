@@ -12,6 +12,8 @@ services:
     container_name: ${APP_NAME}-http-server
     build:
       context: .
+      # Stage de développement du Dockerfile (frankenphp_prod sert au déploiement)
+      target: frankenphp_dev
       args:
         # Profiler de code de la barre de debug (extension Excimer) :
         # 1 => installé (défaut, développement) | 0 => image sans profiler

@@ -9,6 +9,10 @@ Vous pouvez aller plus loin : exécuter **l'application elle-même** dans Docker
     - **Flux classique** (inchangé) : les services dans Docker, l'application sur votre poste via `php bin/edu start` — voir [Start/Stop l'application](start-application.md)
     - **Flux 100 % Docker** (cette page) : l'application **et** les services dans Docker
 
+!!! tip "Mettre son application en ligne"
+
+    Le `Dockerfile` contient aussi une image de production (stage `frankenphp_prod`), utilisée pour déployer l'application sur un serveur : voir [Déployer son application](../deploy/index.md).
+
 ## Architecture du stack
 
 Le fichier `compose.yaml` à la racine du projet démarre cinq services :
