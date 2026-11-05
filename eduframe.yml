@@ -9,10 +9,10 @@
 name: 'EduFramework'
 
 # La version du framework
-version: 'v2.9.0'
+version: 'v2.9.1'
 
 # La date de livraison de la version
-date_version: '2026-10-21'
+date_version: '2026-11-05'
 
 # La version minimale de PHP requise
 php_version: '8.4'
