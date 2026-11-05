@@ -48,6 +48,31 @@ class HttpRequestLogger
     private static ?string $errorMessage = null;
 
     /**
+     * Variables GET et POST de la requête en cours, capturées par start() telles
+     * qu'envoyées par le client (avant d'éventuelles modifications par le code),
+     * puis réutilisées par finish() pour compléter le log
+     * @var array{get: array<mixed>, post: array<mixed>}
+     */
+    private static array $requestParams = ['get' => [], 'post' => []];
+
+    /**
+     * Profondeur maximale des valeurs de session enregistrées (objets et tableaux
+     * imbriqués) : au-delà, la valeur est remplacée par un marqueur
+     */
+    private const MAX_DEPTH = 6;
+
+    /**
+     * Options d'encodage JSON des événements : un caractère non UTF-8 ou une valeur
+     * non encodable (INF, NAN, ...) ne doit jamais faire perdre tout le log
+     */
+    private const JSON_FLAGS = JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR;
+
+    /**
+     * Valeur affichée à la place des variables sensibles (mots de passe, secrets)
+     */
+    public const MASKED_VALUE = '******';
+
+    /**
      * Réserve la ligne de log de la requête HTTP en cours dans la base des logs.
      * L'identifiant retourné par getCurrentLogId() est utilisé par la barre de debug
      * pour faire le lien vers le descriptif de la requête dans le profiler.
@@ -65,10 +90,16 @@ class HttpRequestLogger
     public static function start(): void
     {
         self::$currentLogId = null;
+        self::$requestParams = ['get' => [], 'post' => []];
 
         if (self::shouldLog() === false) {
             return;
         }
+
+        self::$requestParams = [
+            'get' => self::maskSensitive($_GET),
+            'post' => self::maskSensitive($_POST),
+        ];
 
         try {
             self::$currentLogId = LogsService::addLog((string) json_encode(self::buildEvent(
@@ -76,8 +107,13 @@ class HttpRequestLogger
                 self::requestPath(),
                 self::clientIpPort(),
                 (int) (http_response_code() ?: 200),
-                PHP_SAPI
-            )));
+                PHP_SAPI,
+                null,
+                null,
+                null,
+                self::$requestParams['get'],
+                self::$requestParams['post']
+            ), self::JSON_FLAGS));
         } catch (\Throwable $exception) {
             error_log('[EduFramework Logs] ' . $exception->getMessage());
         }
@@ -97,6 +133,8 @@ class HttpRequestLogger
         self::$currentLogId = null;
         $errorMessage = self::$errorMessage;
         self::$errorMessage = null;
+        $requestParams = self::$requestParams;
+        self::$requestParams = ['get' => [], 'post' => []];
 
         if ($logId === null) {
             return;
@@ -105,6 +143,12 @@ class HttpRequestLogger
         // Temps d'exécution et mémoire utilisée, mesurés comme la barre de debug
         $executionTimeMs = round((microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1);
         $memoryMb = round(memory_get_peak_usage(true) / 1048576, 2);
+
+        // Variables de session en fin de requête (après l'exécution du controller),
+        // uniquement si l'application a démarré une session
+        $sessionParams = (isset($_SESSION) && is_array($_SESSION))
+            ? self::maskSensitive((array) self::normalize($_SESSION))
+            : null;
 
         try {
             LogsService::updateLog($logId, (string) json_encode(self::buildEvent(
@@ -115,8 +159,11 @@ class HttpRequestLogger
                 PHP_SAPI,
                 $executionTimeMs,
                 $memoryMb,
-                $errorMessage
-            )));
+                $errorMessage,
+                $requestParams['get'],
+                $requestParams['post'],
+                $sessionParams
+            ), self::JSON_FLAGS));
         } catch (\Throwable $exception) {
             error_log('[EduFramework Logs] ' . $exception->getMessage());
         }
@@ -204,6 +251,11 @@ class HttpRequestLogger
      * La clé `error_message` est ajoutée uniquement si une erreur a été
      * enregistrée par setError() : elle décrit l'exception à l'origine
      * de la réponse (message, fichier et ligne)
+     * Les clés `get` et `post` sont ajoutées uniquement si la requête contient
+     * des variables GET ($_GET) ou POST ($_POST), afin de pouvoir les consulter
+     * dans le profiler pour déboguer
+     * La clé `session` est ajoutée uniquement si la session contient des
+     * variables ($_SESSION en fin de requête)
      *
      * @param string $method Méthode HTTP (GET, POST, ...)
      * @param string $path Chemin de la requête (avec la chaîne de requête)
@@ -214,9 +266,13 @@ class HttpRequestLogger
      * @param float|null $memoryMb Mémoire utilisée en mégaoctets (pic)
      * @param string|null $errorMessage Description de l'erreur à l'origine de la réponse
      *     (message, fichier et ligne de l'exception)
-     * @return array<string, string|float> Événement au format BufferToServer
+     * @param array<mixed>|null $getParams Variables GET de la requête
+     * @param array<mixed>|null $postParams Variables POST de la requête
+     * @param array<mixed>|null $sessionParams Variables de session en fin de requête
+     * @return array<string, mixed> Événement au format BufferToServer
      *        (clés raw, timestamp, ip_port, status_code, method, path, sapi,
-     *        et execution_time_ms / memory_mb / error_message si fournis)
+     *        et execution_time_ms / memory_mb / error_message / get / post / session
+     *        si fournis)
      */
     public static function buildEvent(
         string $method,
@@ -226,7 +282,10 @@ class HttpRequestLogger
         string $sapi = PHP_SAPI,
         float|null $executionTimeMs = null,
         float|null $memoryMb = null,
-        string|null $errorMessage = null
+        string|null $errorMessage = null,
+        array|null $getParams = null,
+        array|null $postParams = null,
+        array|null $sessionParams = null
     ): array {
         $timestamp = date('D M ') . sprintf('%2d', (int) date('j')) . date(' H:i:s Y');
 
@@ -249,8 +308,87 @@ class HttpRequestLogger
         if ($errorMessage !== null && $errorMessage !== '') {
             $event['error_message'] = $errorMessage;
         }
+        if ($getParams !== null && $getParams !== []) {
+            $event['get'] = $getParams;
+        }
+        if ($postParams !== null && $postParams !== []) {
+            $event['post'] = $postParams;
+        }
+        if ($sessionParams !== null && $sessionParams !== []) {
+            $event['session'] = $sessionParams;
+        }
 
         return $event;
+    }
+
+    /**
+     * Masque récursivement les valeurs des variables sensibles (mots de passe,
+     * secrets) afin qu'elles ne soient jamais enregistrées en clair dans les logs.
+     * Une variable est sensible si son nom contient `pass`, `pwd`, `secret`, `mot_de_passe`
+     * ou `mdp` (insensible à la casse : password, mot_de_passe, user_pwd, ...).
+     *
+     * @param array<mixed> $params Variables de la requête ($_GET, $_POST)
+     * @return array<mixed> Variables avec les valeurs sensibles masquées
+     */
+    public static function maskSensitive(array $params): array
+    {
+        foreach ($params as $key => $value) {
+            if (is_string($key) && preg_match('/pass|pwd|secret|mot_?de_?passe|mdp/i', $key) === 1) {
+                $params[$key] = self::MASKED_VALUE;
+            } elseif (is_array($value)) {
+                $params[$key] = self::maskSensitive($value);
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Convertit une valeur (de session) en données encodables en JSON :
+     * - les objets deviennent un tableau de toutes leurs propriétés (y compris
+     *   privées et protégées), précédé de la clé `__class` (nom de la classe) ;
+     * - les ressources deviennent une chaîne `resource(type)` ;
+     * - au-delà de MAX_DEPTH niveaux, la valeur est remplacée par `…`.
+     *
+     * @param mixed $value Valeur à convertir
+     * @param int $depth Profondeur courante
+     * @return mixed Valeur encodable en JSON
+     */
+    public static function normalize(mixed $value, int $depth = 0): mixed
+    {
+        if (is_array($value) === false && is_object($value) === false) {
+            if (is_resource($value) === true || gettype($value) === 'resource (closed)') {
+                return 'resource(' . get_resource_type($value) . ')';
+            }
+            if (is_float($value) && is_finite($value) === false) {
+                return (string) $value;
+            }
+            return $value;
+        }
+
+        if ($depth >= self::MAX_DEPTH) {
+            return '…';
+        }
+
+        $normalized = [];
+        if (is_object($value) === true) {
+            $normalized['__class'] = $value::class;
+            if ($value instanceof \Closure) {
+                return $normalized;
+            }
+            foreach ((array) $value as $key => $item) {
+                // Les propriétés privées / protégées sont préfixées par \0Classe\0 ou \0*\0
+                $name = (string) $key;
+                $pos = strrpos($name, "\0");
+                $normalized[$pos === false ? $name : substr($name, $pos + 1)] = self::normalize($item, $depth + 1);
+            }
+            return $normalized;
+        }
+
+        foreach ($value as $key => $item) {
+            $normalized[$key] = self::normalize($item, $depth + 1);
+        }
+        return $normalized;
     }
 
     /**
