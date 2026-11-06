@@ -19,7 +19,7 @@ class CreateApiCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new CreateApiCommand());
+        $application->addCommand(new CreateApiCommand());
         $command = $application->find("make:api");
         $this->commandeTester = new CommandTester($command);
     }

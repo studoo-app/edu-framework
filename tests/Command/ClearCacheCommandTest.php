@@ -30,7 +30,7 @@ class ClearCacheCommandTest extends TestCase
 
         (new ConfigCore(['cache_path' => $this->cachePath]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new ClearCacheCommand());
+        $application->addCommand(new ClearCacheCommand());
         $command = $application->find('cache:clear');
         $this->commandeTester = new CommandTester($command);
     }
@@ -64,7 +64,7 @@ class ClearCacheCommandTest extends TestCase
         (new ConfigCore(['cache_path' => sys_get_temp_dir() . '/edu-framework-test-cache-inexistant-' . uniqid() . '/']));
 
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new ClearCacheCommand());
+        $application->addCommand(new ClearCacheCommand());
         $command = $application->find('cache:clear');
         $commandeTester = new CommandTester($command);
 
