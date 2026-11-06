@@ -13,6 +13,9 @@ use Studoo\EduFramework\Core\View\TwigCore;
 
 class HttpErrorControllerTest extends TestCase
 {
+    /**
+     * Configure Twig et neutralise APP_ENV avant chaque test
+     */
     public function setUp(): void
     {
         // Neutralise APP_ENV : le message de l'exception ne doit pas être affiché
@@ -26,6 +29,19 @@ class HttpErrorControllerTest extends TestCase
         TwigCore::setEnvironment();
     }
 
+    /**
+     * Remet le code de réponse HTTP à 200 après chaque test
+     */
+    public function tearDown(): void
+    {
+        // Les controllers d'erreur positionnent le code HTTP (403, 404, 405, 500) :
+        // on le remet à 200 pour ne pas polluer les tests suivants
+        http_response_code(200);
+    }
+
+    /**
+     * La page 404 affiche « Page introuvable » sans le nom du framework
+     */
     public function testPage404(): void
     {
         $html = (new HttpError404Controller())->execute(new Request('/inconnu', 'GET'));
@@ -36,6 +52,9 @@ class HttpErrorControllerTest extends TestCase
         $this->assertStringNotContainsString('EduFramework', $html);
     }
 
+    /**
+     * La page 405 affiche « Méthode non autorisée »
+     */
     public function testPage405(): void
     {
         $html = (new HttpError405Controller())->execute(new Request('/test', 'POST'));
@@ -44,6 +63,9 @@ class HttpErrorControllerTest extends TestCase
         $this->assertStringContainsString('Méthode non autorisée', $html);
     }
 
+    /**
+     * La page 403 affiche « Accès interdit »
+     */
     public function testPage403(): void
     {
         $html = (new HttpError403Controller())->execute(new Request('/secret', 'GET'));
@@ -52,6 +74,9 @@ class HttpErrorControllerTest extends TestCase
         $this->assertStringContainsString('Accès interdit', $html);
     }
 
+    /**
+     * La page 500 affiche « Erreur interne du serveur »
+     */
     public function testPage500(): void
     {
         $html = (new HttpErrorDefaultController())->execute(new Request('/test', 'GET'));
@@ -60,6 +85,9 @@ class HttpErrorControllerTest extends TestCase
         $this->assertStringContainsString('Erreur interne du serveur', $html);
     }
 
+    /**
+     * En mode dev, la page 500 affiche le message de l'exception
+     */
     public function testPage500AfficheMessageEnModeDev(): void
     {
         // En mode développement, le message de l'exception est affiché sur la page
@@ -73,6 +101,9 @@ class HttpErrorControllerTest extends TestCase
         unset($_ENV['APP_ENV']);
     }
 
+    /**
+     * Hors mode dev, la page 500 masque le message de l'exception
+     */
     public function testPage500CacheMessageHorsModeDev(): void
     {
         // Hors mode développement, le message de l'exception ne doit pas être affiché
