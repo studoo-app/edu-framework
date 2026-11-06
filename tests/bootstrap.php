@@ -7,6 +7,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 // Driver de profilage factice partagé par les tests du profiler de code
 require_once __DIR__ . '/Core/Profiler/FakeProfilerDriver.php';
+require_once __DIR__ . '/Core/Logs/SessionUserFixture.php';
 
 // ConfigCore::getEnv() lit aussi l'environnement du processus (getenv) : on retire
 // APP_ENV hérité du shell ou du conteneur de dev (compose.yaml : APP_ENV=dev), sinon

@@ -445,11 +445,7 @@ class HttpRequestLoggerTest extends TestCase
      */
     public function testNormalizeConvertsObjectsResourcesAndDeepValues(): void
     {
-        $user = new class {
-            public string $nom = 'Ada';
-            private string $email = 'ada@studoo.app';
-            protected int $age = 36;
-        };
+        $user = new SessionUserFixture();
         $stream = fopen('php://memory', 'r');
 
         $normalized = HttpRequestLogger::normalize([
@@ -459,7 +455,7 @@ class HttpRequestLoggerTest extends TestCase
         ]);
         fclose($stream);
 
-        $this->assertSame($user::class, $normalized['user']['__class']);
+        $this->assertSame(SessionUserFixture::class, $normalized['user']['__class']);
         $this->assertSame('Ada', $normalized['user']['nom']);
         $this->assertSame('ada@studoo.app', $normalized['user']['email']);
         $this->assertSame(36, $normalized['user']['age']);
