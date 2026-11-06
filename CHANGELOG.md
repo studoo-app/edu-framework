@@ -2,6 +2,13 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## Non publié
+
+**maintenance**
+
+- Tests : migration de PHPUnit 9 vers **PHPUnit 13** (`phpunit/phpunit: ^13`) et de `phpunit.xml` vers le schéma 13.4 (la section `<coverage><include>` devient `<source><include>`)
+- Tests : `HttpErrorControllerTest` remet le code de réponse HTTP à 200 après chaque test, pour ne plus fausser `HttpRequestLoggerTest` selon l'ordre d'exécution
+
 ## v2.9.1 - 05/11/2026
 
 **bug Fixes**
