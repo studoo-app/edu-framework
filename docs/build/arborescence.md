@@ -20,6 +20,8 @@ L'arborescence du projet est la structure de votre projet. Elle est composée de
 │   └── edu (Ligne de commande)
 ├── public
 │   └── index.php
+├── tests (Tests unitaires, optionnel)
+│   └── bootstrap.php
 ├── var
 │   ├── dbdata (Données du service MySQL)
 │   ├── dbgate (Configuration du service dbgate)
@@ -32,6 +34,7 @@ L'arborescence du projet est la structure de votre projet. Elle est composée de
 ├── .gitignore
 ├── compose.yaml
 ├── composer.json
+├── phpunit.xml (Configuration des tests, optionnel)
 ├── README.md
 └── LICENSE
 ```
@@ -57,6 +60,8 @@ Voici le détail de l'arborescence du projet :
 | **bin/edu**                                   | Dossier de la ligne de commande Edu                                    |
 | **public**                                    | Dossier contenant les fichiers publics                                 |
 | **public/index.php**                          | Fichier de démarrage de l'application (Endpoint)                       |
+| **tests**                                     | Dossier des [tests unitaires](tests-unitaires.md) (PHPUnit)            |
+| **phpunit.xml**                               | Fichier de configuration de PHPUnit                                    |
 | **var**                                       | Dossier contenant les données variables (bases, logs, configuration)   |
 | **var/dbdata**                                | Données du service MySQL (volume Docker)                               |
 | **var/logs**                                  | Base SQLite `core_logs.sqlite` des logs du serveur de développement    |

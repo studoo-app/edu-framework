@@ -35,3 +35,9 @@ Pour créer une nouvelle commande, vous devez suivre les instructions suivantes 
 Pour créer une API JSON (controller, route et documentation OpenAPI), vous devez suivre les instructions suivantes :
 
 - [Comment construire une API](controller-edu-api.md)
+
+## 6. Tester son application
+
+Pour vérifier automatiquement le bon fonctionnement de votre code avec PHPUnit, vous devez suivre les instructions suivantes :
+
+- [Comment mettre en place des tests unitaires](tests-unitaires.md)
