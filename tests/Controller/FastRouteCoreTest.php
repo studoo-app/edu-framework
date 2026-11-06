@@ -258,6 +258,9 @@ class FastRouteCoreTest extends TestCase
         $route->getRoute();
     }
 
+    /**
+     * getDispatcher() renvoie un dispatcher de studoo/edu-route
+     */
     public function testGetDispatcherReturnsEduRouteDispatcher()
     {
         $route = new FastRouteCore();
@@ -266,6 +269,9 @@ class FastRouteCoreTest extends TestCase
         $this->assertInstanceOf(Dispatcher::class, $route->getDispatcher());
     }
 
+    /**
+     * La casse de la méthode est conservée : une route [get] ne répond pas à une requête GET (erreur 405)
+     */
     public function testHttpMethodKeepsItsCase()
     {
         // Comme avec nikic/fast-route, une méthode écrite en minuscules (get) ne répond pas à une requête GET
@@ -277,6 +283,9 @@ class FastRouteCoreTest extends TestCase
         $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
     }
 
+    /**
+     * Une valeur vide (tiret orphelin ou ~) dans la liste httpMethod ne bloque pas la route GET
+     */
     public function testEmptyHttpMethodValueKeepsTheRouteWorking()
     {
         // Un tiret orphelin ou ~ dans la liste httpMethod de routes.yaml donne null : la route GET répond toujours
@@ -291,6 +300,9 @@ class FastRouteCoreTest extends TestCase
         $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
     }
 
+    /**
+     * Une méthode HTTP qui est une liste lève une erreur explicite citant l'URI de la route
+     */
     public function testInvalidHttpMethodThrowsExplicitError()
     {
         $route = new FastRouteCore();
@@ -300,6 +312,9 @@ class FastRouteCoreTest extends TestCase
         $route->addRoute(['GET', ['POST']], '/', "Controller\HomeController");
     }
 
+    /**
+     * Une route de routes.yaml sans controller lève une erreur qui nomme la route
+     */
     public function testLoadRouteConfigWithMissingKey()
     {
         $route = new FastRouteCore();
@@ -309,6 +324,9 @@ class FastRouteCoreTest extends TestCase
         $route->loadRouteConfig(__DIR__ . '/../Config/InvalidRoutes/');
     }
 
+    /**
+     * Une liste imbriquée dans httpMethod de routes.yaml lève une erreur qui nomme la route
+     */
     public function testLoadRouteConfigWithInvalidHttpMethodNamesTheRoute()
     {
         $route = new FastRouteCore();
@@ -318,6 +336,9 @@ class FastRouteCoreTest extends TestCase
         $route->loadRouteConfig(__DIR__ . '/../Config/InvalidMethodRoutes/');
     }
 
+    /**
+     * uri: 404 (nombre) et httpMethod: GET (sans crochets) sont acceptés, comme avec nikic/fast-route
+     */
     public function testLoadRouteConfigAcceptsScalarValues()
     {
         // uri: 404 (nombre) et httpMethod: GET (sans crochets) sont acceptés, comme avec nikic/fast-route
@@ -329,6 +350,9 @@ class FastRouteCoreTest extends TestCase
         $this->assertEquals('65ff3d775df3e8c72a519c7d5e69abb760b605c1d7730387514a48068e6e9ca7', hash('sha256', $route->getRoute()));
     }
 
+    /**
+     * Les paramètres obligatoire et optionnel de /user/{id:\d+}[/{name}] sont transmis à la requête
+     */
     public function testRouteWithOptionalParameter()
     {
         $route = new FastRouteCore();
