@@ -3,6 +3,7 @@
   "description": "Light Education PHP framework",
   "keywords": ["education", "framework", "mvc", "php"],
   "minimum-stability": "dev",
+  "prefer-stable": true,
   "license": "MIT",
   "authors": [
     {
@@ -24,12 +25,12 @@
     "twig/twig": "3.x-dev",
     "nikic/fast-route": "^1.3",
     "ext-pdo": "*",
-    "symfony/yaml": "6.4.*",
-    "symfony/console": "6.3.*",
+    "symfony/yaml": "^7.4",
+    "symfony/console": "^7.4",
     "nette/php-generator": "^4.1@dev",
     "zircote/swagger-php": "5.8.*",
-    "symfony/filesystem": "7.4.x-dev",
-    "symfony/process": "7.4.x-dev"
+    "symfony/filesystem": "^7.4",
+    "symfony/process": "^7.4"
   }
   ,
   "require-dev": {

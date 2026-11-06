@@ -35,7 +35,7 @@ class CreateDeployCommandTest extends TestCase
 
         (new ConfigCore(['base_path' => $this->projectPath]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new CreateDeployCommand());
+        $application->addCommand(new CreateDeployCommand());
         $this->commandeTester = new CommandTester($application->find('make:deploy'));
     }
 

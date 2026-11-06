@@ -420,6 +420,13 @@ La collecte est assurée par la classe `HttpRequestLogger`, en deux temps comme 
 
 Si une erreur survient (exception attrapée par le framework : erreur 500, `ErrorHttpStatusException` levée par un controller, ...), le framework la transmet à `HttpRequestLogger::setError()` et le log de la requête porte une clé `error_message` décrivant la cause de l'erreur — message de l'exception, **fichier et ligne** où elle s'est produite. La description est visible dans le contexte du log (elle est filtrable par le champ **Recherche**) et sur la page descriptif de la requête, afin d'identifier et corriger l'erreur directement depuis les logs. Une requête qui s'est déroulée sans erreur ne porte pas la clé.
 
+Pour faciliter le débogage, le log de la requête porte aussi les **variables de la requête**, affichées sous forme de tableaux sur la page descriptif de la requête :
+
+- `get` et `post` : les variables `$_GET` et `$_POST`, capturées **en début de requête** telles qu'envoyées par le client (avant d'éventuelles modifications par le controller) ;
+- `session` : les variables `$_SESSION`, capturées **en fin de requête** (après l'exécution du controller), uniquement si l'application a démarré une session. Les objets stockés en session sont enregistrés avec toutes leurs propriétés (y compris privées et protégées) et une clé `__class` indiquant leur classe.
+
+Chaque clé n'est présente que si elle contient des variables. Les **variables sensibles** — dont le nom contient `pass`, `pwd`, `secret`, `mot_de_passe` ou `mdp` (insensible à la casse) — sont masquées (`******`), y compris dans les tableaux imbriqués : un mot de passe n'est jamais enregistré en clair dans la base des logs. Le corps brut d'une requête JSON (`php://input`) n'est pas capturé.
+
 Chaque événement porte les clés :
 
 | Clé | Description |

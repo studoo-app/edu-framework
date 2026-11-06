@@ -37,22 +37,22 @@ class AppCommand extends Application
             (new DatabaseService());
         }
 
-        $this->add(new \Studoo\EduFramework\Commands\DefaultCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CreateControllerCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CheckStackCommand());
-        $this->add(new \Studoo\EduFramework\Commands\StartCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CreateCliCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CreateApiCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CreateEntityCommand());
-        $this->add(new \Studoo\EduFramework\Commands\ClearCacheCommand());
-        $this->add(new \Studoo\EduFramework\Commands\CreateDeployCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\DefaultCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CreateControllerCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CheckStackCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\StartCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CreateCliCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CreateApiCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CreateEntityCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\ClearCacheCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\CreateDeployCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {
             $commandList = Yaml::parseFile(ConfigCore::getConfig('command_config_path') . 'commands.yaml');
             if (is_array($commandList)) {
                 foreach ($commandList as $command) {
                     if (class_exists($command) === true) {
-                        $this->add(new $command());
+                        $this->addCommand(new $command());
                     }
                 }
             }

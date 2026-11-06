@@ -28,6 +28,16 @@ class HttpRequestLoggerTest extends TestCase
     private array $envBackup;
 
     /**
+     * @var array<mixed> Sauvegarde de $_GET pour restauration après chaque test
+     */
+    private array $getBackup;
+
+    /**
+     * @var array<mixed> Sauvegarde de $_POST pour restauration après chaque test
+     */
+    private array $postBackup;
+
+    /**
      * Définit le dossier temporaire dédié aux logs de la suite de tests
      */
     public static function setUpBeforeClass(): void
@@ -43,11 +53,14 @@ class HttpRequestLoggerTest extends TestCase
     {
         $this->serverBackup = $_SERVER;
         $this->envBackup = $_ENV;
+        $this->getBackup = $_GET;
+        $this->postBackup = $_POST;
 
         // Réinitialisation des états statiques pour isoler chaque test
         (new ReflectionProperty(LogsService::class, 'dbConnectLogs'))->setValue(null, null);
         (new ReflectionProperty(HttpRequestLogger::class, 'currentLogId'))->setValue(null, null);
         (new ReflectionProperty(HttpRequestLogger::class, 'errorMessage'))->setValue(null, null);
+        (new ReflectionProperty(HttpRequestLogger::class, 'requestParams'))->setValue(null, ['get' => [], 'post' => []]);
 
         (new ConfigCore([
             'sqlite_logs_path' => self::$logsPath
@@ -64,6 +77,9 @@ class HttpRequestLoggerTest extends TestCase
     {
         $_SERVER = $this->serverBackup;
         $_ENV = $this->envBackup;
+        $_GET = $this->getBackup;
+        $_POST = $this->postBackup;
+        unset($_SESSION);
     }
 
     /**
@@ -310,6 +326,142 @@ class HttpRequestLoggerTest extends TestCase
             . ' [' . $event['status_code'] . ']: ' . $event['method'] . ' ' . $event['path'],
             $event['raw']
         );
+    }
+
+    /**
+     * Vérifie que buildEvent() ajoute les variables GET et POST uniquement si elles sont fournies
+     */
+    public function testBuildEventIncludesGetAndPostParamsWhenProvided(): void
+    {
+        $event = HttpRequestLogger::buildEvent(
+            'POST', '/ville?nom=Nice', '127.0.0.1:1', 200, 'frankenphp',
+            null, null, null, ['nom' => 'Nice'], ['ville' => ['cp' => '06000']]
+        );
+        $this->assertSame(['nom' => 'Nice'], $event['get']);
+        $this->assertSame(['ville' => ['cp' => '06000']], $event['post']);
+
+        $event = HttpRequestLogger::buildEvent('GET', '/', '127.0.0.1:1', 200, 'frankenphp', null, null, null, [], []);
+        $this->assertArrayNotHasKey('get', $event);
+        $this->assertArrayNotHasKey('post', $event);
+    }
+
+    /**
+     * Vérifie que les variables sensibles (mots de passe, secrets) sont masquées, y compris imbriquées
+     */
+    public function testMaskSensitiveHidesPasswordsAndSecrets(): void
+    {
+        $masked = HttpRequestLogger::maskSensitive([
+            'email' => 'a@b.fr',
+            'password' => 'azerty',
+            'user' => ['Mot_De_Passe' => 'x', 'nom' => 'Ada', 'pwd_confirm' => 'y'],
+            'client_secret' => 's',
+            0 => 'liste',
+        ]);
+
+        $this->assertSame('a@b.fr', $masked['email']);
+        $this->assertSame(HttpRequestLogger::MASKED_VALUE, $masked['password']);
+        $this->assertSame(HttpRequestLogger::MASKED_VALUE, $masked['user']['Mot_De_Passe']);
+        $this->assertSame(HttpRequestLogger::MASKED_VALUE, $masked['user']['pwd_confirm']);
+        $this->assertSame('Ada', $masked['user']['nom']);
+        $this->assertSame(HttpRequestLogger::MASKED_VALUE, $masked['client_secret']);
+        $this->assertSame('liste', $masked[0]);
+    }
+
+    /**
+     * Vérifie que start() / finish() enregistrent les variables GET et POST de la requête (masquées)
+     */
+    public function testStartAndFinishLogGetAndPostParams(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/login?redirect=/home';
+        $_GET = ['redirect' => '/home'];
+        $_POST = ['email' => 'ada@studoo.app', 'password' => 'secret123'];
+
+        HttpRequestLogger::start();
+        $logId = HttpRequestLogger::getCurrentLogId();
+        $this->assertNotNull($logId);
+
+        $reserved = LogsService::getLogs(1, 0, ['token' => (string) $logId])[0]['event'];
+        $this->assertSame(['redirect' => '/home'], $reserved['get']);
+        $this->assertSame(HttpRequestLogger::MASKED_VALUE, $reserved['post']['password']);
+
+        // Les variables enregistrées sont celles reçues au début de la requête
+        $_POST['email'] = 'modifie@studoo.app';
+        HttpRequestLogger::finish();
+
+        $event = LogsService::getLogs(1, 0, ['token' => (string) $logId])[0]['event'];
+        $this->assertSame(['redirect' => '/home'], $event['get']);
+        $this->assertSame(
+            ['email' => 'ada@studoo.app', 'password' => HttpRequestLogger::MASKED_VALUE],
+            $event['post']
+        );
+    }
+
+    /**
+     * Vérifie que finish() enregistre les variables de session de fin de requête (masquées)
+     */
+    public function testFinishLogsSessionVariablesAtTheEndOfTheRequest(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/profil';
+        $_SESSION = ['user_id' => 1];
+
+        HttpRequestLogger::start();
+        $logId = HttpRequestLogger::getCurrentLogId();
+        $this->assertNotNull($logId);
+
+        // Le controller modifie la session : c'est l'état de fin de requête qui est enregistré
+        $_SESSION['role'] = 'admin';
+        $_SESSION['password_hash'] = 'xyz';
+        HttpRequestLogger::finish();
+
+        $event = LogsService::getLogs(1, 0, ['token' => (string) $logId])[0]['event'];
+        $this->assertSame(
+            ['user_id' => 1, 'role' => 'admin', 'password_hash' => HttpRequestLogger::MASKED_VALUE],
+            $event['session']
+        );
+    }
+
+    /**
+     * Vérifie que la clé session est absente quand aucune session n'est démarrée
+     */
+    public function testFinishWithoutSessionDoesNotAddSessionKey(): void
+    {
+        unset($_SESSION);
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/sans-session';
+
+        HttpRequestLogger::start();
+        $logId = HttpRequestLogger::getCurrentLogId();
+        HttpRequestLogger::finish();
+
+        $event = LogsService::getLogs(1, 0, ['token' => (string) $logId])[0]['event'];
+        $this->assertArrayNotHasKey('session', $event);
+    }
+
+    /**
+     * Vérifie que normalize() rend encodables en JSON les objets (propriétés privées
+     * comprises), les ressources et les structures trop profondes
+     */
+    public function testNormalizeConvertsObjectsResourcesAndDeepValues(): void
+    {
+        $user = new SessionUserFixture();
+        $stream = fopen('php://memory', 'r');
+
+        $normalized = HttpRequestLogger::normalize([
+            'user' => $user,
+            'stream' => $stream,
+            'deep' => [[[[[[['trop profond']]]]]]],
+        ]);
+        fclose($stream);
+
+        $this->assertSame(SessionUserFixture::class, $normalized['user']['__class']);
+        $this->assertSame('Ada', $normalized['user']['nom']);
+        $this->assertSame('ada@studoo.app', $normalized['user']['email']);
+        $this->assertSame(36, $normalized['user']['age']);
+        $this->assertSame('resource(stream)', $normalized['stream']);
+        $this->assertSame('…', $normalized['deep'][0][0][0][0][0]);
+        $this->assertNotFalse(json_encode($normalized));
     }
 
     /**

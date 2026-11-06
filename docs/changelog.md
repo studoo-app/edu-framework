@@ -2,6 +2,34 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.10.0 - 06/11/2026
+
+**new features**
+
+- Profiler : la page descriptif d'une requête affiche les **variables GET, POST et de session** sous forme de tableaux. `HttpRequestLogger` enregistre `$_GET` et `$_POST` en début de requête et `$_SESSION` en fin de requête (clés `get`, `post` et `session` du log). Les variables sensibles (nom contenant `pass`, `pwd`, `secret`, `mot_de_passe` ou `mdp`) sont masquées, et les objets en session sont enregistrés avec toutes leurs propriétés et une clé `__class`
+- Vue **Logs** : les variables GET / POST / session du contexte sont affichées en JSON
+
+**bug Fixes**
+
+- [#174](https://github.com/studoo-app/edu-framework/issues/174) Dépendances Symfony : `symfony/yaml`, `symfony/console`, `symfony/filesystem` et `symfony/process` passent en **7.4 LTS stable** (`^7.4`) au lieu de branches `x-dev`. `composer.json` active `prefer-stable` pour ne plus résoudre de branches de développement quand une version stable existe
+- Console `bin/edu` : `Application::add()`, déprécié en Symfony 7.4, est remplacé par `addCommand()`
+- Profiler : une erreur pendant l'enregistrement de la session ne peut plus faire échouer la requête
+
+**maintenance**
+
+- Tests : migration de PHPUnit 9 vers **PHPUnit 13** (`phpunit/phpunit: ^13`) et de `phpunit.xml` vers le schéma 13.4 (la section `<coverage><include>` devient `<source><include>`)
+- Tests : `HttpErrorControllerTest` remet le code de réponse HTTP à 200 après chaque test, pour ne plus fausser `HttpRequestLoggerTest` selon l'ordre d'exécution
+
+**documentation**
+
+- update [La barre de debug et le profiler](boost/debug-bar.md) : description des clés `get`, `post` et `session` du log d'une requête
+
+## v2.9.1 - 05/11/2026
+
+**bug Fixes**
+
+- Correction du package symfony/filesystem[7.2.x-dev]
+
 ## v2.9.0 - 21/10/2026
 
 **new features**

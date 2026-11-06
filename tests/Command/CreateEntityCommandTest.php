@@ -18,7 +18,7 @@ class CreateEntityCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new CreateEntityCommand());
+        $application->addCommand(new CreateEntityCommand());
         $command = $application->find("make:entity");
         $this->commandeTester = new CommandTester($command);
     }

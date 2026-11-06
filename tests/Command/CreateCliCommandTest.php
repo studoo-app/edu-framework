@@ -19,7 +19,7 @@ class CreateCliCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new CreateCliCommand());
+        $application->addCommand(new CreateCliCommand());
         $command = $application->find("make:command");
         $this->commandeTester = new CommandTester($command);
     }
