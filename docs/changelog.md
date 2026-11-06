@@ -2,11 +2,11 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## Non publié
+## v2.11.0 - 06/11/2026
 
 **maintenance**
 
-- Routage : le framework utilise [`studoo/edu-route`](https://github.com/studoo-app/eduRoute) (`^1.0`), fork modernisé pour PHP 8.4 de `nikic/fast-route`, dont aucune version n'a été publiée depuis la 1.3.0 de 2018. **Aucun changement pour les applications** : le format de `app/Config/routes.yaml`, la syntaxe des URI (`/user/{id:\d+}[/{name}]`), les méthodes HTTP (la casse est conservée : une route `[get]` ne répond pas à une requête `GET`), les pages 404 et 405, les variables de route (`$request->get('id')`) et `getNameToPath()` fonctionnent comme avant
+- [#187](https://github.com/studoo-app/edu-framework/pull/187) Routage : le framework utilise [`studoo/edu-route`](https://github.com/studoo-app/eduRoute) (`^1.0`), fork modernisé pour PHP 8.4 de `nikic/fast-route`, dont aucune version n'a été publiée depuis la 1.3.0 de 2018. **Aucun changement pour les applications** : le format de `app/Config/routes.yaml`, la syntaxe des URI (`/user/{id:\d+}[/{name}]`), les méthodes HTTP (la casse est conservée : une route `[get]` ne répond pas à une requête `GET`), les pages 404 et 405, les variables de route (`$request->get('id')`) et `getNameToPath()` fonctionnent comme avant
 - Dépendances : `studoo/edu-route` remplace `nikic/fast-route` et ajoute `psr/http-message` et `psr/simple-cache` ; il prend en charge PHP 8.4 et 8.5
 - Code qui utilise directement le moteur de routage :
     - `FastRouteCore::getDispatcher()` renvoie un `Studoo\EduRoute\Dispatcher` (au lieu de `FastRoute\Dispatcher`) ; son `dispatch()` renvoie un objet `Matched`, `MethodNotAllowed` ou `NotMatched` (propriétés `handler`, `variables`, `allowedMethods`) au lieu d'un tableau : l'accès `$result[0]` fonctionne encore mais est déprécié, utilisez `instanceof`
