@@ -11,7 +11,7 @@
 
 namespace Studoo\EduFramework\Core\Controller;
 
-use FastRoute\RouteParser\Std;
+use Studoo\EduRoute\RouteParser\Std;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Exception\BadRouteException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;

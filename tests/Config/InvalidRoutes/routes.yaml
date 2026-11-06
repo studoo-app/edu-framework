@@ -1,0 +1,7 @@
+index:
+    uri: /
+    controller: Controller\HomeController
+    httpMethod: [GET]
+sansController:
+    uri: /oubli
+    httpMethod: [GET]

@@ -6,11 +6,13 @@ use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
+use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Studoo\EduFramework\Core\Exception\ErrorControllerException;
 use Studoo\EduFramework\Core\Exception\ErrorHttpStatusException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use Studoo\EduFramework\Core\Security\CsrfService;
 use Studoo\EduFramework\Core\View\TwigCore;
+use Studoo\EduRoute\Dispatcher;
 
 class FastRouteCoreTest extends TestCase
 {
@@ -254,5 +256,114 @@ class FastRouteCoreTest extends TestCase
         $this->expectException(ErrorHttpStatusException::class);
         $this->expectExceptionMessage("Jeton CSRF invalide ou expiré");
         $route->getRoute();
+    }
+
+    /**
+     * getDispatcher() renvoie un dispatcher de studoo/edu-route
+     */
+    public function testGetDispatcherReturnsEduRouteDispatcher()
+    {
+        $route = new FastRouteCore();
+        $route->addRoute('GET', '/', "Controller\HomeController");
+
+        $this->assertInstanceOf(Dispatcher::class, $route->getDispatcher());
+    }
+
+    /**
+     * La casse de la méthode est conservée : une route [get] ne répond pas à une requête GET (erreur 405)
+     */
+    public function testHttpMethodKeepsItsCase()
+    {
+        // Comme avec nikic/fast-route, une méthode écrite en minuscules (get) ne répond pas à une requête GET
+        $route = new FastRouteCore();
+        $route->addRoute(['get'], '/', "Controller\HomeController");
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
+    }
+
+    /**
+     * Une valeur vide (tiret orphelin ou ~) dans la liste httpMethod ne bloque pas la route GET
+     */
+    public function testEmptyHttpMethodValueKeepsTheRouteWorking()
+    {
+        // Un tiret orphelin ou ~ dans la liste httpMethod de routes.yaml donne null : la route GET répond toujours
+        $route = new FastRouteCore();
+        $route->addRoute(['GET', null], '/', "Controller\HomeController");
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        $this->assertEquals('65ff3d775df3e8c72a519c7d5e69abb760b605c1d7730387514a48068e6e9ca7', hash('sha256', $route->getRoute()));
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->assertEquals('6b92774361c19fd3ece5ad9a3125684071853ee1a7a3459bfb549b6eb6bcc1c5', hash('sha256', $route->getRoute()));
+    }
+
+    /**
+     * Une méthode HTTP qui est une liste lève une erreur explicite citant l'URI de la route
+     */
+    public function testInvalidHttpMethodThrowsExplicitError()
+    {
+        $route = new FastRouteCore();
+
+        $this->expectException(ErrorConfigException::class);
+        $this->expectExceptionMessage("La méthode HTTP de la route </> est invalide");
+        $route->addRoute(['GET', ['POST']], '/', "Controller\HomeController");
+    }
+
+    /**
+     * Une route de routes.yaml sans controller lève une erreur qui nomme la route
+     */
+    public function testLoadRouteConfigWithMissingKey()
+    {
+        $route = new FastRouteCore();
+
+        $this->expectException(ErrorConfigException::class);
+        $this->expectExceptionMessage("La route <sansController> du fichier routes.yaml est invalide : la clé 'controller' est absente");
+        $route->loadRouteConfig(__DIR__ . '/../Config/InvalidRoutes/');
+    }
+
+    /**
+     * Une liste imbriquée dans httpMethod de routes.yaml lève une erreur qui nomme la route
+     */
+    public function testLoadRouteConfigWithInvalidHttpMethodNamesTheRoute()
+    {
+        $route = new FastRouteCore();
+
+        $this->expectException(ErrorConfigException::class);
+        $this->expectExceptionMessage("La route <index> du fichier routes.yaml est invalide : la clé 'httpMethod'");
+        $route->loadRouteConfig(__DIR__ . '/../Config/InvalidMethodRoutes/');
+    }
+
+    /**
+     * uri: 404 (nombre) et httpMethod: GET (sans crochets) sont acceptés, comme avec nikic/fast-route
+     */
+    public function testLoadRouteConfigAcceptsScalarValues()
+    {
+        // uri: 404 (nombre) et httpMethod: GET (sans crochets) sont acceptés, comme avec nikic/fast-route
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/ScalarRoutes/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        $this->assertEquals('65ff3d775df3e8c72a519c7d5e69abb760b605c1d7730387514a48068e6e9ca7', hash('sha256', $route->getRoute()));
+    }
+
+    /**
+     * Les paramètres obligatoire et optionnel de /user/{id:\d+}[/{name}] sont transmis à la requête
+     */
+    public function testRouteWithOptionalParameter()
+    {
+        $route = new FastRouteCore();
+        $route->loadRouteConfig(__DIR__ . '/../Config/');
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/user/21/benoit';
+        $html = $route->getRoute();
+
+        $this->assertSame('21', \Studoo\EduFramework\Core\ConfigCore::getRequest()->get('id'));
+        $this->assertSame('benoit', \Studoo\EduFramework\Core\ConfigCore::getRequest()->get('name'));
+        $this->assertIsString($html);
     }
 }
