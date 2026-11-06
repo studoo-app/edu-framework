@@ -2,6 +2,21 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.10.1 - 06/11/2026
+
+**bug Fixes**
+
+- Template `base.html.twig` (application et template interne du framework) : le bloc s'appelait `titre` alors que les pages définissent `{% block title %}`, la balise `<title>` restait vide. Le bloc est renommé `title` (même correction dans `studoo/edu-framework-skeleton`)
+
+**maintenance**
+
+- Tests : ajout de tests d'exemple sur les controllers de l'application (`tests/App/Controller`) et mise à jour des empreintes HTML de `FastRouteCoreTest`
+
+**documentation**
+
+- new [Tester son application (tests unitaires)](docs/build/tests-unitaires.md) : démarche, installation et configuration de PHPUnit, tests d'une entité, d'un repository sur une base SQLite de test et d'un controller, DataProvider, erreurs fréquentes et exercices
+- update [L'arborescence](docs/build/arborescence.md) : dossier `tests` et fichier `phpunit.xml`
+
 ## v2.10.0 - 06/11/2026
 
 **new features**
