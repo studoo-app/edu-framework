@@ -18,6 +18,7 @@
     * [Construire une API](build/controller-edu-api.md)
     * [Construire le CRUD](build/dataservice-select.md)
     * [Construire une commande CLI](build/new-command-edu.md)
+    * [Tester son application (tests unitaires)](build/tests-unitaires.md)
 * [Consolider](boost/index.md)
     * [Request - La gestion des requêtes HTTP](boost/resquet.md)
     * [DatabaseService - La gestion des données](boost/dataservice.md)

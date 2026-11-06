@@ -45,7 +45,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('a2bd992a139c4ec5c9a3cac42e646dfc4a8e026c719d37924f193e7ff06fe520', hash('sha256', $route->getRoute()));
+        $this->assertEquals('65ff3d775df3e8c72a519c7d5e69abb760b605c1d7730387514a48068e6e9ca7', hash('sha256', $route->getRoute()));
     }
 
     public function testGetDispatcherWithExceptionNotFound()
@@ -85,7 +85,7 @@ class FastRouteCoreTest extends TestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
-        $this->assertEquals('a2bd992a139c4ec5c9a3cac42e646dfc4a8e026c719d37924f193e7ff06fe520', hash('sha256', $route->getRoute()));
+        $this->assertEquals('65ff3d775df3e8c72a519c7d5e69abb760b605c1d7730387514a48068e6e9ca7', hash('sha256', $route->getRoute()));
     }
 
     public function testLoadRouteConfigWithFileNotExist()
@@ -124,7 +124,7 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/link';
 
-        $this->assertEquals('703d619fc8bdbb20450b15dea56caf9b193f6f84d8a8b5187ec9fc36ba4c63a8', hash('sha256', $route->getRoute()));
+        $this->assertEquals('d96088a5c7270de3890c35d1b62fcfdf4ac4a483238f3a9dbca9d75d623e7949', hash('sha256', $route->getRoute()));
     }
 
     public function testLinkToGetnametopathInTwigUserid()
@@ -135,7 +135,7 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/user/21';
 
-        $this->assertEquals('ab2550a7609a2997e9aaef4b49a12388d8978d5507d970cb45fa96fec99e768b', hash('sha256', $route->getRoute()));
+        $this->assertEquals('4a57d9375b9f736fe712287543216ab10ab70bad30a9888b859a55ca462f3ace', hash('sha256', $route->getRoute()));
     }
 
     public function testRouteWithMethodExplicitIndex()
@@ -146,7 +146,7 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/medecin';
 
-        $this->assertEquals('ed13c9c6c5ed3833bd1af6bea040089eff6e48baefcc219a9a04f382f2532931', hash('sha256', $route->getRoute()));
+        $this->assertEquals('18c9106de6b757e423cca403a7429f221a10c35c84a75d02c55e0ed5a8e7bdb9', hash('sha256', $route->getRoute()));
     }
 
     public function testRouteWithMethodExplicitNew()
@@ -157,7 +157,7 @@ class FastRouteCoreTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/medecin/new';
 
-        $this->assertEquals('e2f7b9a3c530c751e475fca16a4e46e95e249ceca802a947adc17e50bfb96a91', hash('sha256', $route->getRoute()));
+        $this->assertEquals('e0b2c8e4b1df5dae3d9d504f15fbcbe6a5e265b0e980b437379854a596bbea9a', hash('sha256', $route->getRoute()));
     }
 
     public function testRouteWithMethodNotExist()
