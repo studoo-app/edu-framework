@@ -624,7 +624,9 @@
                 var inline = Object.keys(context).map(function(key) {
                     if (key === 'execution_time_ms') { return key + ' => ' + prettyDuration(context[key]); }
                     if (key === 'memory_mb') { return key + ' => ' + prettyMemory(context[key]); }
-                    return key + ' => ' + context[key];
+                    // Variables GET / POST / session : objets affichés en JSON (et non [object Object])
+                    var value = context[key];
+                    return key + ' => ' + (value !== null && typeof value === 'object' ? JSON.stringify(value) : value);
                 }).join(', ');
                 var box = el('div', 'log-context');
                 box.appendChild(el('b', null, 'Contexte : '));

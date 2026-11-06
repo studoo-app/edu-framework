@@ -144,13 +144,13 @@ class HttpRequestLogger
         $executionTimeMs = round((microtime(true) - (float) ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1);
         $memoryMb = round(memory_get_peak_usage(true) / 1048576, 2);
 
-        // Variables de session en fin de requête (après l'exécution du controller),
-        // uniquement si l'application a démarré une session
-        $sessionParams = (isset($_SESSION) && is_array($_SESSION))
-            ? self::maskSensitive((array) self::normalize($_SESSION))
-            : null;
-
         try {
+            // Variables de session en fin de requête (après l'exécution du controller),
+            // uniquement si l'application a démarré une session
+            $sessionParams = (isset($_SESSION) && is_array($_SESSION))
+                ? self::maskSensitive((array) self::normalize($_SESSION))
+                : null;
+
             LogsService::updateLog($logId, (string) json_encode(self::buildEvent(
                 (string) $_SERVER['REQUEST_METHOD'],
                 self::requestPath(),
@@ -357,36 +357,62 @@ class HttpRequestLogger
     public static function normalize(mixed $value, int $depth = 0): mixed
     {
         if (is_array($value) === false && is_object($value) === false) {
-            if (is_resource($value) === true || gettype($value) === 'resource (closed)') {
-                return 'resource(' . get_resource_type($value) . ')';
-            }
-            if (is_float($value) && is_finite($value) === false) {
-                return (string) $value;
-            }
-            return $value;
+            return self::normalizeScalar($value);
         }
 
         if ($depth >= self::MAX_DEPTH) {
             return '…';
         }
 
-        $normalized = [];
         if (is_object($value) === true) {
-            $normalized['__class'] = $value::class;
-            if ($value instanceof \Closure) {
-                return $normalized;
-            }
-            foreach ((array) $value as $key => $item) {
-                // Les propriétés privées / protégées sont préfixées par \0Classe\0 ou \0*\0
-                $name = (string) $key;
-                $pos = strrpos($name, "\0");
-                $normalized[$pos === false ? $name : substr($name, $pos + 1)] = self::normalize($item, $depth + 1);
-            }
+            return self::normalizeObject($value, $depth);
+        }
+
+        $normalized = [];
+        foreach ($value as $key => $item) {
+            $normalized[$key] = self::normalize($item, $depth + 1);
+        }
+        return $normalized;
+    }
+
+    /**
+     * Convertit une valeur qui n'est ni un tableau ni un objet en donnée encodable
+     * en JSON : ressource → `resource(type)`, INF / NAN → chaîne, le reste inchangé
+     *
+     * @param mixed $value Valeur à convertir
+     * @return mixed Valeur encodable en JSON
+     */
+    private static function normalizeScalar(mixed $value): mixed
+    {
+        if (is_resource($value) === true || gettype($value) === 'resource (closed)') {
+            return 'resource(' . get_resource_type($value) . ')';
+        }
+        if (is_float($value) && is_finite($value) === false) {
+            return (string) $value;
+        }
+        return $value;
+    }
+
+    /**
+     * Convertit un objet en tableau de toutes ses propriétés (y compris privées et
+     * protégées), précédé de la clé `__class` ; une closure n'expose que sa classe
+     *
+     * @param object $value Objet à convertir
+     * @param int $depth Profondeur courante
+     * @return array<string, mixed> Propriétés de l'objet encodables en JSON
+     */
+    private static function normalizeObject(object $value, int $depth): array
+    {
+        $normalized = ['__class' => $value::class];
+        if ($value instanceof \Closure) {
             return $normalized;
         }
 
-        foreach ($value as $key => $item) {
-            $normalized[$key] = self::normalize($item, $depth + 1);
+        foreach ((array) $value as $key => $item) {
+            // Les propriétés privées / protégées sont préfixées par \0Classe\0 ou \0*\0
+            $name = (string) $key;
+            $pos = strrpos($name, "\0");
+            $normalized[$pos === false ? $name : substr($name, $pos + 1)] = self::normalize($item, $depth + 1);
         }
         return $normalized;
     }
