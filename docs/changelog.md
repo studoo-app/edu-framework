@@ -2,6 +2,25 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.11.0 - 06/11/2026
+
+**maintenance**
+
+- [#187](https://github.com/studoo-app/edu-framework/pull/187) Routage : le framework utilise [`studoo/edu-route`](https://github.com/studoo-app/eduRoute) (`^1.0`), fork modernisé pour PHP 8.4 de `nikic/fast-route`, dont aucune version n'a été publiée depuis la 1.3.0 de 2018. **Aucun changement pour les applications** : le format de `app/Config/routes.yaml`, la syntaxe des URI (`/user/{id:\d+}[/{name}]`), les méthodes HTTP (la casse est conservée : une route `[get]` ne répond pas à une requête `GET`), les pages 404 et 405, les variables de route (`$request->get('id')`) et `getNameToPath()` fonctionnent comme avant
+- Dépendances : `studoo/edu-route` remplace `nikic/fast-route` et ajoute `psr/http-message` et `psr/simple-cache` ; il prend en charge PHP 8.4 et 8.5
+- Code qui utilise directement le moteur de routage :
+    - `FastRouteCore::getDispatcher()` renvoie un `Studoo\EduRoute\Dispatcher` (au lieu de `FastRoute\Dispatcher`) ; son `dispatch()` renvoie un objet `Matched`, `MethodNotAllowed` ou `NotMatched` (propriétés `handler`, `variables`, `allowedMethods`) au lieu d'un tableau : l'accès `$result[0]` fonctionne encore mais est déprécié, utilisez `instanceof`
+    - une route invalide (route en double, paramètre répété, groupe capturant) lève `Studoo\EduRoute\BadRouteException` au lieu de `FastRoute\BadRouteException`, avec le même message ; `Route::getNameToPath()` la lève aussi pour une URI invalide. Elle est différente de `Studoo\EduFramework\Core\Exception\BadRouteException` (route inconnue, paramètre manquant), qui ne change pas
+
+**bug Fixes**
+
+- `routes.yaml` : une route mal décrite (clé `uri`, `controller` ou `httpMethod` absente, liste à la place d'un texte) lève une `ErrorConfigException` qui nomme la route (`La route <hello> du fichier routes.yaml est invalide : la clé 'controller' est absente…`, affiché en mode `dev`) au lieu d'une erreur PHP
+- `routes.yaml` : une valeur vide (`~` ou tiret orphelin) dans la liste `httpMethod` n'émet plus d'avertissement de dépréciation sous PHP 8.5
+
+**documentation**
+
+- update [Construire une page](build/controller-edu.md) : les trois clés d'une route
+
 ## v2.10.1 - 06/11/2026
 
 **bug Fixes**

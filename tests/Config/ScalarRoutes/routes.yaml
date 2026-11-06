@@ -1,0 +1,8 @@
+nombre:
+    uri: 404
+    controller: Controller\HomeController
+    httpMethod: [GET]
+index:
+    uri: /
+    controller: Controller\HomeController
+    httpMethod: GET

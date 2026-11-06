@@ -110,6 +110,14 @@ hello:
   httpMethod: [GET]
 ```
 
+!!! info "Les trois clés d'une route"
+
+    Chaque route doit définir `uri`, `controller` et `httpMethod`. La clé `httpMethod` contient une méthode HTTP
+    (`httpMethod: GET`) ou une liste de méthodes (`[GET, POST]`), écrites en **majuscules** : une route `[get]`
+    ne répond pas à une requête `GET` (erreur 405).
+    Si une clé manque, la page d'erreur affiche, en mode développement (`APP_ENV=dev`), un message qui nomme
+    la route : `La route <hello> du fichier routes.yaml est invalide : la clé 'controller' est absente…`
+
 Vous pouvez accéder à votre controller en tapant l'url suivante : [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
 Vous pouvez modifier le fichier des routes "app/Config/routes.yaml" pour changer l'url de votre controller.
