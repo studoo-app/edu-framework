@@ -26,6 +26,13 @@ class HttpErrorControllerTest extends TestCase
         TwigCore::setEnvironment();
     }
 
+    public function tearDown(): void
+    {
+        // Les controllers d'erreur positionnent le code HTTP (403, 404, 405, 500) :
+        // on le remet à 200 pour ne pas polluer les tests suivants
+        http_response_code(200);
+    }
+
     public function testPage404(): void
     {
         $html = (new HttpError404Controller())->execute(new Request('/inconnu', 'GET'));

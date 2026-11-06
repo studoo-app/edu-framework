@@ -34,7 +34,7 @@
   ,
   "require-dev": {
     "roave/security-advisories": "dev-latest",
-    "phpunit/phpunit": "^9"
+    "phpunit/phpunit": "^13"
   },
   "config": {
     "platform": {
