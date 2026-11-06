@@ -16,7 +16,7 @@ class StartCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new StartCommand());
+        $application->addCommand(new StartCommand());
         $command = $application->find("start");
         $this->commandeTester = new CommandTester($command);
     }

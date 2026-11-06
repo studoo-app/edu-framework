@@ -24,7 +24,7 @@ class DefaultCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new DefaultCommand());
+        $application->addCommand(new DefaultCommand());
         $command = $application->find("default");
         $this->commandeTester = new CommandTester($command);
     }

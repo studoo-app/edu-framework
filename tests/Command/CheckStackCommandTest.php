@@ -16,7 +16,7 @@ class CheckStackCommandTest extends TestCase
     {
         (new ConfigCore([]));
         $application = new Application(ConfigCore::getConfig('name'), ConfigCore::getConfig('version'));
-        $application->add(new CheckStackCommand());
+        $application->addCommand(new CheckStackCommand());
         $command = $application->find("check:config");
         $this->commandeTester = new CommandTester($command);
     }
