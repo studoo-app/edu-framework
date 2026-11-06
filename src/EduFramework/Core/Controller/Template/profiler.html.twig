@@ -188,6 +188,11 @@
             font-family: 'SFMono-Regular', Consolas, monospace;
             color: #333;
         }
+        #requestBody table.params-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'SFMono-Regular', Consolas, monospace; }
+        #requestBody table.params-table td { padding: 4px 8px; border: 1px solid #e0e0e0; vertical-align: top; word-break: break-all; }
+        #requestBody table.params-table td.param-key { width: 30%; background-color: #f5f5f5; color: #555; font-weight: 600; }
+        #requestBody table.params-table td.param-value pre { padding: 0; border: 0; background: none; }
+        #requestBody .params-empty { color: #999; font-style: italic; }
         #requestBody pre.error-message {
             background-color: #fbeceb;
             border-color: #e6b5b3;
@@ -619,7 +624,9 @@
                 var inline = Object.keys(context).map(function(key) {
                     if (key === 'execution_time_ms') { return key + ' => ' + prettyDuration(context[key]); }
                     if (key === 'memory_mb') { return key + ' => ' + prettyMemory(context[key]); }
-                    return key + ' => ' + context[key];
+                    // Variables GET / POST / session : objets affichés en JSON (et non [object Object])
+                    var value = context[key];
+                    return key + ' => ' + (value !== null && typeof value === 'object' ? JSON.stringify(value) : value);
                 }).join(', ');
                 var box = el('div', 'log-context');
                 box.appendChild(el('b', null, 'Contexte : '));
@@ -834,6 +841,29 @@
                 return tr;
             }
 
+            // Tableau clé / valeur des variables GET ou POST d'une requête
+            // (les valeurs imbriquées — tableaux — sont affichées en JSON)
+            function paramsTable(params) {
+                if (params === undefined || params === null || Object.keys(params).length === 0) {
+                    return el('span', 'params-empty', 'Aucune variable');
+                }
+                var table = el('table', 'params-table');
+                Object.keys(params).forEach(function (key) {
+                    var tr = el('tr');
+                    tr.appendChild(el('td', 'param-key', key));
+                    var td = el('td', 'param-value');
+                    var value = params[key];
+                    if (value !== null && typeof value === 'object') {
+                        td.appendChild(el('pre', null, JSON.stringify(value, null, 2)));
+                    } else {
+                        td.textContent = String(value);
+                    }
+                    tr.appendChild(td);
+                    table.appendChild(tr);
+                });
+                return table;
+            }
+
             function renderRequest(log) {
                 var body = $('requestBody');
                 body.innerHTML = '';
@@ -855,6 +885,9 @@
                 body.appendChild(requestRow('M\u00e9thode', methodBadge(e.method)));
                 body.appendChild(requestRow('Statut HTTP', el('span', 'status-badge ' + statusClass(e.status_code), e.status_code)));
                 body.appendChild(requestRow('URL', (e.path === undefined ? '\u2014' : e.path)));
+                body.appendChild(requestRow('Variables GET', paramsTable(e.get)));
+                body.appendChild(requestRow('Variables POST', paramsTable(e.post)));
+                body.appendChild(requestRow('Session (fin de requ\u00eate)', paramsTable(e.session)));
                 body.appendChild(requestRow('IP du client', (e.ip_port === undefined ? '\u2014' : e.ip_port)));
                 body.appendChild(requestRow('Serveur (SAPI)', sapiBadge(e.sapi)));
                 body.appendChild(requestRow('Dur\u00e9e', prettyDuration(e.execution_time_ms)));
