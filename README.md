@@ -32,13 +32,3 @@ L'état des pipelines de développement est disponible :
 | Edu Framework documentation | main    | [![Deploy](https://github.com/studoo-app/edu-framework-doc/actions/workflows/deploy.yml/badge.svg)](https://github.com/studoo-app/edu-framework-doc)               |
 | Edu Framework | v2.x    | [![Run test status](https://github.com/studoo-app/edu-framework/actions/workflows/testing.yml/badge.svg?branch=2.x)](https://github.com/studoo-app/edu-framework)  |
 
-## Dashboard 
-
-![Alt](https://repobeats.axiom.co/api/embed/a46fce2a15244cb1f57a05fa73692ee5253d4296.svg "Repobeats analytics image")
-
-## Teams Core Studoo
-
-| Role                      | Name             |
-|---------------------------|------------------|
-| Founder / Lead tech       | [Benoit Foujols](https://github.com/bfoujols)|
-|Lead dev| [Julien Pechberty](https://github.com/JPechberty) |
