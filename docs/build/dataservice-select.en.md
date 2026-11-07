@@ -26,7 +26,7 @@ You must enable the DatabaseService service to use a MySQL, MariaDB or SQLite da
 
 !!! info "Required reading"
 
-    You must have read the documentation on [DatabaseService: Data management](../boost/dataservice.md)
+    You must have read the documentation on [DatabaseService: Data management](dataservice.md)
 
     The DatabaseService service is enabled in the .env file of your project.
     ```diff
@@ -449,10 +449,10 @@ class VilleController implements ControllerInterface
 
 Explanations:
 
-- The `getHttpMethod()` method of the [Request](../boost/resquet.md) class makes it possible to tell displaying the page (`GET`) apart from submitting the form (`POST`).
-- The form data is retrieved with the `get()` method of the [Request](../boost/resquet.md) class.
+- The `getHttpMethod()` method of the [Request](resquet.md) class makes it possible to tell displaying the page (`GET`) apart from submitting the form (`POST`).
+- The form data is retrieved with the `get()` method of the [Request](resquet.md) class.
 - The identifier is initialized to `0`: the database will assign the real identifier during the `INSERT`.
-- The [Route](../boost/route.md) class generates the URL of the `ville` route from its name: if you change the route's URI, the redirection will follow automatically.
+- The [Route](route.md) class generates the URL of the `ville` route from its name: if you change the route's URI, the redirection will follow automatically.
 
 !!! info "The PRG (Post/Redirect/Get) pattern"
 
@@ -647,7 +647,7 @@ The edit form is pre-filled with the city's values. Update the "app/Template/vil
 {% endblock %}
 ```
 
-The Twig function `getNameToPath()` accepts route parameters as its second argument: `getNameToPath('villeupdate', {'id': ville.getId()})` generates the URL `/ville/42/update` for city no. 42. You can read the documentation of the [Route](../boost/route.md) class for more details.
+The Twig function `getNameToPath()` accepts route parameters as its second argument: `getNameToPath('villeupdate', {'id': ville.getId()})` generates the URL `/ville/42/update` for city no. 42. You can read the documentation of the [Route](route.md) class for more details.
 
 ### Adding the "Edit" link to the list
 
@@ -866,6 +866,6 @@ The CRUD of the `ville` entity is complete: you can create, read, update and del
 ## Going further
 
 - [Building an API](controller-edu-api.md): exposing the city CRUD as a REST API (JSON)
-- [DatabaseService - Data management](../boost/dataservice.md)
-- [Route - Generating a URL from its name](../boost/route.md)
-- [Request - Handling HTTP requests](../boost/resquet.md)
+- [DatabaseService - Data management](dataservice.md)
+- [Route - Generating a URL from its name](route.md)
+- [Request - Handling HTTP requests](resquet.md)

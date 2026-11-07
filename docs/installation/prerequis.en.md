@@ -242,7 +242,7 @@ Remove the semicolon to enable the extension.
 !!! warning "From version v2.3.0 onwards"
 
     The `pdo_sqlite` extension is required for the logging service,
-    the [debug bar and the profiler](../boost/debug-bar.md) to work.
+    the [debug bar and the profiler](../build/debug-bar.md) to work.
 
 To do this, open your php.ini file and uncomment the following line:
 
@@ -253,7 +253,7 @@ Remove the semicolon to enable the extension.
 
 #### excimer extension (optional)
 
-The `excimer` extension enables the debug bar's [code profiler](../boost/debug-bar.md#the-code-profiler).
+The `excimer` extension enables the debug bar's [code profiler](../build/debug-bar.md#the-code-profiler).
 It is already installed in the framework's Docker image. Outside Docker:
 
 ````Bash

@@ -195,4 +195,4 @@ The **Code** tab of the profiler displays the profile of a request without any f
 
 The **Code** block of the debug bar also displays a **mini-flamegraph**: clicking it opens it full size in the profiler.
 
-For more details, see the sections [The built-in flamegraph](../boost/debug-bar.md#the-built-in-flamegraph) and [Comparing two requests](../boost/debug-bar.md#comparing-two-requests).
+For more details, see the sections [The built-in flamegraph](../build/debug-bar.md#the-built-in-flamegraph) and [Comparing two requests](../build/debug-bar.md#comparing-two-requests).

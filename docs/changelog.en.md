@@ -56,7 +56,7 @@
 
 **documentation**
 
-- update [The debug bar and the profiler](boost/debug-bar.md): description of the `get`, `post` and `session` keys of a request log
+- update [The debug bar and the profiler](build/debug-bar.md): description of the `get`, `post` and `session` keys of a request log
 
 ## v2.9.1 - 05/11/2026
 
@@ -83,7 +83,7 @@
 
 **documentation**
 
-- update [The debug bar and the profiler](boost/debug-bar.md): new sections "The built-in flamegraph" and "Comparing two requests" (with screenshots), debug bar mini-flamegraph, API parameters `format=flame`, `order`, `compare`, `min` and `depth`
+- update [The debug bar and the profiler](build/debug-bar.md): new sections "The built-in flamegraph" and "Comparing two requests" (with screenshots), debug bar mini-flamegraph, API parameters `format=flame`, `order`, `compare`, `min` and `depth`
 - new [Migrating from version 2.8 to version 2.9](migrate/migration-2_8-2_9.md): updating the framework, Docker files (multi-stage `Dockerfile`, `docker-entrypoint.sh`, `.dockerignore`, `target` in `compose.yaml`), `.gitignore` (`.env.local`, `composer.lock`), `.gitattributes` for shell scripts, changes to how environment variables are loaded
 - new [Deploying your application](deploy/index.md): server preparation, `make:deploy`, environment variables, deployment, database import, shared folders, everyday commands, production image
 - update [The bin/edu command](installation/command-edu.md): `make:deploy` command
@@ -100,7 +100,7 @@
 
 - new [Features](features.md): all the framework's features grouped by learning topic, with the concept practised and its Symfony equivalent
 - new [Migrating from version 2.3 to version 2.8](migrate/migration-2_3-2_8.md): migration steps (backup and switch from MySQL to MariaDB, error templates, Twig cache, `.env` variables, Docker files), changes and new features in versions 2.4 to 2.8
-- update [The debug bar and the profiler](boost/debug-bar.md): new section "The code profiler" (installation, modes, reading the profile with screenshots, reading the flamegraph with Speedscope, API)
+- update [The debug bar and the profiler](build/debug-bar.md): new section "The code profiler" (installation, modes, reading the profile with screenshots, reading the flamegraph with Speedscope, API)
 - update [Installing with Docker](installation/docker.md): environment variables `EDU_PROFILER`, `EDU_PROFILER_KEEP` and `EDU_PROFILER_BUILD`
 - update [Prerequisites](installation/prerequis.md): installing the optional `excimer` extension outside Docker
 
@@ -116,7 +116,7 @@
 
 **documentation**
 
-- update [The debug bar and the profiler](boost/debug-bar.md): status-family filter tabs documented for the **Logs** and **Search** views (click to filter, active tab, syncing of the form's Status field)
+- update [The debug bar and the profiler](build/debug-bar.md): status-family filter tabs documented for the **Logs** and **Search** views (click to filter, active tab, syncing of the form's Status field)
 
 ## v2.7.2 - 17/10/2026
 
@@ -145,7 +145,7 @@
 
 - new [The application in Docker](installation/docker.md): architecture, start/stop, environment variables, ports and running several projects side by side, local HTTPS mode (self-signed certificate, `https://127.0.0.1` limitation), checking prerequisites in the container, troubleshooting
 - update [Starting the services](installation/start-services.md): MySQL becomes MariaDB, FrankenPHP service in the ports table, commands per version, link fixes
-- update [The debug bar and the profiler](boost/debug-bar.md): collection of all requests by `HttpRequestLogger` whatever the server (`sapi` key, execution time and memory per request), request token in the DevTool block, new request details page (`#request/{token}`), profiler available on both servers (`http://localhost:8042/_debug/profiler` and `https://localhost/_debug/profiler`), limitations (static files not logged, Docker network IP, FrankenPHP worker mode); list of development services (clickable URLs) in the DEV block
+- update [The debug bar and the profiler](build/debug-bar.md): collection of all requests by `HttpRequestLogger` whatever the server (`sapi` key, execution time and memory per request), request token in the DevTool block, new request details page (`#request/{token}`), profiler available on both servers (`http://localhost:8042/_debug/profiler` and `https://localhost/_debug/profiler`), limitations (static files not logged, Docker network IP, FrankenPHP worker mode); list of development services (clickable URLs) in the DEV block
 
 ## v2.6.3 - 15/10/2026
 
@@ -166,11 +166,11 @@
 - new [What is MVC?](build/concept-mvc.md): flowchart of a request's lifecycle with the actual classes (FastRouteCore, Controller, Repository, TwigCore)
 - update [How do I create a controller?](build/controller-edu.md): the static diagram is replaced by a flowchart of HelloController's lifecycle
 - new [Building the CRUD](build/dataservice-select.md): class diagram of VilleController / VilleRepository / Ville / DatabaseService
-- new [HTTP errors](boost/http-error.md): flowchart of the error pipeline with the dev/production branches
+- new [HTTP errors](build/http-error.md): flowchart of the error pipeline with the dev/production branches
 - update [How do I create a form?](build/controller-edu-post.md): sequence diagram of the PRG (Post/Redirect/Get) pattern
-- new [DatabaseService: data management](boost/dataservice.md): class diagram of the connection (mysql, mariadb, sqlite adapters)
-- new [The debug bar and the profiler](boost/debug-bar.md): flowchart of the flow from the logs to the profiler
-- new [Route: generating a URL from a route name](boost/route.md): flowchart of URL generation and of the BadRouteException
+- new [DatabaseService: data management](build/dataservice.md): class diagram of the connection (mysql, mariadb, sqlite adapters)
+- new [The debug bar and the profiler](build/debug-bar.md): flowchart of the flow from the logs to the profiler
+- new [Route: generating a URL from a route name](build/route.md): flowchart of URL generation and of the BadRouteException
 
 ## v2.6.1 - 15/10/2026
 
@@ -211,7 +211,7 @@
 - new [The make:entity command](installation/command-edu.md): generating an entity and its repository
 - update [Building the CRUD](build/dataservice-select.md): note on generating the files with `make:entity`
 - update [Installation](installation/installation.md): the framework settings (eduframe.yml)
-- new [HTTP errors](boost/http-error.md): 403/404/405/500 pages, customisation, `ErrorHttpStatusException`
+- new [HTTP errors](build/http-error.md): 403/404/405/500 pages, customisation, `ErrorHttpStatusException`
 
 > Release notes for v2.5.0
 >
@@ -236,10 +236,10 @@
 **documentation**
 
 - new [One controller, several routes](build/controller-edu.md): the `Controller\Class::method` syntax in the routes file
-- new [File handling (upload)](boost/resquet.md): uploading files in Request
+- new [File handling (upload)](build/resquet.md): uploading files in Request
 - update [The bin/edu command](installation/command-edu.md): `cache:clear` command
 - update [Installation](installation/installation.md): error on the routes file and case sensitivity on Linux
-- update [Route](boost/route.md): note on the `Controller\Class::method` syntax
+- update [Route](build/route.md): note on the `Controller\Class::method` syntax
 
 > Release notes for v2.4.0
 >
@@ -311,7 +311,7 @@
 **documentation**
 
 - new [Migrating from version 2.2 to version 2.3](migrate/migration-2_2-2_3.md)
-- new [The debug bar and the profiler](boost/debug-bar.md)
+- new [The debug bar and the profiler](build/debug-bar.md)
 - update [Start/Stop the application](installation/start-application.md): options of the `start` command
 - update [How to install the services](installation/start-services.md): MailPit and dbgate
 - update [Before you start](installation/prerequis.md): `pdo_sqlite` extension and PHP 8.4 minimum
@@ -423,7 +423,7 @@
 **documentation**
 
 - New interface and organisation by chapter
-- new [Request: handling HTTP requests](https://studoo-app.github.io/edu-framework/boost/resquet.html)
+- new [Request: handling HTTP requests](https://studoo-app.github.io/edu-framework/build/resquet/)
 - update [How to install EduFrame](https://studoo-app.github.io/edu-framework/build/index.html): New installation per version
 - update [How to install the services](https://studoo-app.github.io/edu-framework/installation/index.html): Docker refactoring
 - update [Directory structure](https://studoo-app.github.io/edu-framework/installation/index.html): New v2.0 structure

@@ -7,7 +7,7 @@ To handle a post in a controller, you need an HTML form in the twig file and som
 - Create a controller
 - Create a form in the twig file
 - Add processing in the controller
-- Understand how the [Request](../boost/resquet.md) class works to retrieve the form data
+- Understand how the [Request](resquet.md) class works to retrieve the form data
 
 ### Creating a controller
 
@@ -120,7 +120,7 @@ class VilleController implements ControllerInterface
 }
 ```
 
-In this example, we retrieve the city from the form in the controller with the `get($key)` method of the [Request](../boost/resquet.md#getkey) class.
+In this example, we retrieve the city from the form in the controller with the `get($key)` method of the [Request](resquet.md#getkey) class.
 
 <video controls>
 <source src="../assets/screen-form-simple.mp4" type="video/mp4">
@@ -197,9 +197,9 @@ We are going to use the `getNameToPath('NOM_ROUTE')` function in the "ville.html
 !!! info "Going further"
 
     To go further with generating URLs from the route name (routes with parameters, redirections, ...),
-    you can read the documentation of the [Route](../boost/route.md) class.
+    you can read the documentation of the [Route](route.md) class.
 
-    To understand how to handle HTTP requests, you can read the documentation of the [Request](../boost/resquet.md) class.
+    To understand how to handle HTTP requests, you can read the documentation of the [Request](resquet.md) class.
 
     To secure your form against CSRF attacks, you can read the documentation
     [Protecting a form (CSRF)](csrf.md).

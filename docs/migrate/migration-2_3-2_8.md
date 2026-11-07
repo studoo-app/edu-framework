@@ -234,7 +234,7 @@ Pour plus de détails, consulter la section [Un controller, plusieurs routes](..
 ### **Le téléversement de fichiers** (v2.4)
 L'objet `Request` gère les fichiers envoyés par un formulaire : `hasFile()`, `getFile()`, `getFiles()`, puis `isValid()`, `getExtension()` et `move()` sur chaque fichier.
 
-Pour plus de détails, consulter la page [La requête HTTP](../boost/resquet.md).
+Pour plus de détails, consulter la page [La requête HTTP](../build/resquet.md).
 
 ### **Le cache Twig et la commande cache:clear** (v2.4)
 Les templates compilés sont stockés dans `var/cache/twig` et recompilés automatiquement lorsqu'ils sont modifiés. La commande `php bin/edu cache:clear` supprime le cache de l'application.
@@ -262,4 +262,4 @@ La barre de debug et le profiler s'enrichissent :
 - **services de développement** (Mailpit, DbGate, phpMyAdmin, ...) listés avec leurs URLs dans le bloc DEV (v2.7) ;
 - **profiler de code** : temps passé dans chaque fonction PHP, export en flamegraph (v2.8).
 
-Pour plus de détails, consulter la page [La barre de debug et le profiler](../boost/debug-bar.md).
+Pour plus de détails, consulter la page [La barre de debug et le profiler](../build/debug-bar.md).

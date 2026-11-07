@@ -82,7 +82,7 @@ The function generates the hidden token field:
 ### Step 2: validation in the controller
 
 When processing the form, validate the token with the `isCsrfTokenValid()` method
-of the [Request](../boost/resquet.md) class, using **the same route name**:
+of the [Request](resquet.md) class, using **the same route name**:
 
 ```diff
  public function execute(Request $request): string|null
@@ -103,7 +103,7 @@ of the [Request](../boost/resquet.md) class, using **the same route name**:
     in the controller must be **identical**, otherwise the submission is always rejected (403).
 
 If the token is invalid, the `ErrorHttpStatusException` class triggers the
-[HTTP 403 error](../boost/http-error.md) page through the framework's error pipeline.
+[HTTP 403 error](http-error.md) page through the framework's error pipeline.
 If the token is valid, it is immediately **renewed** for the next submission.
 
 !!! tip "Tip"

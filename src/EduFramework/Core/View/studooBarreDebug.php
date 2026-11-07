@@ -416,7 +416,7 @@ HTML;
                     'Documentation' => 'Installer le profiler',
                 ],
                 'edu-tb-code missing',
-                'https://studoo-app.github.io/edu-framework/boost/debug-bar.html'
+                'https://studoo-app.github.io/edu-framework/build/debug-bar/'
             );
         }
 

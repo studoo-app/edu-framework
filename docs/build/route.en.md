@@ -23,7 +23,7 @@ This feature is available from version **v2.1.0**.
 
 !!! info "Several methods in the same controller"
 
-    Since version **v2.4.0**, the `controller` key in the `app/Config/routes.yaml` file can point to a specific controller method using the syntax `Controller\MedecinController::index` (see [One controller, several routes](../build/controller-edu.md#one-controller-several-routes-several-methods)).
+    Since version **v2.4.0**, the `controller` key in the `app/Config/routes.yaml` file can point to a specific controller method using the syntax `Controller\MedecinController::index` (see [One controller, several routes](controller-edu.md#one-controller-several-routes-several-methods)).
 
     This changes nothing for `getNameToPath()`: URL generation relies only on the route's **name** and `uri`.
 

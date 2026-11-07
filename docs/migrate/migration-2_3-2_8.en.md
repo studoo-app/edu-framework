@@ -234,7 +234,7 @@ For more details, see the [One controller, several routes](../build/controller-e
 ### **File uploads** (v2.4)
 The `Request` object handles files sent by a form: `hasFile()`, `getFile()`, `getFiles()`, then `isValid()`, `getExtension()` and `move()` on each file.
 
-For more details, see the [The HTTP request](../boost/resquet.md) page.
+For more details, see the [The HTTP request](../build/resquet.md) page.
 
 ### **Twig cache and the cache:clear command** (v2.4)
 Compiled templates are stored in `var/cache/twig` and automatically recompiled when they are modified. The `php bin/edu cache:clear` command deletes the application cache.
@@ -262,4 +262,4 @@ The debug bar and the profiler get richer:
 - **development services** (Mailpit, DbGate, phpMyAdmin, ...) listed with their URLs in the DEV block (v2.7);
 - **code profiler**: time spent in each PHP function, flamegraph export (v2.8).
 
-For more details, see the [The debug bar and the profiler](../boost/debug-bar.md) page.
+For more details, see the [The debug bar and the profiler](../build/debug-bar.md) page.

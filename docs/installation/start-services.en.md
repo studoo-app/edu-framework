@@ -114,7 +114,7 @@ The services are ready to use. You can now start your Edu Framework application.
     It provides two preconfigured connections:
 
     - **MySql**: server `database`, user `root`, password `studoo` (database `app_db`)
-    - **SQLite**: file `var/logs/core_logs.sqlite` (request logs, also available from the [profiler](../boost/debug-bar.md#the-profiler))
+    - **SQLite**: file `var/logs/core_logs.sqlite` (request logs, also available from the [profiler](../build/debug-bar.md#the-profiler))
 
 !!! info 
     
