@@ -70,13 +70,13 @@ class HelloController implements ControllerInterface
 
 We can see that the HelloController controller implements the ControllerInterface interface. 
 
-The `execute()` method takes an object of type [Request](../boost/resquet.md) as a parameter and returns a character string (string) or null.
+The `execute()` method takes an object of type [Request](resquet.md) as a parameter and returns a character string (string) or null.
 The view layer is handled by the Twig template engine. We use the `render()` method of the TwigCore class to display the "hello/hello.html.twig" template.
 Two variables are passed to the template: "titre" and "request".
 
 !!! info
 
-    To go further, you can read the documentation of the [Request](../boost/resquet.md) class to understand how to handle HTTP requests.
+    To go further, you can read the documentation of the [Request](resquet.md) class to understand how to handle HTTP requests.
 
 
 ### The hello.html.twig file
@@ -198,7 +198,7 @@ class MedecinController
 A method called by a route must:
 
 - be **public** and **non-static**,
-- have a parameter of type [Request](../boost/resquet.md),
+- have a parameter of type [Request](resquet.md),
 - return a character string (`string`) or `null`.
 
 If one of these rules is not followed, an `ErrorControllerException` exception is thrown with an explicit message.

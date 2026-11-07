@@ -102,7 +102,7 @@ They are therefore no longer accessible when `APP_ENV=prod`. If your application
 ### **The debug bar and the profiler**
 In development mode (`APP_ENV=dev`), a **debug bar** is displayed at the bottom of each page (HTTP status, route, execution time, memory, DEV, ...) and a **profiler page** lets you browse the history of HTTP requests.
 
-For more details, see the page [The debug bar and the profiler](../boost/debug-bar.md).
+For more details, see the page [The debug bar and the profiler](../build/debug-bar.md).
 
 ### **The options of the start command**
 The `start` command accepts new options to adapt the startup to your needs:

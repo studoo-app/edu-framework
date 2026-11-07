@@ -94,7 +94,7 @@ Pour aller plus loin : [Le concept d'architecture MVC](build/concept-mvc.md) et 
 | **L'objet `Request`** | Lire les paramètres, la méthode HTTP, les en-têtes et les fichiers envoyés | `Symfony\Component\HttpFoundation\Request` |
 | **Téléversement de fichiers** (`hasFile()`, `getFile()`, `move()`) | Recevoir, valider et ranger un fichier envoyé par un formulaire | `UploadedFile` |
 
-Pour aller plus loin : [Construire une page](build/controller-edu.md), [Request](boost/resquet.md) et [Générer une URL par le nom](boost/route.md).
+Pour aller plus loin : [Construire une page](build/controller-edu.md), [Request](build/resquet.md) et [Générer une URL par le nom](build/route.md).
 
 ## Les vues
 
@@ -115,7 +115,7 @@ Pour aller plus loin : [Construire une page](build/controller-edu.md) et [Constr
 | **Le CRUD** | Créer, lire, modifier et supprimer des données, de la base jusqu'au formulaire | `make:crud` |
 | **Le pattern PRG** (*Post/Redirect/Get*) | Rediriger après un formulaire pour éviter le double envoi | Même pattern (`redirectToRoute()`) |
 
-Pour aller plus loin : [DatabaseService](boost/dataservice.md) et [Construire le CRUD](build/dataservice-select.md).
+Pour aller plus loin : [DatabaseService](build/dataservice.md) et [Construire le CRUD](build/dataservice-select.md).
 
 ## Les API
 
@@ -156,7 +156,7 @@ Edu Framework est utilisé dans des travaux pratiques de cybersécurité : volon
 | **Messages d'erreur masqués en production** | Fuite d'informations techniques | Pages d'erreur de production |
 | **Routes de debug uniquement en `dev`** | Exposition d'outils internes | Profiler désactivé en production |
 
-Pour aller plus loin : [Protéger un formulaire (CSRF)](build/csrf.md) et [Les erreurs HTTP](boost/http-error.md).
+Pour aller plus loin : [Protéger un formulaire (CSRF)](build/csrf.md) et [Les erreurs HTTP](build/http-error.md).
 
 ## La gestion des erreurs
 
@@ -166,7 +166,7 @@ Pour aller plus loin : [Protéger un formulaire (CSRF)](build/csrf.md) et [Les e
 | **`ErrorHttpStatusException`** | Lever une erreur HTTP depuis un controller (Exemple : accès interdit) | `HttpException`, `createAccessDeniedException()` |
 | **Message de l'exception en mode dev** | Lire une erreur pour la corriger, sans l'exposer en production | Page d'exception du mode dev |
 
-Pour aller plus loin : [Les erreurs HTTP](boost/http-error.md).
+Pour aller plus loin : [Les erreurs HTTP](build/http-error.md).
 
 ## Le débogage et la performance
 
@@ -179,7 +179,7 @@ En mode développement (`APP_ENV=dev`), Edu Framework fournit des outils inspir�
 | **Requêtes SQL par requête HTTP** | Repérer une requête SQL lente ou répétée (problème « N+1 ») | Panneau Doctrine du profiler |
 | **Profiler de code** (Excimer, flamegraph intégré) | Mesurer le temps passé dans chaque fonction, lire et comparer des flamegraphs | Blackfire, panneau *Performance* |
 
-Pour aller plus loin : [La barre de debug et le profiler](boost/debug-bar.md).
+Pour aller plus loin : [La barre de debug et le profiler](build/debug-bar.md).
 
 ## Les mails
 
@@ -216,8 +216,7 @@ Pour aller plus loin : [Démarrer les services](installation/start-services.md),
 La documentation est organisée comme un parcours progressif :
 
 1. **[Démarrer](installation/index.md)** : installer l'environnement, créer et lancer son projet.
-2. **[Construire](build/index.md)** : une page, un formulaire, le CRUD, une commande CLI, une API.
-3. **[Consolider](boost/index.md)** : approfondir la requête, les données, les routes, les erreurs et le débogage.
+2. **[Construire](build/index.md)** : une page, un formulaire, le CRUD, une commande CLI, une API, puis approfondir la requête, les données, les routes, les erreurs et le débogage.
 
 Les objectifs pédagogiques de chaque étape sont détaillés dans la page [Objectifs pédagogiques](about.md).
 

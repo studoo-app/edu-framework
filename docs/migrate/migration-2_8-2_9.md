@@ -195,4 +195,4 @@ L'onglet **Code** du profiler affiche le profil d'une requête sans fichier à t
 
 Le bloc **Code** de la barre de debug affiche aussi un **mini-flamegraph** : un clic l'ouvre en grand dans le profiler.
 
-Pour plus de détails, consulter les sections [Le flamegraph intégré](../boost/debug-bar.md#le-flamegraph-integre) et [Comparer deux requêtes](../boost/debug-bar.md#comparer-deux-requetes).
+Pour plus de détails, consulter les sections [Le flamegraph intégré](../build/debug-bar.md#le-flamegraph-integre) et [Comparer deux requêtes](../build/debug-bar.md#comparer-deux-requetes).

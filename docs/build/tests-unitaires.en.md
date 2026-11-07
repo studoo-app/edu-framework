@@ -485,7 +485,7 @@ Explanations:
 
 - `setUp()` is run by PHPUnit **before each test**: the table is dropped and then recreated with exactly 2 cities.
   The `testCreateVilleAjouteUneVilleEnBase` test adds a city, but the next test will still start again from 2 cities: the tests are **independent**.
-- `$_ENV['DB_TYPE']` and `$_ENV['DB_NAME']` replace the `.env` file: the [DatabaseService](../boost/dataservice.md) service connects to `var/sqlite/test.sqlite`.
+- `$_ENV['DB_TYPE']` and `$_ENV['DB_NAME']` replace the `.env` file: the [DatabaseService](dataservice.md) service connects to `var/sqlite/test.sqlite`.
 - There is also `tearDown()`, run **after each test** (Example: deleting a file created by the test).
 
 !!! warning "Test database and .gitignore"
@@ -503,7 +503,7 @@ Explanations:
 
 ## Step 7: testing a controller
 
-A controller returns the HTML code of the page. To test it, you **simulate the HTTP request** with a [Request](../boost/resquet.md) object, call the controller, then check the resulting HTML.
+A controller returns the HTML code of the page. To test it, you **simulate the HTTP request** with a [Request](resquet.md) object, call the controller, then check the resulting HTML.
 
 Example with the `UserController` controller of the `/user/{id}` route:
 

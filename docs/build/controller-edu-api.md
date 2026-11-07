@@ -123,7 +123,7 @@ class HelloController implements ControllerInterface
 Plusieurs points sont à observer dans ce controller :
 
 - Le **namespace** est `Controller\api` : les controllers d'API sont séparés des controllers "web" (namespace `Controller`).
-- Comme tout controller, il **implémente l'interface `ControllerInterface`** et sa méthode `execute()` prend en paramètre un objet [Request](../boost/resquet.md) et retourne une chaîne de caractères (string) ou null.
+- Comme tout controller, il **implémente l'interface `ControllerInterface`** et sa méthode `execute()` prend en paramètre un objet [Request](resquet.md) et retourne une chaîne de caractères (string) ou null.
 - La fonction native `header('Content-Type: application/json')` indique au client que la réponse est au format JSON.
 - La fonction native `json_encode()` transforme un tableau PHP en chaîne JSON.
 - Il n'y a **pas de vue Twig** : la chaîne JSON renvoyée par `json_encode()` est directement la réponse.
@@ -248,7 +248,7 @@ Le controller généré contient des données d'exemple (`$listTest`). Les secti
 !!! info "Objectif"
 
     - Création du fichier de base via la commande `make:api`
-    - Remplacer les données d'exemple par les villes issues de la base de données via [DatabaseService](../boost/dataservice.md)
+    - Remplacer les données d'exemple par les villes issues de la base de données via [DatabaseService](dataservice.md)
     - Tester l'API avec curl
 
 **Prérequis :**
@@ -340,7 +340,7 @@ Content-Type: application/json
 !!! info "Objectif"
 
     - Créer une API qui renvoie **une seule ville** à partir de son identifiant : `GET /api/ville/{id}`
-    - Récupérer un paramètre de route avec la classe [Request](../boost/resquet.md)
+    - Récupérer un paramètre de route avec la classe [Request](resquet.md)
     - Documenter le paramètre avec l'attribut OpenAPI `Parameter`
 
 En REST, il est d'usage d'exposer une ressource unique sous la forme `/api/ville/{id}`.
@@ -411,7 +411,7 @@ class VilleDetailController implements ControllerInterface
 
 Explications :
 
-- Le paramètre dynamique `{id}` de la route est récupéré avec la méthode `get()` de la classe [Request](../boost/resquet.md), comme dans le [CRUD de ville](dataservice-select.md).
+- Le paramètre dynamique `{id}` de la route est récupéré avec la méthode `get()` de la classe [Request](resquet.md), comme dans le [CRUD de ville](dataservice-select.md).
 - La requête utilise une requête préparée avec le paramètre `:id` pour éviter l'injection SQL.
 - La fonction native `http_response_code(404)` permet de renvoyer un code HTTP d'erreur avec un corps JSON explicite.
 - L'attribut `#[Attributes\Parameter(...)]` documente le paramètre de chemin pour OpenAPI.
@@ -517,8 +517,8 @@ class VilleController implements ControllerInterface
 
 Explications :
 
-- La méthode `getHttpMethod()` de la classe [Request](../boost/resquet.md#gethttpmethod) permet de distinguer le traitement du `GET` (liste) et du `POST` (création).
-- Les données envoyées par le client sont récupérées avec la méthode `get()` de la classe [Request](../boost/resquet.md#getkey).
+- La méthode `getHttpMethod()` de la classe [Request](resquet.md#gethttpmethod) permet de distinguer le traitement du `GET` (liste) et du `POST` (création).
+- Les données envoyées par le client sont récupérées avec la méthode `get()` de la classe [Request](resquet.md#getkey).
 - La fonction native `http_response_code(201)` renvoie le code HTTP `201 Created`, convention REST pour une création réussie.
 - L'attribut `#[Attributes\Post(path: '...')]` documente la nouvelle opération pour OpenAPI.
 
@@ -542,7 +542,7 @@ Content-Type: application/json
 
 !!! info "Corps de requête au format JSON"
 
-    La classe [Request](../boost/resquet.md) lit les données de formulaire (type `application/x-www-form-urlencoded`, comme celles envoyées par curl ou un formulaire HTML).
+    La classe [Request](resquet.md) lit les données de formulaire (type `application/x-www-form-urlencoded`, comme celles envoyées par curl ou un formulaire HTML).
     Si votre client envoie directement un corps JSON (type `application/json`, fréquent avec Postman ou un frontend JavaScript), les données se lisent ainsi :
 
     ```php
@@ -623,9 +623,9 @@ Ce fichier peut ensuite être visualisé dans des outils comme [Swagger Editor](
 
 # Pour aller plus loin
 
-- [Request - La gestion des requêtes HTTP](../boost/resquet.md)
-- [Route - Générer une URL par le nom](../boost/route.md)
-- [DatabaseService - La gestion des données](../boost/dataservice.md)
+- [Request - La gestion des requêtes HTTP](resquet.md)
+- [Route - Générer une URL par le nom](route.md)
+- [DatabaseService - La gestion des données](dataservice.md)
 - [Le CRUD de "VILLE" complet](dataservice-select.md)
 - [La documentation de swagger-php](https://github.com/zircote/swagger-php){:target="_blank"}
 - [La spécification OpenAPI](https://swagger.io/specification/){:target="_blank"}

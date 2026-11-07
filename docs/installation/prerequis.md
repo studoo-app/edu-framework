@@ -242,7 +242,7 @@ Enlever le point-virgule pour activer l'extension.
 !!! warning "A partir de la version v2.3.0"
 
     L'extension `pdo_sqlite` est nécessaire au fonctionnement du service de logs,
-    de la [barre de debug et du profiler](../boost/debug-bar.md).
+    de la [barre de debug et du profiler](../build/debug-bar.md).
 
 Pour cela, vous devez ouvrir votre fichier php.ini et décommenter la ligne suivante :
 
@@ -253,7 +253,7 @@ Enlever le point-virgule pour activer l'extension.
 
 #### excimer extension (optionnelle)
 
-L'extension `excimer` active le [profiler de code](../boost/debug-bar.md#le-profiler-de-code) de la barre de debug.
+L'extension `excimer` active le [profiler de code](../build/debug-bar.md#le-profiler-de-code) de la barre de debug.
 Elle est déjà installée dans l'image Docker du framework. Hors Docker :
 
 ````Bash
