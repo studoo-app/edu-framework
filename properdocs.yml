@@ -122,6 +122,17 @@ plugins:
   - offline:
       enabled: !ENV [OFFLINE, false]
   - search
+  # Documentation bilingue : page.md (français, par défaut) et page.en.md (anglais, servi sous /en/)
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: fr
+          default: true
+          name: Français
+          build: true
+        - locale: en
+          name: English
+          build: true
   - literate-nav:
       nav_file: _summary.md
   - git-committers:
@@ -132,3 +143,7 @@ plugins:
 
 extra_css:
   - stylesheets/extra.css
+
+# Met à jour le sélecteur de langue FR / EN à chaque page (navigation.instant)
+extra_javascript:
+  - javascripts/i18n-switcher.js
