@@ -6,3 +6,8 @@
 .md-typeset [type="checkbox"]:checked + .task-list-indicator:before {
     background-color: #c3c3c3;
 }
+
+/* Contenu en pleine largeur : le thème Material limite .md-grid à 61rem */
+.md-grid {
+    max-width: initial;
+}
