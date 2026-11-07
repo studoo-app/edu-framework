@@ -2,6 +2,20 @@
 
 **Overview of the Edu Framework releases**
 
+## v2.12.0 - 07/11/2026
+
+**features**
+
+- [#197](https://github.com/studoo-app/edu-framework/pull/197) New `php bin/edu routes:list` command: lists the routes of `app/Config/routes.yaml` (method, URI, controller, name), one row per HTTP method; the `--method` option filters on one HTTP method
+
+**maintenance**
+
+- Routing: `studoo/edu-route` is upgraded to `^1.1` (list of declared routes). The route name (key of `routes.yaml`) is now passed to the routing engine; `FastRouteCore::addRoute()` takes an optional fourth `$name` parameter and `FastRouteCore::declaredRoutes()` returns the declared routes
+
+**documentation**
+
+- update [The bin/edu command](installation/command-edu.md): `routes:list` command
+
 ## v2.11.0 - 06/11/2026
 
 **maintenance**

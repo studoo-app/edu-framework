@@ -17,6 +17,7 @@ use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
 use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
 use Studoo\EduRoute\DataGenerator\MarkBased as MarkBasedDataGenerator;
+use Studoo\EduRoute\DeclaredRoute;
 use Studoo\EduRoute\Dispatcher;
 use Studoo\EduRoute\Dispatcher\MarkBased as MarkBasedDispatcher;
 use Studoo\EduRoute\Dispatcher\Result\Matched;
@@ -77,7 +78,9 @@ class FastRouteCore
         if (is_array($fileData)) {
             foreach ($fileData as $routeName => $routeConfig) {
                 [$httpMethod, $uri, $controller] = $this->readRouteConfig($routeName, $routeConfig);
-                $this->addRoute($httpMethod, $uri, $controller);
+                // Le nom de la route (clé du fichier routes.yaml) est transmis au moteur de routage
+                // pour l'afficher dans la commande routes:list
+                $this->addRoute($httpMethod, $uri, $controller, is_string($routeName) ? $routeName : null);
             }
         }
 
@@ -147,14 +150,32 @@ class FastRouteCore
      *        Deux formes possibles :
      *          - "Controller\MedecinController" : appel de la méthode execute() par défaut
      *          - "Controller\MedecinController::index" : appel de la méthode index()
+     * @param string|null         $name Nom de la route (clé du fichier routes.yaml), null si elle n'est pas nommée
      * @return $this
      * @throws ErrorConfigException Si une méthode HTTP est une liste ou un objet
      */
-    public function addRoute(string|array $httpMethod, string $uri, string $controller): self
+    public function addRoute(string|array $httpMethod, string $uri, string $controller, ?string $name = null): self
     {
-        $this->routeCollector->addRoute($this->normalizeHttpMethods($httpMethod, $uri), $uri, $controller);
+        $extraParameters = ($name !== null && $name !== '') ? [RouteCollector::ROUTE_NAME => $name] : [];
+        $this->routeCollector->addRoute(
+            $this->normalizeHttpMethods($httpMethod, $uri),
+            $uri,
+            $controller,
+            $extraParameters
+        );
 
         return $this;
+    }
+
+    /**
+     * Methode pour récupérer la liste des routes déclarées, dans l'ordre de déclaration
+     * Une entrée par méthode HTTP : une route [GET, POST] donne deux entrées
+     * Utilisée par la commande routes:list
+     * @return list<DeclaredRoute>
+     */
+    public function declaredRoutes(): array
+    {
+        return $this->routeCollector->declaredRoutes();
     }
 
     /**
