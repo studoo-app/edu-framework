@@ -139,6 +139,7 @@ The `php bin/edu` command gathers the developer's tools, like `bin/console` in S
 | `make:api` | Generates a documented API controller | `make:controller` + API Platform |
 | `make:command` | Generates a CLI command | `make:command` |
 | `cache:clear` | Clears the application cache | `cache:clear` |
+| `routes:list` | Lists the application routes (`--method` to filter) | `debug:router` |
 
 Building your own commands is also a way to approach automation, and the use of a CLI tool by an AI agent.
 

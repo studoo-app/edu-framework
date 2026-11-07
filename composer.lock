@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8391882fe11db48698bda144cb9e3a7",
+    "content-hash": "0620c91938fe06c0001c06ef3d0bc78a",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -625,16 +625,16 @@
         },
         {
             "name": "studoo/edu-route",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/studoo-app/eduRoute.git",
-                "reference": "90d7fad258669898a3733a487920ef07178b0938"
+                "reference": "5b19430cc6a6933cbd54df5eeacc64ac64e7a8e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/studoo-app/eduRoute/zipball/90d7fad258669898a3733a487920ef07178b0938",
-                "reference": "90d7fad258669898a3733a487920ef07178b0938",
+                "url": "https://api.github.com/repos/studoo-app/eduRoute/zipball/5b19430cc6a6933cbd54df5eeacc64ac64e7a8e8",
+                "reference": "5b19430cc6a6933cbd54df5eeacc64ac64e7a8e8",
                 "shasum": ""
             },
             "require": {
@@ -663,7 +663,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.0-dev"
+                    "dev-main": "1.1-dev"
                 }
             },
             "autoload": {
@@ -671,12 +671,7 @@
                     "Studoo\\EduRoute\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Studoo\\EduRoute\\Benchmark\\": "benchmark/",
-                    "Studoo\\EduRoute\\Test\\": "test/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -700,10 +695,11 @@
                 "routing"
             ],
             "support": {
-                "source": "https://github.com/studoo-app/eduRoute/tree/v1.0.0",
-                "issues": "https://github.com/studoo-app/eduRoute/issues"
+                "issues": "https://github.com/studoo-app/eduRoute/issues",
+                "source": "https://github.com/studoo-app/eduRoute/tree/v1.1.0"
             },
-            "time": "2026-11-06T19:39:56+00:00"
+            "time": "2026-11-07T13:28:20+00:00",
+            "published-time": "2026-11-07T13:28:28+00:00"
         },
         {
             "name": "symfony/console",
