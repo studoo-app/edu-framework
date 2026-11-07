@@ -78,17 +78,11 @@ public function testUneVilleDeMoinsDe100000HabitantsNestPasUneGrandeVille(): voi
 
     Think about **edge cases**: the value just below, exactly equal to and just above a limit, an empty string, an empty list...
 
-## Step 1: installing PHPUnit
+## Step 1: checking that PHPUnit is installed
 
-PHPUnit is installed with Composer, as a **development dependency** (`--dev`): it will not be installed on the production server.
+A project created with `composer create-project studoo/edu-framework-skeleton` **already** contains PHPUnit: it is declared in the `require-dev` section of the `composer.json` file, as a **development dependency**. It is therefore not installed on the production server.
 
-Type this command at the root of your project:
-
-```Bash
-composer require --dev phpunit/phpunit
-```
-
-Check the installation:
+Check the installation at the root of your project:
 
 ```Bash
 php vendor/bin/phpunit --version
@@ -97,15 +91,33 @@ php vendor/bin/phpunit --version
 !!! note "Example output"
 
     ```Bash
-    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
+    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+    ```
+
+??? failure "The command cannot be found (`Could not open input file`)"
+
+    The dependencies are not installed: run `composer install`.
+
+    If the `composer.json` file does not contain `phpunit/phpunit` in `require-dev` (older project, or a project created without the skeleton), install PHPUnit:
+
+    ```Bash
+    composer require --dev phpunit/phpunit
     ```
 
 !!! info "PHPUnit version"
 
-    This documentation uses PHPUnit 13 (PHP 8.4 minimum). The examples use **PHP attributes** (`#[DataProvider]`):
+    The examples on this page work with PHPUnit 11 (provided by the skeleton) as well as with PHPUnit 12 and 13. They use **PHP attributes** (`#[DataProvider]`):
     the old annotations in comments (`@dataProvider`) are no longer recognized since PHPUnit 12.
 
 ## Step 2: configuring the project
+
+The skeleton already provides the `tests` folder and the `phpunit.xml` and `tests/bootstrap.php` files, but their configuration is **minimal**: you must complete them to be able to test controllers and repositories.
+
+| File | Provided by the skeleton | To do |
+|---|---|---|
+| `composer.json` | without the `autoload-dev` section | add `autoload-dev` |
+| `phpunit.xml` | only loads `vendor/autoload.php`, old `<coverage>` format | replace the content |
+| `tests/bootstrap.php` | only loads `vendor/autoload.php` | replace the content |
 
 ### The tests tree
 
@@ -163,7 +175,7 @@ composer dump-autoload
 
 ### The phpunit.xml file
 
-Create the `phpunit.xml` file at the root of the project. It tells PHPUnit where the tests are and which file to run before running them.
+Replace the content of the `phpunit.xml` file at the root of the project (create it if it does not exist). It tells PHPUnit where the tests are and which file to run before running them.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -184,10 +196,17 @@ Create the `phpunit.xml` file at the root of the project. It tells PHPUnit where
 </phpunit>
 ```
 
+The two changes compared to the skeleton's file:
+
+- `bootstrap="tests/bootstrap.php"` instead of `vendor/autoload.php`: PHPUnit runs the file that configures the framework (see below)
+- the `<source>` section replaces the old `<coverage>` section, which triggers the `PHPUnit Deprecations: 1` warning since PHPUnit 11
+
 ### The tests/bootstrap.php file
 
 During a test, the `public/index.php` file is **not** executed: there is no web server and no browser.
 The `tests/bootstrap.php` file replaces `public/index.php`: it loads the libraries and configures the framework (paths to the templates, the routes, the SQLite database).
+
+Replace the content of the `tests/bootstrap.php` file:
 
 ```php
 <?php
@@ -309,7 +328,7 @@ php vendor/bin/phpunit
 !!! success "All tests pass"
 
     ```Bash
-    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
+    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
 
     ..                                                                  2 / 2 (100%)
 
@@ -538,7 +557,7 @@ Explanations:
 
 ## Your turn
 
-- [ ] Install PHPUnit and create the `phpunit.xml` and `tests/bootstrap.php` files
+- [ ] Check that PHPUnit is installed, add `autoload-dev` and complete the `phpunit.xml` and `tests/bootstrap.php` files
 - [ ] Write the `VilleTest` test and make it pass
 - [ ] Deliberately break `estGrandeVille()` and check that the test fails
 - [ ] Write a test for the repository's `getVille(int $id)` method: an existing city, then a non-existent identifier (the expected result is `false`)
