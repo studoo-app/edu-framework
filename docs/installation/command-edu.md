@@ -40,7 +40,7 @@ Voici les commandes disponibles par version :
 | make:entity     | génération d'une entité et son repository     | v2.5.0                 |
 | cache:clear     | suppression du cache de l'application        | v2.4.0                 |
 | make:deploy     | génération de la configuration de déploiement | v2.9.0                 |
-| routes:list     | liste des routes de l'application             | Unreleased             |
+| routes:list     | liste des routes de l'application             | v2.12.0                |
 
 !!! info "Pour aller plus loin"
 

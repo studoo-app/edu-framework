@@ -40,7 +40,7 @@ Here are the available commands by version:
 | make:entity     | generates an entity and its repository        | v2.5.0                 |
 | cache:clear     | deletes the application cache                 | v2.4.0                 |
 | make:deploy     | generates the deployment configuration        | v2.9.0                 |
-| routes:list     | lists the application routes                  | Unreleased             |
+| routes:list     | lists the application routes                  | v2.12.0                |
 
 !!! info "Going further"
 

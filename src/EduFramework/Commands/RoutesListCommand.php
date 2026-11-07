@@ -41,6 +41,10 @@ use Symfony\Component\Yaml\Exception\ParseException;
 )]
 class RoutesListCommand extends CommandManage
 {
+    /**
+     * Configuration de la commande : option --method pour filtrer sur une méthode HTTP
+     * @return void
+     */
     protected function configure(): void
     {
         $this->addOption(
@@ -51,9 +55,15 @@ class RoutesListCommand extends CommandManage
         );
     }
 
+    /**
+     * Affiche la liste des routes déclarées dans le fichier routes.yaml
+     * @param InputInterface  $input  Interface d'entrée
+     * @param OutputInterface $output Interface de sortie
+     * @return int Command::SUCCESS ou Command::FAILURE si le fichier des routes est absent ou invalide
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        self::$stdOutput->writeln([
+        $output->writeln([
             CommandBanner::getBanner(),
             'Liste des routes de l\'application',
             ''

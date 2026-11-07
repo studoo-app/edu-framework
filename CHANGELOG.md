@@ -2,11 +2,11 @@
 
 **Overview of the Edu Framework releases**
 
-## Unreleased
+## v2.12.0 - 07/11/2026
 
 **features**
 
-- New `php bin/edu routes:list` command: lists the routes of `app/Config/routes.yaml` (method, URI, controller, name), one row per HTTP method; the `--method` option filters on one HTTP method
+- [#197](https://github.com/studoo-app/edu-framework/pull/197) New `php bin/edu routes:list` command: lists the routes of `app/Config/routes.yaml` (method, URI, controller, name), one row per HTTP method; the `--method` option filters on one HTTP method
 
 **maintenance**
 

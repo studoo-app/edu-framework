@@ -2,11 +2,11 @@
 
 **Présentation des versions du framework Edu Framework**
 
-## Unreleased
+## v2.12.0 - 07/11/2026
 
 **features**
 
-- Nouvelle commande `php bin/edu routes:list` : liste les routes de `app/Config/routes.yaml` (méthode, URI, contrôleur, nom), une ligne par méthode HTTP ; l'option `--method` filtre sur une méthode HTTP
+- [#197](https://github.com/studoo-app/edu-framework/pull/197) Nouvelle commande `php bin/edu routes:list` : liste les routes de `app/Config/routes.yaml` (méthode, URI, contrôleur, nom), une ligne par méthode HTTP ; l'option `--method` filtre sur une méthode HTTP
 
 **maintenance**
 

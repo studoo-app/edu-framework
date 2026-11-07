@@ -9,8 +9,17 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * Tests de la commande routes:list (liste des routes du fichier routes.yaml)
+ */
 class RoutesListCommandTest extends TestCase
 {
+    /**
+     * Exécute la commande routes:list avec le dossier de configuration des routes indiqué
+     * @param string $routeConfigPath Dossier contenant le fichier routes.yaml
+     * @param array<string, mixed> $input Arguments et options de la commande
+     * @return CommandTester
+     */
     private function runCommand(string $routeConfigPath, array $input = []): CommandTester
     {
         (new ConfigCore(['route_config_path' => $routeConfigPath]));
@@ -22,6 +31,10 @@ class RoutesListCommandTest extends TestCase
         return $commandeTester;
     }
 
+    /**
+     * Liste complète : une ligne par méthode HTTP, avec le nom de la route
+     * @return void
+     */
     public function testCommandRoutesList(): void
     {
         $commandeTester = $this->runCommand(__DIR__ . '/../Config/');
@@ -38,6 +51,10 @@ class RoutesListCommandTest extends TestCase
         $this->assertStringContainsString('14 route(s)', $output);
     }
 
+    /**
+     * Option --method : seules les routes de la méthode HTTP sont affichées
+     * @return void
+     */
     public function testCommandRoutesListFilterByMethod(): void
     {
         $commandeTester = $this->runCommand(__DIR__ . '/../Config/', ['--method' => 'post']);
@@ -48,6 +65,10 @@ class RoutesListCommandTest extends TestCase
         $this->assertStringContainsString('5 route(s)', $output);
     }
 
+    /**
+     * Option --method sans route correspondante : message d'information
+     * @return void
+     */
     public function testCommandRoutesListFilterWithoutRoute(): void
     {
         $commandeTester = $this->runCommand(__DIR__ . '/../Config/', ['--method' => 'DELETE']);
@@ -56,6 +77,10 @@ class RoutesListCommandTest extends TestCase
         $this->assertStringContainsString('Aucune route pour la méthode HTTP <DELETE>', $commandeTester->getDisplay());
     }
 
+    /**
+     * Fichier routes.yaml absent : message d'erreur et code d'échec
+     * @return void
+     */
     public function testCommandRoutesListWithoutRouteFile(): void
     {
         $commandeTester = $this->runCommand(sys_get_temp_dir() . '/edu-framework-routes-inexistant-' . uniqid() . '/');
@@ -64,6 +89,10 @@ class RoutesListCommandTest extends TestCase
         $this->assertStringContainsString("n'existe pas", $commandeTester->getDisplay());
     }
 
+    /**
+     * Route mal décrite dans routes.yaml : message d'erreur qui nomme la route
+     * @return void
+     */
     public function testCommandRoutesListWithInvalidRoute(): void
     {
         $commandeTester = $this->runCommand(__DIR__ . '/../Config/InvalidRoutes/');
