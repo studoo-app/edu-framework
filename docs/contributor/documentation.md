@@ -67,7 +67,7 @@ python3 -m venv venv
 
 !!! abstract "ENVironnement Virtuel"
 
-    Pourquoi utiliser un environnement virtuel Python ? [https://docs.python.org/3/library/venv.html(https://docs.python.org/3/library/venv.html){:target="_blank"}
+    Pourquoi utiliser un environnement virtuel Python ? [https://docs.python.org/3/library/venv.html](https://docs.python.org/3/library/venv.html){:target="_blank"}
 
 
 ## Activation de l'environnement virtuel
@@ -125,6 +125,20 @@ properdocs serve
 ProperDocs va lancer un serveur local pour visualiser la documentation. 
 
 Ouvrez un navigateur et tapez l'adresse [https://127.0.0.1:8000/edu-framework/](https://127.0.0.1:8000/edu-framework/){:target="_blank"}
+
+## Une documentation bilingue
+
+La documentation est disponible en français (langue par défaut) et en anglais.
+
+- Chaque page `page.md` (en français) peut avoir son équivalent anglais `page.en.md` dans le même dossier.
+- La navigation anglaise est définie dans le fichier `docs/_summary.en.md` (la navigation française se trouve dans `docs/_summary.md`).
+- Une page sans fichier `.en.md` est affichée en français dans la version anglaise du site.
+- Dans les liens entre pages, pointez toujours vers le nom du fichier français (`page.md`) : la version anglaise est résolue automatiquement.
+
+!!! tip "Garder les deux versions à jour"
+
+    Lorsque vous modifiez une page, mettez à jour les deux versions (`page.md` et `page.en.md`) dans la mesure du possible.
+    Si vous ne pouvez pas traduire vos modifications, signalez-le dans votre pull request.
 
 !!! abstract "Une fois installé"
 
