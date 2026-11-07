@@ -91,7 +91,7 @@ php vendor/bin/phpunit --version
 !!! note "Example output"
 
     ```Bash
-    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
     ```
 
 ??? failure "The command cannot be found (`Could not open input file`)"
@@ -106,14 +106,19 @@ php vendor/bin/phpunit --version
 
 !!! info "PHPUnit version"
 
-    The examples on this page work with PHPUnit 11 (provided by the skeleton) as well as with PHPUnit 12 and 13. They use **PHP attributes** (`#[DataProvider]`):
+    The skeleton provides PHPUnit 13 since its v2.11.1 version; older projects have PHPUnit 11. The examples on this page work with PHPUnit 11, 12 and 13. They use **PHP attributes** (`#[DataProvider]`):
     the old annotations in comments (`@dataProvider`) are no longer recognized since PHPUnit 12.
 
 ## Step 2: configuring the project
 
-The skeleton already provides the `tests` folder and the `phpunit.xml` and `tests/bootstrap.php` files, but their configuration is **minimal**: you must complete them to be able to test controllers and repositories.
+The skeleton provides the `tests` folder and the `phpunit.xml` and `tests/bootstrap.php` files. Depending on the version of the skeleton used to create your project, their configuration is **already complete** or **minimal**.
 
-| File | Provided by the skeleton | To do |
+Open the `phpunit.xml` file at the root of your project:
+
+- it contains `bootstrap="tests/bootstrap.php"`: your project is **already configured**; read this step to understand the files, then go to [step 3](#step-3-writing-your-first-test);
+- it contains `bootstrap="vendor/autoload.php"`: the configuration is **minimal**; complete it as shown below.
+
+| File | Minimal configuration (older skeleton) | To do |
 |---|---|---|
 | `composer.json` | without the `autoload-dev` section | add `autoload-dev` |
 | `phpunit.xml` | only loads `vendor/autoload.php`, old `<coverage>` format | replace the content |
@@ -196,7 +201,7 @@ Replace the content of the `phpunit.xml` file at the root of the project (create
 </phpunit>
 ```
 
-The two changes compared to the skeleton's file:
+The two changes compared to the minimal configuration:
 
 - `bootstrap="tests/bootstrap.php"` instead of `vendor/autoload.php`: PHPUnit runs the file that configures the framework (see below)
 - the `<source>` section replaces the old `<coverage>` section, which triggers the `PHPUnit Deprecations: 1` warning since PHPUnit 11
@@ -328,7 +333,7 @@ php vendor/bin/phpunit
 !!! success "All tests pass"
 
     ```Bash
-    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
 
     ..                                                                  2 / 2 (100%)
 
