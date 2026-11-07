@@ -91,7 +91,7 @@ php vendor/bin/phpunit --version
 !!! note "Exemple d'affichage"
 
     ```Bash
-    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
     ```
 
 ??? failure "La commande est introuvable (`Could not open input file`)"
@@ -106,7 +106,7 @@ php vendor/bin/phpunit --version
 
 !!! info "Version de PHPUnit"
 
-    Les exemples de cette page fonctionnent avec PHPUnit 11 (fourni par le skeleton) comme avec PHPUnit 12 et 13. Ils utilisent les **attributs PHP** (`#[DataProvider]`) :
+    Le skeleton fournit PHPUnit 13 depuis sa version v2.11.1 ; les projets plus anciens ont PHPUnit 11. Les exemples de cette page fonctionnent avec PHPUnit 11, 12 et 13. Ils utilisent les **attributs PHP** (`#[DataProvider]`) :
     les anciennes annotations dans les commentaires (`@dataProvider`) ne sont plus reconnues depuis PHPUnit 12.
 
 ## Étape 2 : configurer le projet
@@ -333,7 +333,7 @@ php vendor/bin/phpunit
 !!! success "Tous les tests passent"
 
     ```Bash
-    PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+    PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
 
     ..                                                                  2 / 2 (100%)
 
