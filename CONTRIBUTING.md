@@ -1,55 +1,56 @@
 Contributing Guidelines
 =========================================
 
-Merci d'envisager de contribuer à notre projet ! Nous apprécions votre temps et vos efforts. \ 
-Voici quelques lignes directrices pour vous aider à démarrer :
+Thank you for considering contributing to our project! We appreciate your time and effort. \
+Here are some guidelines to help you get started:
 
-Rapport de bogues
+Bug reports
+-----------
+
+If you find a bug, please create a new ticket (issue) in our bug tracker. \
+Our project tracker is on GitHub, at this address: https://github.com/studoo-app/edu-framework/issues
+
+Make sure to include:
+
+* A clear, descriptive title
+* The steps to reproduce the bug
+* The expected behavior
+* The actual behavior
+* Any relevant logs or error messages
+
+Feature requests
 ----------------
 
-Si vous trouvez un bogue, veuillez créer un nouveau ticket (issue) dans notre système de suivi des bogues. \
-Notre suivi de projet est sur github dont voici l'adresse : https://github.com/studoo-app/edu-framework/issues
+If you have an idea for a new feature, please create a new ticket (issue) in our bug tracker. \
+Our project tracker is on GitHub, at this address: https://github.com/studoo-app/edu-framework/issues
 
-Assurez-vous d'inclure :
+Make sure to include:
 
-* Un titre clair et descriptif
-* Les étapes pour reproduire le bogue
-* Le comportement attendu
-* Le comportement réel
-* Tous les journaux ou messages d'erreur pertinents
-
-Proposition de fonctionnalités
------------------------------
-
-Si vous avez une idée pour une nouvelle fonctionnalité, veuillez créer un nouveau ticket (issue) dans notre système de suivi des bogues. \
-Notre suivi de projet est sur github dont voici l'adresse : https://github.com/studoo-app/edu-framework/issues
-
-Assurez-vous d'inclure :
-* Un titre clair et descriptif
-* Une description détaillée de la fonctionnalité proposée
-* Tous les cas d'utilisation ou exemples pertinents
-* Tous les inconvénients potentiels ou limitations
+* A clear, descriptive title
+* A detailed description of the proposed feature
+* Any relevant use cases or examples
+* Any potential drawbacks or limitations
 
 Pull Requests
 -------------
 
-Avant de soumettre une pull request, veuillez vous assurer :
+Before submitting a pull request, please make sure:
 
-* Que votre code respecte nos normes de codage (voir ci-dessous)
-* Que vos modifications sont bien documentées
-* Que vous avez ajouté des tests pour toute nouvelle fonctionnalité
-* Que vous avez exécuté tous les tests existants et que vous avez vérifié qu'ils réussissent
-  
-Normes de codage
+* That your code follows our coding standards (see below)
+* That your changes are properly documented
+* That you have added tests for any new feature
+* That you have run all the existing tests and checked that they pass
+
+Coding standards
 ----------------
 
-Notre projet utilise les normes de codage PSR-2. Veuillez vous assurer que votre code respecte ces normes avant de soumettre une pull request.
+Our project uses the PSR-2 coding standards. Please make sure your code follows these standards before submitting a pull request.
 
-De plus, veuillez vous assurer que votre code est bien organisé, facile à lire et bien commenté.
+In addition, please make sure your code is well organized, easy to read and well commented.
 
-Code de conduite
-----------------
+Code of conduct
+---------------
 
-Notre projet suit le [Code de conduite](CODE\_OF\_CONDUCT.md). Veuillez le lire avant de contribuer à notre projet.
+Our project follows the [Code of conduct](CODE_OF_CONDUCT.md). Please read it before contributing to our project.
 
-Merci pour vos contributions !
+Thank you for your contributions!

@@ -1,37 +1,37 @@
-Code de conduite
-================
+Code of conduct
+===============
 
-Nous voulons que notre projet soit accueillant, inclusif et respectueux pour tous les contributeurs. Pour cette raison, nous avons adopté ce Code de conduite. Nous attendons de tous les participants à notre projet qu'ils respectent ce Code de conduite.
+We want our project to be welcoming, inclusive and respectful for all contributors. For this reason, we have adopted this Code of conduct. We expect all participants in our project to respect this Code of conduct.
 
-Comportement attendu
---------------------
+Expected behavior
+-----------------
 
-* Soyez respectueux envers les autres, quelles que soient leurs différences.
-* Soyez courtois et professionnel dans vos interactions.
-* Soyez ouvert d'esprit et accueillez les idées et les commentaires des autres.
-* Soyez responsable de vos actions et de vos paroles.
-* Soyez conscient que vos paroles et vos actions peuvent avoir un impact sur les autres.
+* Be respectful towards others, whatever their differences.
+* Be courteous and professional in your interactions.
+* Be open-minded and welcome other people's ideas and feedback.
+* Be accountable for your actions and your words.
+* Be aware that your words and actions can have an impact on others.
 
-Comportement inacceptable
--------------------------
+Unacceptable behavior
+---------------------
 
-* Les commentaires ou les comportements discriminatoires, harcelants ou offensants ne seront pas tolérés.
-* Les propos ou les comportements sexuellement explicites ou suggestifs ne sont pas appropriés.
-* Les menaces ou la violence ne seront pas tolérées.
-* L'utilisation abusive ou l'appropriation inappropriée de l'identité d'autrui ne sera pas tolérée.
+* Discriminatory, harassing or offensive comments or behavior will not be tolerated.
+* Sexually explicit or suggestive language or behavior is not appropriate.
+* Threats or violence will not be tolerated.
+* Misuse or inappropriate appropriation of another person's identity will not be tolerated.
 
-Conséquences des comportements inacceptables
---------------------------------------------
-
-Les comportements inacceptables peuvent entraîner :
-
-* Un avertissement de la part des responsables du projet.
-* Une exclusion temporaire ou permanente du projet.
-* D'autres conséquences appropriées.
-
-Signaler un comportement inacceptable
+Consequences of unacceptable behavior
 -------------------------------------
 
-Si vous êtes témoin ou victime d'un comportement inacceptable, veuillez contacter les responsables du projet dès que possible. Vous pouvez contacter les responsables du projet par e-mail à Benoit.Foujols[a]ac-creteil.fr . Tous les rapports seront traités avec sérieux et confidentialité.
+Unacceptable behavior may lead to:
 
-Nous sommes engagés à faire respecter ce Code de conduite et à créer un environnement accueillant et inclusif pour tous les contributeurs. Merci de votre aide pour faire de notre projet un espace sûr et respectueux pour tous.
+* A warning from the project maintainers.
+* Temporary or permanent exclusion from the project.
+* Other appropriate consequences.
+
+Reporting unacceptable behavior
+-------------------------------
+
+If you witness or experience unacceptable behavior, please contact the project maintainers as soon as possible. You can contact the project maintainers by email at Benoit.Foujols[a]ac-creteil.fr . All reports will be handled seriously and confidentially.
+
+We are committed to enforcing this Code of conduct and to creating a welcoming and inclusive environment for all contributors. Thank you for helping make our project a safe and respectful space for everyone.
