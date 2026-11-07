@@ -1,3 +1,6 @@
+# Dépendances Python de la documentation (ProperDocs).
+# Ce fichier n'est pas du Python : Pylint (analyse Codacy) ne doit pas l'analyser.
+# pylint: skip-file
 properdocs
 mkdocs-material
 markdown-callouts
