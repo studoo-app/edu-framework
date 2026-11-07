@@ -25,7 +25,7 @@
     * [Route - Générer une URL par le nom](boost/route.md)
     * [Les erreurs HTTP](boost/http-error.md)
     * [La barre de debug et le profiler](boost/debug-bar.md)
-* [Déployer](deploy/index.md)
+* Déployer
     * [Déployer son application](deploy/index.md)
 * [Migrer](migrate/major.md)
     * [Migrer de la version 2.8 à la version 2.9](migrate/migration-2_8-2_9.md)
