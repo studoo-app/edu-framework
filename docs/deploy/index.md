@@ -4,6 +4,10 @@ Votre application fonctionne sur votre poste : il est temps de la mettre en lign
 
 Edu-Framework s'appuie pour cela sur [FrankenDeploy](https://yoanbernabeu.github.io/frankendeploy/){:target="_blank"}, un outil en ligne de commande qui déploie une application [FrankenPHP](https://frankenphp.dev){:target="_blank"} sur un serveur (VPS) **Debian** ou **Ubuntu** : il installe Docker sur le serveur, obtient le certificat HTTPS (Let's Encrypt), crée la base de données et met à jour l'application sans coupure de service.
 
+!!! tip "Sans Docker ?"
+
+    Si vous ne souhaitez pas utiliser Docker, consultez [Déployer avec Deployer (sans Docker)](deployer.md) : PHP et Caddy sont installés directement sur le serveur.
+
 !!! warning "Outil expérimental"
 
     FrankenDeploy est jeune et conçu à l'origine pour Symfony : Edu-Framework fournit le `Dockerfile` et la configuration qui le rendent compatible. Consultez la [documentation de FrankenDeploy](https://yoanbernabeu.github.io/frankendeploy/){:target="_blank"} pour le détail de chaque commande.
