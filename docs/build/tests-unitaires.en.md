@@ -111,9 +111,14 @@ php vendor/bin/phpunit --version
 
 ## Step 2: configuring the project
 
-The skeleton already provides the `tests` folder and the `phpunit.xml` and `tests/bootstrap.php` files, but their configuration is **minimal**: you must complete them to be able to test controllers and repositories.
+The skeleton provides the `tests` folder and the `phpunit.xml` and `tests/bootstrap.php` files. Depending on the version of the skeleton used to create your project, their configuration is **already complete** or **minimal**.
 
-| File | Provided by the skeleton | To do |
+Open the `phpunit.xml` file at the root of your project:
+
+- it contains `bootstrap="tests/bootstrap.php"`: your project is **already configured**; read this step to understand the files, then go to [step 3](#step-3-writing-your-first-test);
+- it contains `bootstrap="vendor/autoload.php"`: the configuration is **minimal**; complete it as shown below.
+
+| File | Minimal configuration (older skeleton) | To do |
 |---|---|---|
 | `composer.json` | without the `autoload-dev` section | add `autoload-dev` |
 | `phpunit.xml` | only loads `vendor/autoload.php`, old `<coverage>` format | replace the content |
@@ -196,7 +201,7 @@ Replace the content of the `phpunit.xml` file at the root of the project (create
 </phpunit>
 ```
 
-The two changes compared to the skeleton's file:
+The two changes compared to the minimal configuration:
 
 - `bootstrap="tests/bootstrap.php"` instead of `vendor/autoload.php`: PHPUnit runs the file that configures the framework (see below)
 - the `<source>` section replaces the old `<coverage>` section, which triggers the `PHPUnit Deprecations: 1` warning since PHPUnit 11
