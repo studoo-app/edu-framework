@@ -87,7 +87,7 @@ Si le dossier `var/cache` n'existe pas, un message vous indique qu'il n'y a aucu
 
 ### La commande routes:list
 
-La commande `routes:list` affiche les routes déclarées dans le fichier `app/Config/routes.yaml`, dans l'ordre du fichier :
+La commande `routes:list` affiche les routes déclarées dans le fichier `app/Config/routes.yaml`, dans l'ordre du fichier, puis celles déclarées avec l'attribut [`#[Route]`](../build/route-attribute.md) (à partir de la version v2.13.0) :
 
 ```bash
 php bin/edu routes:list

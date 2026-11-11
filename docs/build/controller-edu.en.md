@@ -94,6 +94,12 @@ It will also create a "hello.html.twig" file in the "app/Template/hello" folder.
 
 In the "hello.html.twig" view, the page title "HelloController" is displayed in an h1. A `{{ titre }}` variable is passed to the template by the controller.
 
+!!! tip "Declaring the route in the controller"
+
+    Since version v2.13.0, the route can also be declared directly on the controller method
+    with the `#[Route('/hello', name: 'hello')]` attribute, like in Symfony:
+    see [Declaring a route with #[Route]](route-attribute.md).
+
 You can access your controller by typing the following URL: [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
 <figure markdown="span">

@@ -2,6 +2,24 @@
 
 **Overview of the Edu Framework releases**
 
+## Unreleased
+
+**features**
+
+- [#198](https://github.com/studoo-app/edu-framework/issues/198) Routes declared with PHP attributes: `#[Route('/hello/{name}', methods: ['GET', 'POST'], name: 'hello_name')]` on a controller method and `#[RouteGroup('/admin', namePrefix: 'admin_')]` on the class (`studoo/edu-route` attributes). The controllers of `app/Controller` (subfolders included) are read on each request, after `app/Config/routes.yaml`: both ways work together and `routes.yaml` becomes optional as soon as a controller declares a route
+- `getNameToPath()` (Twig and `Route` class) generates the URL of every named route, from `routes.yaml` or from attributes: it relies on the routes declared to the routing engine instead of reading `routes.yaml` again
+- `php bin/edu routes:list` also lists the routes declared with attributes
+
+**maintenance**
+
+- `FastRouteCore::loadRoutes()` loads `routes.yaml` then the attributes (used by `LoadCouchCore` and `routes:list`); `FastRouteCore::loadRouteAttributes()` and `FastRouteCore::findAttributeControllers()` are public
+- New optional configuration keys `controller_path` (default: `app/Controller/` under `base_path`) and `controller_namespace` (default: `Controller\`)
+- `Route::getRouteInfo()` only returns named routes (key, `uri`, `controller`, `httpMethod`, `uri_parse`); `Route::loadRoute()` still returns the raw content of `routes.yaml`
+
+**documentation**
+
+- new [Declaring a route with #[Route]](docs/build/route-attribute.md) page; update [Building a page](docs/build/controller-edu.md), [Route](docs/build/route.md) and [The bin/edu command](docs/installation/command-edu.md)
+
 ## v2.12.0 - 07/11/2026
 
 **features**

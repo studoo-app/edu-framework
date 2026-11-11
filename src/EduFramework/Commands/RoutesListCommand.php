@@ -13,7 +13,6 @@ namespace Studoo\EduFramework\Commands;
 
 use Studoo\EduFramework\Commands\Extends\CommandBanner;
 use Studoo\EduFramework\Commands\Extends\CommandManage;
-use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\FastRouteCore;
 use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
@@ -27,7 +26,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
  * Class RoutesListCommand
- * Classe permettant de lister les routes de l'application (fichier app/Config/routes.yaml)
+ * Classe permettant de lister les routes de l'application
+ * (fichier app/Config/routes.yaml et attributs #[Route] des controllers)
  * Example command line:
  * ```
  * $ php bin/edu routes:list
@@ -37,7 +37,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 #[AsCommand(
     name: 'routes:list',
-    description: 'Liste les routes de l\'application (fichier app/Config/routes.yaml)',
+    description: 'Liste les routes de l\'application (fichier routes.yaml et attributs #[Route])',
 )]
 class RoutesListCommand extends CommandManage
 {
@@ -69,17 +69,17 @@ class RoutesListCommand extends CommandManage
             ''
         ]);
 
-        // Chargement des routes depuis le fichier de configuration (clé route_config_path)
+        // Chargement des routes (fichier routes.yaml puis attributs #[Route] des controllers)
         // avec les mêmes contrôles que lors d'une requête HTTP
         $routeCore = new FastRouteCore();
         try {
-            $routeCore->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
+            $routeCore->loadRoutes();
         } catch (ErrorRouteConfigNotExistException | ErrorConfigException | BadRouteException | ParseException $exception) {
             self::$stdOutput->error($exception->getMessage());
             return Command::FAILURE;
         }
 
-        // Une ligne par méthode HTTP, dans l'ordre du fichier routes.yaml
+        // Une ligne par méthode HTTP, dans l'ordre de déclaration (routes.yaml puis attributs)
         $method = $input->getOption('method');
         $rows = [];
         foreach ($routeCore->declaredRoutes() as $route) {
@@ -94,7 +94,7 @@ class RoutesListCommand extends CommandManage
             self::$stdOutput->info(
                 is_string($method)
                     ? "Aucune route pour la méthode HTTP <$method>"
-                    : "Aucune route déclarée dans le fichier routes.yaml"
+                    : "Aucune route déclarée (fichier routes.yaml ou attribut #[Route])"
             );
             return Command::SUCCESS;
         }

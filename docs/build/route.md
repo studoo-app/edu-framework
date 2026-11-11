@@ -27,6 +27,12 @@ Cette fonctionnalité est disponible à partir de la version **v2.1.0**.
 
     Cela ne change rien pour `getNameToPath()` : la génération d'URL se base uniquement sur le **nom** et l'`uri` de la route.
 
+!!! info "Routes déclarées avec l'attribut #[Route]"
+
+    Depuis la version **v2.13.0**, `getNameToPath()` génère aussi l'URL des routes déclarées sur les controllers avec
+    l'attribut `#[Route('/ville', name: 'villeread')]` : le nom est alors le paramètre `name` de l'attribut
+    (voir [Déclarer une route avec #[Route]](route-attribute.md)).
+
 ## Comment l'URL est-elle construite ?
 
 ```mermaid

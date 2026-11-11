@@ -16,6 +16,9 @@ use Studoo\EduFramework\Core\Controller\Error\HttpError404Controller;
 use Studoo\EduFramework\Core\Controller\Error\HttpError405Controller;
 use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Studoo\EduFramework\Core\Exception\ErrorRouteConfigNotExistException;
+use Studoo\EduRoute\Attribute\AttributeRouteLoader;
+use Studoo\EduRoute\Attribute\Route as RouteAttribute;
+use Studoo\EduRoute\Attribute\RouteGroup;
 use Studoo\EduRoute\DataGenerator\MarkBased as MarkBasedDataGenerator;
 use Studoo\EduRoute\DeclaredRoute;
 use Studoo\EduRoute\Dispatcher;
@@ -25,6 +28,9 @@ use Studoo\EduRoute\Dispatcher\Result\MethodNotAllowed;
 use Studoo\EduRoute\RouteCollector;
 use Studoo\EduRoute\RouteParser\Std;
 use Symfony\Component\Yaml\Yaml;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -53,6 +59,125 @@ class FastRouteCore
             new Std(),
             new MarkBasedDataGenerator()
         );
+    }
+
+    /**
+     * Methode pour charger toutes les routes de l'application, dans cet ordre :
+     *   1. le fichier de configuration app/Config/routes.yaml (clé route_config_path), s'il existe
+     *   2. les attributs #[Route] des controllers du dossier app/Controller (clé controller_path)
+     * Les deux modes de déclaration peuvent être utilisés ensemble
+     * @return $this
+     * @throws ErrorRouteConfigNotExistException Si le fichier routes.yaml est absent et qu'aucun controller
+     *         ne déclare de route avec l'attribut #[Route]
+     * @throws ErrorConfigException Si une route du fichier routes.yaml est mal décrite
+     * @throws \Studoo\EduRoute\BadRouteException Si une route est invalide (route en double, attribut mal placé...)
+     */
+    public function loadRoutes(): self
+    {
+        $routeConfigPath = (string) ConfigCore::getConfig('route_config_path');
+        $controllers = self::findAttributeControllers(self::getControllerPath(), self::getControllerNamespace());
+
+        // Sans fichier routes.yaml ni attribut #[Route], on garde l'erreur explicite du fichier absent
+        if (is_file($routeConfigPath . 'routes.yaml') === true || $controllers === []) {
+            $this->loadRouteConfig($routeConfigPath);
+        }
+
+        return $this->loadRouteAttributes(...$controllers);
+    }
+
+    /**
+     * Methode pour charger les routes déclarées avec les attributs #[Route] et #[RouteGroup] des controllers
+     * Exemple:
+     * ```
+     * #[Route('/medecin/{id:\d+}', methods: ['GET', 'POST'], name: 'medecin_show')]
+     * public function show(Request $request): string
+     * ```
+     * La route appelle la méthode du controller (handler "Controller\MedecinController::show")
+     * @param class-string ...$controllers Classes des controllers à lire
+     * @return $this
+     * @throws \Studoo\EduRoute\BadRouteException Si un attribut est invalide (méthode privée, nom en double...)
+     */
+    public function loadRouteAttributes(string ...$controllers): self
+    {
+        AttributeRouteLoader::register($this->routeCollector, ...$controllers);
+
+        return $this;
+    }
+
+    /**
+     * Recherche les controllers qui déclarent des routes avec les attributs #[Route] ou #[RouteGroup]
+     * Les fichiers sont lus dans l'ordre alphabétique de leur chemin (sous-dossiers compris),
+     * le nom de la classe est déduit du chemin (PSR-4) : app/Controller/Api/UserController.php
+     * => Controller\Api\UserController
+     * @param string $controllerPath      Dossier des controllers (Exemple: app/Controller/)
+     * @param string $controllerNamespace Namespace du dossier (Exemple: Controller\)
+     * @return list<class-string> Controllers qui déclarent au moins une route
+     */
+    public static function findAttributeControllers(string $controllerPath, string $controllerNamespace): array
+    {
+        if (is_dir($controllerPath) === false) {
+            return [];
+        }
+
+        $root = rtrim((string) realpath($controllerPath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $files = [];
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
+        foreach ($iterator as $file) {
+            if ($file->isFile() === true && $file->getExtension() === 'php') {
+                $files[] = substr($file->getPathname(), strlen($root));
+            }
+        }
+        sort($files);
+
+        $controllers = [];
+        foreach ($files as $file) {
+            $className = rtrim($controllerNamespace, '\\') . '\\'
+                . str_replace(DIRECTORY_SEPARATOR, '\\', substr($file, 0, -4));
+            if (class_exists($className) === true && self::hasRouteAttribute(new ReflectionClass($className))) {
+                $controllers[] = $className;
+            }
+        }
+
+        return $controllers;
+    }
+
+    /**
+     * Indique si une classe porte un attribut de route (#[RouteGroup] sur la classe, #[Route] sur une méthode)
+     * Les attributs mal placés sont gardés : le moteur de routage les signalera avec un message explicite
+     * @param ReflectionClass<object> $class
+     * @return bool
+     */
+    private static function hasRouteAttribute(ReflectionClass $class): bool
+    {
+        if ($class->getAttributes(RouteGroup::class) !== [] || $class->getAttributes(RouteAttribute::class) !== []) {
+            return true;
+        }
+        foreach ($class->getMethods() as $method) {
+            if ($method->getAttributes(RouteAttribute::class) !== []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Dossier des controllers : clé controller_path, sinon le dossier app/Controller/ du projet (clé base_path)
+     * @return string
+     */
+    public static function getControllerPath(): string
+    {
+        return (string) (ConfigCore::getConfig('controller_path')
+            ?? rtrim((string) ConfigCore::getConfig('base_path'), '/') . '/app/Controller/');
+    }
+
+    /**
+     * Namespace du dossier des controllers : clé controller_namespace, sinon Controller\
+     * @return string
+     */
+    public static function getControllerNamespace(): string
+    {
+        return (string) (ConfigCore::getConfig('controller_namespace') ?? 'Controller\\');
     }
 
     /**

@@ -22,6 +22,12 @@ use Twig\Extension\AbstractExtension;
 class StudooGetPathRouteExtension extends AbstractExtension
 {
     /**
+     * Routes de l'application, chargées au premier appel de getNameToPath()
+     * @var Route|null
+     */
+    private ?Route $route = null;
+
+    /**
      * Permet de déclarer les fonctions de l'extension
      * @return \Twig\TwigFunction[]
      */
@@ -41,7 +47,8 @@ class StudooGetPathRouteExtension extends AbstractExtension
      */
     public function getNameToPath(string $name, array $param = []): string
     {
-        $route = new Route();
-        return $route->getNameToPath($name, $param);
+        // Les routes sont chargées une seule fois par rendu (fichier routes.yaml et attributs #[Route])
+        $this->route ??= new Route();
+        return $this->route->getNameToPath($name, $param);
     }
 }

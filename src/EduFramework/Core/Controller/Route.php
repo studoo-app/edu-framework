@@ -62,12 +62,27 @@ class Route
 
 
     /**
-     * Renseigne et renvoi un tableau contenant les informations des route du fichier config/routes.yaml
+     * Renseigne et renvoi un tableau contenant les informations des routes nommées de l'application :
+     * fichier config/routes.yaml et attributs #[Route] des controllers (mêmes routes que le moteur de routage)
+     * Exemple: ['home' => ['uri' => '/home', 'controller' => 'Controller\HomeController', 'httpMethod' => ['GET'],
+     *          'uri_parse' => [...]]]
      * @return array<mixed> Tableau contenant les informations des routes
+     * @throws ErrorRouteConfigNotExistException
      */
     public function getRouteInfo(): array
     {
-        $this->listRoutes = $this->loadRoute();
+        $this->listRoutes = [];
+        foreach ((new FastRouteCore())->loadRoutes()->declaredRoutes() as $declaredRoute) {
+            // Seules les routes nommées servent à la génération d'URL
+            if ($declaredRoute->name === null) {
+                continue;
+            }
+            // Une route [GET, POST] est déclarée une fois par méthode HTTP : une seule entrée par nom
+            $this->listRoutes[$declaredRoute->name]['uri'] = $declaredRoute->pattern;
+            $this->listRoutes[$declaredRoute->name]['controller'] = $declaredRoute->describeHandler();
+            $this->listRoutes[$declaredRoute->name]['httpMethod'][] = $declaredRoute->method;
+        }
+
         $routeParse = new Std();
         foreach ($this->listRoutes as $nameRoute => $route) {
             $this->listRoutes[$nameRoute]["uri_parse"] = $routeParse->parse($route["uri"]);
@@ -76,7 +91,7 @@ class Route
     }
 
     /**
-     * Récupération du fichier config/routes.yaml
+     * Récupération du contenu brut du fichier config/routes.yaml (sans les routes déclarées par attributs)
      * @return array<mixed>|bool Tableau des routes ou false si le fichier ne contient pas de routes
      * @throws ErrorRouteConfigNotExistException
      */
