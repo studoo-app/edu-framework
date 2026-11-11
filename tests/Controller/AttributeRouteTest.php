@@ -180,7 +180,28 @@ class AttributeRouteTest extends TestCase
         $commandeTester->execute([]);
         $output = $commandeTester->getDisplay();
 
-        $this->assertMatchesRegularExpression('#GET\s+/admin/product/\{id:\\\\d\+\}\s+AttributeRoutes\\\\Admin\\\\ProductController::edit\s+admin_product#', $output);
+        $this->assertMatchesRegularExpression('#GET\s+/admin/product/\{id:\\\\d\+\}\s+AttributeRoutes\\\\Admin\\\\ProductController::edit\s+admin_product\s+\#\[Route\]#', $output);
+        $this->assertMatchesRegularExpression('#\s+routes\.yaml\s#', $output);
         $this->assertStringContainsString('18 route(s)', $output);
+    }
+
+    /**
+     * Chaque route déclarée connaît sa source : routes.yaml, attribut #[Route] ou addRoute()
+     * @return void
+     */
+    public function testDeclaredRouteSources(): void
+    {
+        $routeCore = (new FastRouteCore())->loadRoutes();
+        $routeCore->addRoute('GET', '/manuelle', 'Controller\HomeController');
+
+        $sources = [];
+        foreach ($routeCore->declaredRoutes() as $index => $route) {
+            $sources[$route->method . ' ' . $route->pattern] = $routeCore->declaredRouteSources()[$index];
+        }
+
+        $this->assertCount(count($routeCore->declaredRoutes()), $routeCore->declaredRouteSources());
+        $this->assertSame(FastRouteCore::SOURCE_YAML, $sources['GET /home']);
+        $this->assertSame(FastRouteCore::SOURCE_ATTRIBUTE, $sources['POST /hello/{name}']);
+        $this->assertSame(FastRouteCore::SOURCE_CODE, $sources['GET /manuelle']);
     }
 }

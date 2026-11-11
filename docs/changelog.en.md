@@ -2,6 +2,20 @@
 
 **Overview of the Edu Framework releases**
 
+## v2.14.0 - 11/11/2026
+
+**features**
+
+- [#200](https://github.com/studoo-app/edu-framework/pull/200) `php bin/edu routes:list` shows a new **Source** column: `routes.yaml` or `#[Route]` depending on where the route is declared
+
+**maintenance**
+
+- New `FastRouteCore::declaredRouteSources()`: source of each declared route, in the order of `declaredRoutes()` (`FastRouteCore::SOURCE_YAML`, `SOURCE_ATTRIBUTE` or `SOURCE_CODE` for a route added with `addRoute()`)
+
+**documentation**
+
+- update [The bin/edu command](installation/command-edu.md) (`routes:list` Source column)
+
 ## v2.13.0 - 11/11/2026
 
 **features**

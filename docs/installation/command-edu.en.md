@@ -94,14 +94,15 @@ php bin/edu routes:list
 ```
 
 ```
- --------- ------------------------- -------------------------------------- ---------------- 
-  Méthode   URI                       Contrôleur                             Nom             
- --------- ------------------------- -------------------------------------- ---------------- 
-  GET       /                         Controller\HomeController              index           
-  GET       /user/{id}                Controller\UserController              user            
-  POST      /user/{id}                Controller\UserController              user            
-  GET       /medecin                  Controller\MedecinController::index    medecin         
- --------- ------------------------- -------------------------------------- ---------------- 
+ --------- --------------- ------------------------------------- ------------ ------------- 
+  Méthode   URI             Contrôleur                            Nom          Source      
+ --------- --------------- ------------------------------------- ------------ ------------- 
+  GET       /               Controller\HomeController             index        routes.yaml 
+  GET       /user/{id}      Controller\UserController             user         routes.yaml 
+  POST      /user/{id}      Controller\UserController             user         routes.yaml 
+  GET       /medecin        Controller\MedecinController::index   medecin      routes.yaml 
+  GET       /hello/{name}   Controller\HelloController::show      hello_name   #[Route]    
+ --------- --------------- ------------------------------------- ------------ ------------- 
 ```
 
 | Column               | Detail                                                                |
@@ -110,6 +111,7 @@ php bin/edu routes:list
 | URI                  | the URI as written in `routes.yaml` (Example: `/user/{id:\d+}[/{name}]`) |
 | Contrôleur (controller) | the called controller, with its method if any (`::index`)          |
 | Nom (name)           | the route name (key of the `routes.yaml` file), used by `getNameToPath()` |
+| Source               | where the route comes from: `routes.yaml` or `#[Route]` (controller attribute, since version v2.14.0) |
 
 The `--method` (or `-m`) option only displays the routes of one HTTP method: `php bin/edu routes:list --method=POST`.
 
