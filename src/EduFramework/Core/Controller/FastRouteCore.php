@@ -49,6 +49,22 @@ class FastRouteCore
      */
     private RouteCollector $routeCollector;
 
+    /** Source d'une route déclarée dans le fichier app/Config/routes.yaml */
+    public const SOURCE_YAML = 'routes.yaml';
+
+    /** Source d'une route déclarée avec l'attribut #[Route] d'un controller */
+    public const SOURCE_ATTRIBUTE = '#[Route]';
+
+    /** Source d'une route ajoutée directement avec la méthode addRoute() */
+    public const SOURCE_CODE = 'addRoute()';
+
+    /**
+     * Source de chaque route déclarée, dans l'ordre de declaredRoutes()
+     * (les routes non listées ont été ajoutées avec addRoute())
+     * @var array<int, string>
+     */
+    private array $routeSources = [];
+
     /**
      * FastRouteCore constructor.
      */
@@ -99,7 +115,10 @@ class FastRouteCore
      */
     public function loadRouteAttributes(string ...$controllers): self
     {
-        AttributeRouteLoader::register($this->routeCollector, ...$controllers);
+        $this->trackSource(
+            self::SOURCE_ATTRIBUTE,
+            fn () => AttributeRouteLoader::register($this->routeCollector, ...$controllers)
+        );
 
         return $this;
     }
@@ -201,12 +220,14 @@ class FastRouteCore
 
         $fileData = Yaml::parseFile($pathConfigFile . 'routes.yaml');
         if (is_array($fileData)) {
-            foreach ($fileData as $routeName => $routeConfig) {
-                [$httpMethod, $uri, $controller] = $this->readRouteConfig($routeName, $routeConfig);
-                // Le nom de la route (clé du fichier routes.yaml) est transmis au moteur de routage
-                // pour l'afficher dans la commande routes:list
-                $this->addRoute($httpMethod, $uri, $controller, is_string($routeName) ? $routeName : null);
-            }
+            $this->trackSource(self::SOURCE_YAML, function () use ($fileData): void {
+                foreach ($fileData as $routeName => $routeConfig) {
+                    [$httpMethod, $uri, $controller] = $this->readRouteConfig($routeName, $routeConfig);
+                    // Le nom de la route (clé du fichier routes.yaml) est transmis au moteur de routage
+                    // pour l'afficher dans la commande routes:list
+                    $this->addRoute($httpMethod, $uri, $controller, is_string($routeName) ? $routeName : null);
+                }
+            });
         }
 
         return $this;
@@ -301,6 +322,42 @@ class FastRouteCore
     public function declaredRoutes(): array
     {
         return $this->routeCollector->declaredRoutes();
+    }
+
+    /**
+     * Methode pour récupérer la source de chaque route déclarée, dans l'ordre de declaredRoutes()
+     * Valeurs : self::SOURCE_YAML (routes.yaml), self::SOURCE_ATTRIBUTE (#[Route]) ou self::SOURCE_CODE (addRoute())
+     * Utilisée par la commande routes:list
+     * @return list<string>
+     */
+    public function declaredRouteSources(): array
+    {
+        $sources = [];
+        foreach (array_keys($this->routeCollector->declaredRoutes()) as $index) {
+            $sources[] = $this->routeSources[$index] ?? self::SOURCE_CODE;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Exécute un chargement de routes et associe la source donnée aux routes qu'il a ajoutées
+     * Les routes ajoutées avant une erreur gardent leur source
+     * @param string   $source Source des routes (self::SOURCE_YAML ou self::SOURCE_ATTRIBUTE)
+     * @param callable $load   Chargement des routes
+     * @return void
+     */
+    private function trackSource(string $source, callable $load): void
+    {
+        $start = count($this->routeCollector->declaredRoutes());
+        try {
+            $load();
+        } finally {
+            $end = count($this->routeCollector->declaredRoutes());
+            for ($index = $start; $index < $end; $index++) {
+                $this->routeSources[$index] = $source;
+            }
+        }
     }
 
     /**

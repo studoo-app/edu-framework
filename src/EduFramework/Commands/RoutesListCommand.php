@@ -56,7 +56,8 @@ class RoutesListCommand extends CommandManage
     }
 
     /**
-     * Affiche la liste des routes déclarées dans le fichier routes.yaml
+     * Affiche la liste des routes déclarées (fichier routes.yaml et attributs #[Route])
+     * avec la source de chaque route
      * @param InputInterface  $input  Interface d'entrée
      * @param OutputInterface $output Interface de sortie
      * @return int Command::SUCCESS ou Command::FAILURE si le fichier des routes est absent ou invalide
@@ -81,13 +82,21 @@ class RoutesListCommand extends CommandManage
 
         // Une ligne par méthode HTTP, dans l'ordre de déclaration (routes.yaml puis attributs)
         $method = $input->getOption('method');
+        // La colonne Source indique où la route est déclarée : routes.yaml ou #[Route]
+        $sources = $routeCore->declaredRouteSources();
         $rows = [];
-        foreach ($routeCore->declaredRoutes() as $route) {
+        foreach ($routeCore->declaredRoutes() as $index => $route) {
             $routeMethod = $route->isFallback() ? 'ANY' : $route->method;
             if (is_string($method) && strcasecmp($routeMethod, $method) !== 0) {
                 continue;
             }
-            $rows[] = [$routeMethod, $route->pattern, $route->describeHandler(), $route->name ?? '-'];
+            $rows[] = [
+                $routeMethod,
+                $route->pattern,
+                $route->describeHandler(),
+                $route->name ?? '-',
+                $sources[$index],
+            ];
         }
 
         if ($rows === []) {
@@ -99,7 +108,7 @@ class RoutesListCommand extends CommandManage
             return Command::SUCCESS;
         }
 
-        self::$stdOutput->table(['Méthode', 'URI', 'Contrôleur', 'Nom'], $rows);
+        self::$stdOutput->table(['Méthode', 'URI', 'Contrôleur', 'Nom', 'Source'], $rows);
         self::$stdOutput->writeln(count($rows) . ' route(s)');
 
         return Command::SUCCESS;

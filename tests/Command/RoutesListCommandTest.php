@@ -43,11 +43,13 @@ class RoutesListCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $commandeTester->getStatusCode());
         $this->assertStringContainsString('Liste des routes', $output);
         // Une ligne par méthode HTTP, avec le nom de la route (clé du fichier routes.yaml)
-        $this->assertMatchesRegularExpression('#GET\s+/home\s+Controller\\\\HomeController\s+home#', $output);
+        $this->assertMatchesRegularExpression('#GET\s+/home\s+Controller\\\\HomeController\s+home\s+routes\.yaml#', $output);
         $this->assertMatchesRegularExpression('#POST\s+/user/\{id\}\s+Controller\\\\UserController\s+user\s#', $output);
         // Le motif d'origine est conservé (segments optionnels inclus)
         $this->assertStringContainsString('/user/{id:\d+}[/{name}]', $output);
         $this->assertStringContainsString('Controller\MedecinController::index', $output);
+        $this->assertStringContainsString('Source', $output);
+        $this->assertStringNotContainsString('#[Route]', $output);
         $this->assertStringContainsString('14 route(s)', $output);
     }
 
