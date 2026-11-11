@@ -21,6 +21,7 @@
     * [Tester son application (tests unitaires)](build/tests-unitaires.md)
     * [Request - La gestion des requêtes HTTP](build/resquet.md)
     * [DatabaseService - La gestion des données](build/dataservice.md)
+    * [Déclarer une route avec #[Route]](build/route-attribute.md)
     * [Route - Générer une URL par le nom](build/route.md)
     * [Les erreurs HTTP](build/http-error.md)
     * [La barre de debug et le profiler](build/debug-bar.md)

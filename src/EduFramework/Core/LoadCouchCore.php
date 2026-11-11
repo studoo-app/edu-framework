@@ -73,8 +73,8 @@ class LoadCouchCore
         $route = new FastRouteCore();
 
         try {
-            // LoadCouchCore des routes depuis le fichier de configuration
-            $route->loadRouteConfig(ConfigCore::getConfig('route_config_path'));
+            // Chargement des routes : fichier app/Config/routes.yaml puis attributs #[Route] des controllers
+            $route->loadRoutes();
 
             // Route interne de la barre de debug (uniquement en mode dev)
             if (ConfigCore::existEnv('APP_ENV') === true && ConfigCore::getEnv('APP_ENV') === 'dev'

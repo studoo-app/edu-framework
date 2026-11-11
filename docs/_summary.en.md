@@ -21,6 +21,7 @@
     * [Test your application (unit tests)](build/tests-unitaires.md)
     * [Request - Handling HTTP requests](build/resquet.md)
     * [DatabaseService - Handling data](build/dataservice.md)
+    * [Declare a route with #[Route]](build/route-attribute.md)
     * [Route - Generate a URL from its name](build/route.md)
     * [HTTP errors](build/http-error.md)
     * [The debug bar and the profiler](build/debug-bar.md)

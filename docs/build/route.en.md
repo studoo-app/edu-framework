@@ -27,6 +27,12 @@ This feature is available from version **v2.1.0**.
 
     This changes nothing for `getNameToPath()`: URL generation relies only on the route's **name** and `uri`.
 
+!!! info "Routes declared with the #[Route] attribute"
+
+    Since version **v2.13.0**, `getNameToPath()` also generates the URL of routes declared on controllers with
+    the `#[Route('/ville', name: 'villeread')]` attribute: the name is then the attribute's `name` parameter
+    (see [Declaring a route with #[Route]](route-attribute.md)).
+
 ## How is the URL built?
 
 ```mermaid
