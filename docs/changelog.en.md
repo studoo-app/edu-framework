@@ -2,7 +2,7 @@
 
 **Overview of the Edu Framework releases**
 
-## Unreleased
+## v2.13.0 - 11/11/2026
 
 **features**
 

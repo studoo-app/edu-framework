@@ -153,7 +153,7 @@ class AttributeRouteTest extends TestCase
     }
 
     /**
-     * Un attribut #[Route] invalide (méthode privée) est signalé par le moteur de routage
+     * Un attribut #[Route] invalide (méthode statique) est signalé par le moteur de routage
      * @return void
      */
     public function testInvalidAttributeRoute(): void
