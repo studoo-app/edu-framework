@@ -17,7 +17,9 @@ use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\LogsService;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlExplainAdvisor;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlExplainer;
+use Studoo\EduFramework\Core\Profiler\Sql\SqlParamResolver;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlQueryInspector;
+use Studoo\EduFramework\Core\Profiler\Sql\SqlTableInspector;
 use Studoo\EduFramework\Core\Service\DatabaseService;
 
 /**
@@ -38,6 +40,30 @@ use Studoo\EduFramework\Core\Service\DatabaseService;
  */
 class DebugSqlExplainController implements ControllerInterface
 {
+    /**
+     * Réponse vide : valeurs par défaut de chaque clé
+     */
+    private const array EMPTY_RESPONSE = [
+        'id' => null,
+        'token' => null,
+        'query' => null,
+        'duration_ms' => null,
+        'rows_count' => null,
+        'executions' => 0,
+        'params' => [],
+        'driver' => null,
+        'server_version' => null,
+        'read_only' => false,
+        'plan' => null,
+        'analysis' => null,
+        'accesses' => [],
+        'tables' => [],
+        'findings' => [],
+        'suggestions' => [],
+        'message' => null,
+        'error' => null,
+    ];
+
     /**
      * Retourne l'analyse EXPLAIN d'une requête SQL au format JSON
      * Paramètres de la requête :
@@ -71,86 +97,32 @@ class DebugSqlExplainController implements ControllerInterface
             header('Content-Type: application/json; charset=utf-8');
         }
 
-        $response = [
-            'id' => null,
-            'token' => null,
-            'query' => null,
-            'duration_ms' => null,
-            'rows_count' => null,
-            'executions' => 0,
-            'params' => [],
-            'driver' => null,
-            'server_version' => null,
-            'read_only' => false,
-            'plan' => null,
-            'analysis' => null,
-            'accesses' => [],
-            'tables' => [],
-            'findings' => [],
-            'suggestions' => [],
-            'message' => null,
-            'error' => null,
-        ];
-
-        $id = (string) $request->get('id');
-        if (preg_match('/^\d{1,18}$/', $id) !== 1) {
-            return $this->json($response, 'Identifiant de requête SQL invalide.');
+        $sqlId = (string) $request->get('id');
+        if (preg_match('/^\d{1,18}$/', $sqlId) !== 1) {
+            return $this->json(self::EMPTY_RESPONSE, 'Identifiant de requête SQL invalide.');
         }
 
-        $entry = LogsService::getSqlQuery((int) $id);
+        $entry = LogsService::getSqlQuery((int) $sqlId);
         if ($entry === null) {
-            return $this->json($response, 'Requête SQL introuvable : les logs ont peut-être été vidés.');
+            return $this->json(self::EMPTY_RESPONSE, 'Requête SQL introuvable : les logs ont peut-être été vidés.');
         }
 
         $inspector = new SqlQueryInspector($entry['query']);
-        $params = $this->resolveParams($entry['params'], $inspector->placeholders(), $request->get('params'));
-        $response = array_merge($response, [
-            'id' => $entry['id'],
-            'token' => $entry['request_id'],
-            'query' => $entry['query'],
-            'duration_ms' => $entry['duration_ms'],
-            'rows_count' => $entry['rows_count'],
-            'executions' => $entry['executions'],
-            'params' => array_map(
-                static fn (array $param): array => [
-                    'name' => $param['name'],
-                    'value' => $param['value'],
-                    'provided' => $param['provided'],
-                ],
-                $params
-            ),
-            'read_only' => $inspector->isReadOnly(),
-        ]);
+        $params = SqlParamResolver::resolve($entry['params'], $inspector->placeholders(), $request->get('params'));
+        $response = $this->entryResponse($entry, $params, $inspector);
 
-        if ($inspector->isExplainable() === false) {
-            return $this->json($response, 'Seules les requêtes SELECT, INSERT, UPDATE, DELETE et REPLACE ont un plan d\'exécution.');
-        }
-        if ($inspector->hasMultipleStatements() === true) {
-            return $this->json($response, 'Le texte contient plusieurs requêtes séparées par « ; » : l\'analyse est refusée.');
+        $pdo = $this->connection();
+        $refusal = $this->refusal($inspector, $pdo);
+        if ($refusal !== null || $pdo === null) {
+            return $this->json($response, $refusal);
         }
 
-        try {
-            $explainer = new SqlExplainer(DatabaseService::getConnect());
-            $response['driver'] = $explainer->driver();
-            $response['server_version'] = $explainer->serverVersion();
-        } catch (\Throwable) {
-            return $this->json(
-                $response,
-                'Aucune connexion à la base de données de l\'application : vérifiez DB_HOST_STATUS=true dans le fichier .env.'
-            );
-        }
-
-        if ($explainer->isSupported() === false) {
-            return $this->json($response, 'L\'analyse EXPLAIN n\'est disponible que pour MySQL, MariaDB et SQLite.');
-        }
-
-        $missing = array_filter($params, static fn (array $param): bool => $param['provided'] === false);
-        if ($missing !== []) {
-            return $this->json(
-                $response,
-                'Renseignez la valeur des paramètres ' . implode(', ', array_column($missing, 'name'))
-                . ' pour analyser la requête.'
-            );
+        $explainer = new SqlExplainer($pdo);
+        $response['driver'] = $explainer->driver();
+        $response['server_version'] = $explainer->serverVersion();
+        $refusal = $this->explainerRefusal($explainer, $params);
+        if ($refusal !== null) {
+            return $this->json($response, $refusal);
         }
 
         $bound = array_map(
@@ -158,96 +130,164 @@ class DebugSqlExplainController implements ControllerInterface
             $params
         );
 
-        try {
-            $response['plan'] = $explainer->explain($entry['query'], $bound);
-            $accesses = $explainer->accesses($response['plan']['rows']);
+        return $this->json($this->analyse($response, $explainer, $inspector, $bound, $request->get('analyze') === '1'));
+    }
 
-            if ($request->get('analyze') === '1') {
-                if ($inspector->isReadOnly() === false) {
-                    $response['message'] = 'EXPLAIN ANALYZE exécute réellement la requête : il est réservé aux requêtes de lecture (SELECT).';
-                } else {
-                    $response['analysis'] = $explainer->analyze($entry['query'], $bound);
-                    // MariaDB : le plan mesuré (colonnes r_rows, r_filtered) remplace le plan estimé
-                    if ($response['analysis']['rows'] !== []) {
-                        $accesses = $explainer->accesses($response['analysis']['rows']);
-                    }
-                }
+    /**
+     * Réponse décrivant la requête SQL enregistrée et ses paramètres
+     *
+     * @param array{id: int, request_id: int, query: string, duration_ms: float, rows_count: int|null,
+     *        params: array<int, array{name: int|string, value: mixed, type: int}>, executions: int,
+     *        event_date: string|null} $entry Requête SQL enregistrée
+     * @param array<int, array{name: int|string, value: mixed, type: int, provided: bool}> $params Paramètres
+     * @param SqlQueryInspector $inspector Lecture du texte de la requête
+     * @return array<string, mixed>
+     */
+    private function entryResponse(array $entry, array $params, SqlQueryInspector $inspector): array
+    {
+        return array_merge(self::EMPTY_RESPONSE, [
+            'id' => $entry['id'],
+            'token' => $entry['request_id'],
+            'query' => $entry['query'],
+            'duration_ms' => $entry['duration_ms'],
+            'rows_count' => $entry['rows_count'],
+            'executions' => $entry['executions'],
+            'params' => array_map(
+                static fn (array $param): array => ['name' => $param['name'], 'value' => $param['value'], 'provided' => $param['provided']],
+                $params
+            ),
+            'read_only' => $inspector->isReadOnly(),
+        ]);
+    }
+
+    /**
+     * Raison pour laquelle la requête ne peut pas être analysée (texte ou connexion), null sinon
+     *
+     * @param SqlQueryInspector $inspector Lecture du texte de la requête
+     * @param PDO|null $pdo Connexion à la base de données de l'application
+     * @return string|null
+     */
+    private function refusal(SqlQueryInspector $inspector, ?PDO $pdo): ?string
+    {
+        return match (true) {
+            $inspector->isExplainable() === false
+                => 'Seules les requêtes SELECT, INSERT, UPDATE, DELETE et REPLACE ont un plan d\'exécution.',
+            $inspector->hasMultipleStatements() === true
+                => 'Le texte contient plusieurs requêtes séparées par « ; » : l\'analyse est refusée.',
+            $pdo === null
+                => 'Aucune connexion à la base de données de l\'application : vérifiez DB_HOST_STATUS=true dans le fichier .env.',
+            default => null,
+        };
+    }
+
+    /**
+     * Raison pour laquelle le moteur ne peut pas analyser la requête (moteur non pris
+     * en charge, paramètres sans valeur), null sinon
+     *
+     * @param SqlExplainer $explainer Analyse du plan d'exécution
+     * @param array<int, array{name: int|string, value: mixed, type: int, provided: bool}> $params Paramètres
+     * @return string|null
+     */
+    private function explainerRefusal(SqlExplainer $explainer, array $params): ?string
+    {
+        if ($explainer->isSupported() === false) {
+            return 'L\'analyse EXPLAIN n\'est disponible que pour MySQL, MariaDB et SQLite.';
+        }
+
+        $missing = array_column(array_filter($params, static fn (array $param): bool => $param['provided'] === false), 'name');
+
+        return ($missing === [] ? null : 'Renseignez la valeur des paramètres ' . implode(', ', $missing) . ' pour analyser la requête.');
+    }
+
+    /**
+     * Analyse la requête : plan estimé, plan mesuré (ANALYZE), structure des tables
+     * et axes d'amélioration
+     *
+     * @param array<string, mixed> $response Réponse décrivant la requête
+     * @param SqlExplainer $explainer Analyse du plan d'exécution
+     * @param SqlQueryInspector $inspector Lecture du texte de la requête
+     * @param array<int, array{name: int|string, value: mixed, type: int}> $bound Paramètres liés à la requête
+     * @param bool $analyze Exécuter réellement la requête
+     * @return array<string, mixed>
+     */
+    private function analyse(
+        array $response,
+        SqlExplainer $explainer,
+        SqlQueryInspector $inspector,
+        array $bound,
+        bool $analyze
+    ): array {
+        try {
+            $response['plan'] = $explainer->explain($inspector->getSql(), $bound);
+            $rows = $response['plan']['rows'];
+            if ($analyze === true && $inspector->isReadOnly() === true) {
+                $response['analysis'] = $explainer->analyze($inspector->getSql(), $bound);
+                // MariaDB : le plan mesuré (colonnes r_rows, r_filtered) remplace le plan estimé
+                $rows = ($response['analysis']['rows'] !== [] ? $response['analysis']['rows'] : $rows);
             }
         } catch (\PDOException $exception) {
-            $response['error'] = $exception->getMessage();
-            return $this->json($response, 'La base de données a refusé l\'analyse de cette requête.');
+            return array_merge($response, [
+                'error' => $exception->getMessage(),
+                'message' => 'La base de données a refusé l\'analyse de cette requête.',
+            ]);
         }
 
-        $tables = $explainer->tables($inspector->tableNames());
-        $response['accesses'] = $accesses;
-        $response['tables'] = array_values($tables);
-        $advisor = new SqlExplainAdvisor($inspector, $accesses, $tables, [
-            'executions' => $entry['executions'],
-            'rows_count' => $entry['rows_count'],
-            'driver' => $response['driver'],
-        ]);
-        $response['findings'] = $advisor->advise();
-        $response['suggestions'] = $advisor->suggestions();
+        if ($analyze === true && $inspector->isReadOnly() === false) {
+            $response['message'] = 'EXPLAIN ANALYZE exécute réellement la requête : il est réservé aux requêtes de lecture (SELECT).';
+        }
 
-        return $this->json($response, $response['message']);
+        return $this->withAdvice($response, $inspector, $explainer->accesses($rows));
     }
 
     /**
-     * Associe à chaque paramètre de la requête sa valeur : celle saisie dans le
-     * profiler (params), sinon celle enregistrée à l'exécution
+     * Ajoute à la réponse les accès aux tables, la structure des tables et les axes d'amélioration
      *
-     * @param array<int, array{name: int|string, value: mixed, type: int}> $captured Paramètres enregistrés
-     * @param array<int, int|string> $placeholders Paramètres présents dans la requête
-     * @param string|null $override Valeurs saisies, objet JSON (Exemple : {":id": "3"})
-     * @return array<int, array{name: int|string, value: mixed, type: int, provided: bool}>
+     * @param array<string, mixed> $response Réponse
+     * @param SqlQueryInspector $inspector Lecture du texte de la requête
+     * @param array<int, array<string, mixed>> $accesses Accès aux tables normalisés
+     * @return array<string, mixed>
      */
-    private function resolveParams(array $captured, array $placeholders, ?string $override): array
+    private function withAdvice(array $response, SqlQueryInspector $inspector, array $accesses): array
     {
-        $known = [];
-        foreach ($captured as $param) {
-            $name = $param['name'];
-            if (is_string($name) === true && str_starts_with($name, ':') === false) {
-                $name = ':' . $name;
-            }
-            $known[(string) $name] = $param;
-        }
+        $tables = (new SqlTableInspector(DatabaseService::getConnect()))->tables($inspector->tableNames());
+        $advisor = new SqlExplainAdvisor($inspector, $accesses, $tables, [
+            'executions' => (int) $response['executions'],
+            'rows_count' => $response['rows_count'],
+            'driver' => (string) $response['driver'],
+        ]);
 
-        $values = ($override === null || $override === '' ? null : json_decode($override, true));
-        $values = (is_array($values) === true ? $values : []);
-
-        $params = [];
-        foreach ($placeholders as $name) {
-            $key = (string) $name;
-            $type = (int) ($known[$key]['type'] ?? PDO::PARAM_STR);
-            if (array_key_exists($key, $values) === true && (is_scalar($values[$key]) === true || $values[$key] === null)) {
-                $value = $values[$key];
-                $wasInt = (isset($known[$key]) === true
-                    && (is_int($known[$key]['value']) === true || $type === PDO::PARAM_INT));
-                if (is_string($value) === true && preg_match('/^-?\d{1,18}$/', $value) === 1
-                    && ($wasInt === true || isset($known[$key]) === false)) {
-                    $value = (int) $value;
-                }
-                $params[] = ['name' => $name, 'value' => $value, 'type' => $type, 'provided' => true];
-            } elseif (isset($known[$key]) === true) {
-                $params[] = ['name' => $name, 'value' => $known[$key]['value'], 'type' => $type, 'provided' => true];
-            } else {
-                $params[] = ['name' => $name, 'value' => null, 'type' => $type, 'provided' => false];
-            }
-        }
-
-        return $params;
+        return array_merge($response, [
+            'accesses' => $accesses,
+            'tables' => array_values($tables),
+            'findings' => $advisor->advise(),
+            'suggestions' => $advisor->suggestions(),
+        ]);
     }
 
     /**
-     * Encode la réponse en JSON avec un éventuel message
+     * Retourne la connexion à la base de données de l'application, null si elle n'est pas ouverte
+     *
+     * @return PDO|null
+     */
+    private function connection(): ?PDO
+    {
+        try {
+            return DatabaseService::getConnect();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Encode la réponse en JSON, avec le message donné (sinon celui de la réponse)
      *
      * @param array<string, mixed> $response Réponse
      * @param string|null $message Raison pour laquelle l'analyse n'a pas pu être faite
      * @return string
      */
-    private function json(array $response, ?string $message): string
+    private function json(array $response, ?string $message = null): string
     {
-        $response['message'] = $message;
+        $response['message'] = $message ?? $response['message'];
 
         return (string) json_encode(
             $response,

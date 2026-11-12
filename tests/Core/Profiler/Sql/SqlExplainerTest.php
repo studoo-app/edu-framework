@@ -4,7 +4,10 @@ namespace Core\Profiler\Sql;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Studoo\EduFramework\Core\Profiler\Sql\MysqlPlanNormalizer;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlExplainer;
+use Studoo\EduFramework\Core\Profiler\Sql\SqlitePlanNormalizer;
+use Studoo\EduFramework\Core\Profiler\Sql\SqlTableInspector;
 
 /**
  * Tests de l'exécution du plan d'exécution sur SQLite (EXPLAIN QUERY PLAN),
@@ -69,7 +72,7 @@ class SqlExplainerTest extends TestCase
      */
     public function testSqliteSpecialStepsAreNormalized(): void
     {
-        $accesses = SqlExplainer::sqliteAccesses([
+        $accesses = SqlitePlanNormalizer::normalize([
             ['id' => 2, 'parent' => 0, 'detail' => 'SCAN u'],
             ['id' => 5, 'parent' => 0, 'detail' => 'SEARCH e USING AUTOMATIC COVERING INDEX (utilisateur_id=?) LEFT-JOIN'],
             ['id' => 8, 'parent' => 0, 'detail' => 'USE TEMP B-TREE FOR GROUP BY'],
@@ -94,7 +97,7 @@ class SqlExplainerTest extends TestCase
      */
     public function testMysqlPlanIsNormalized(): void
     {
-        $accesses = SqlExplainer::mysqlAccesses([
+        $accesses = MysqlPlanNormalizer::normalize([
             ['id' => 1, 'select_type' => 'SIMPLE', 'table' => 'u', 'type' => 'ALL', 'key' => null,
                 'rows' => '4000', 'r_rows' => '4000.00', 'Extra' => 'Using temporary; Using filesort'],
             ['id' => 1, 'select_type' => 'SIMPLE', 'table' => 'e', 'type' => 'ref', 'key' => 'idx_e',
@@ -119,7 +122,7 @@ class SqlExplainerTest extends TestCase
      */
     public function testTablesStructureIsRead(): void
     {
-        $tables = (new SqlExplainer($this->pdo))->tables(['livres', 'inconnue', 'livres; DROP TABLE x']);
+        $tables = (new SqlTableInspector($this->pdo))->tables(['livres', 'inconnue', 'livres; DROP TABLE x']);
 
         $this->assertSame(['livres'], array_keys($tables));
         $this->assertSame(2, $tables['livres']['rows']);

@@ -115,6 +115,28 @@ class SqlQueryLogger
     }
 
     /**
+     * Décode les paramètres d'une requête enregistrés en JSON (encodeParams()) :
+     * liste de {name, value, type}, vide si la requête n'a pas de paramètre ou si
+     * le JSON est illisible
+     *
+     * @param mixed $json Paramètres enregistrés (colonne params de serv_sql_logs)
+     * @return array<int, array{name: int|string, value: mixed, type: int}>
+     */
+    public static function decodeParams(mixed $json): array
+    {
+        $decoded = (is_string($json) === true ? json_decode($json, true) : null);
+        $params = [];
+        foreach (is_array($decoded) === true ? $decoded : [] as $param) {
+            $name = (is_array($param) === true ? ($param['name'] ?? null) : null);
+            if (is_int($name) === true || is_string($name) === true) {
+                $params[] = ['name' => $name, 'value' => $param['value'] ?? null, 'type' => (int) ($param['type'] ?? PDO::PARAM_STR)];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * Retourne le nombre de requêtes SQL collectées pour la requête HTTP en cours
      * (utilisé par le bloc SQL de la barre de debug)
      *

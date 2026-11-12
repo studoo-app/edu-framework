@@ -42,12 +42,12 @@ class SqlQueryInspectorTest extends TestCase
 
         $this->assertSame([[
             'left_alias' => 'l', 'left_column' => 'auteur_id', 'right_alias' => 'a', 'right_column' => 'id',
-        ]], $inspector->joinConditions());
-        $this->assertSame([['alias' => 'a', 'column' => 'id', 'operator' => '=']], $inspector->whereColumns());
+        ]], $inspector->getConditions()->joinConditions());
+        $this->assertSame([['alias' => 'a', 'column' => 'id', 'operator' => '=']], $inspector->getConditions()->whereColumns());
 
         $filters = (new SqlQueryInspector(
             "SELECT * FROM livres WHERE annee >= 2000 AND titre LIKE 'Le%' AND auteur_id IN (1, 2) AND isbn IS NULL"
-        ))->whereColumns();
+        ))->getConditions()->whereColumns();
         $this->assertSame(['annee', 'titre', 'auteur_id', 'isbn'], array_column($filters, 'column'));
         $this->assertSame(['>=', 'LIKE', 'IN', 'IS'], array_column($filters, 'operator'));
     }
@@ -62,13 +62,13 @@ class SqlQueryInspectorTest extends TestCase
             . 'GROUP BY u.id, u.nom ORDER BY total DESC, u.nom LIMIT 10'
         );
 
-        $this->assertSame(['total'], $inspector->selectAliases());
-        $order = $inspector->orderByItems();
+        $this->assertSame(['total'], $inspector->getOrdering()->selectAliases());
+        $order = $inspector->getOrdering()->orderByItems();
         // "total" est un alias du SELECT (valeur calculée) : ce n'est pas une colonne
         $this->assertNull($order[0]['column']);
         $this->assertSame('DESC', $order[0]['direction']);
         $this->assertSame(['alias' => 'u', 'column' => 'nom', 'expression' => 'u.nom', 'direction' => 'ASC'], $order[1]);
-        $this->assertSame(['id', 'nom'], array_column($inspector->groupByItems(), 'column'));
+        $this->assertSame(['id', 'nom'], array_column($inspector->getOrdering()->groupByItems(), 'column'));
         $this->assertTrue($inspector->hasLimit());
     }
 
@@ -125,12 +125,12 @@ class SqlQueryInspectorTest extends TestCase
         );
 
         $this->assertTrue($inspector->hasSelectStar());
-        $this->assertSame(['YEAR(e.date_emprunt)', 'LOWER(nom)'], array_column($inspector->functionsOnWhereColumns(), 'expression'));
-        $this->assertSame(['e.titre'], $inspector->leadingWildcardLikes());
+        $this->assertSame(['YEAR(e.date_emprunt)', 'LOWER(nom)'], array_column($inspector->getConditions()->functionsOnWhereColumns(), 'expression'));
+        $this->assertSame(['e.titre'], $inspector->getConditions()->leadingWildcardLikes());
 
         $clean = new SqlQueryInspector("SELECT COUNT(*) FROM livres WHERE titre LIKE 'Le%'");
         $this->assertFalse($clean->hasSelectStar());
-        $this->assertSame([], $clean->functionsOnWhereColumns());
-        $this->assertSame([], $clean->leadingWildcardLikes());
+        $this->assertSame([], $clean->getConditions()->functionsOnWhereColumns());
+        $this->assertSame([], $clean->getConditions()->leadingWildcardLikes());
     }
 }

@@ -4,7 +4,7 @@ namespace Core\Profiler\Sql;
 
 use PHPUnit\Framework\TestCase;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlExplainAdvisor;
-use Studoo\EduFramework\Core\Profiler\Sql\SqlExplainer;
+use Studoo\EduFramework\Core\Profiler\Sql\MysqlPlanNormalizer;
 use Studoo\EduFramework\Core\Profiler\Sql\SqlQueryInspector;
 
 /**
@@ -56,7 +56,7 @@ class SqlExplainAdvisorTest extends TestCase
     {
         return (new SqlExplainAdvisor(
             new SqlQueryInspector($sql),
-            SqlExplainer::mysqlAccesses($plan),
+            MysqlPlanNormalizer::normalize($plan),
             $this->tables(),
             $context
         ))->advise();
@@ -120,7 +120,7 @@ class SqlExplainAdvisorTest extends TestCase
                 "SELECT l.titre FROM livres l JOIN auteurs a ON l.auteur_id = a.id WHERE a.id = :auteur_id ORDER BY l.annee_publication"
             ),
             // MySQL rattache « Using filesort » à la table const (a), la table triée est livres
-            SqlExplainer::mysqlAccesses([
+            MysqlPlanNormalizer::normalize([
                 $this->row('a', 'const', 'PRIMARY', 1, 'Using filesort'),
                 $this->row('l', 'ALL', null, 6000, 'Using where'),
             ]),
@@ -176,6 +176,21 @@ class SqlExplainAdvisorTest extends TestCase
     }
 
     /**
+     * Plan mesuré MariaDB (ANALYZE) : r_rows compte les lignes conservées après le filtre,
+     * le niveau d'un parcours complet se juge sur les lignes lues (rows estimé)
+     */
+    public function testMariadbAnalyzeJudgesFullScanOnRowsRead(): void
+    {
+        $scan = $this->row('emprunts', 'ALL', null, 60000, 'Using where');
+        $scan['r_rows'] = '6.00';
+
+        $findings = $this->advise('SELECT id FROM emprunts WHERE utilisateur_id = 5', [$scan]);
+
+        $this->assertSame(SqlExplainAdvisor::CRITICAL, $findings[0]['level']);
+        $this->assertStringContainsString('60 000 lignes', str_replace("\u{202F}", ' ', $findings[0]['title']));
+    }
+
+    /**
      * Index existant mais ignoré par le moteur : pas de nouvel index proposé
      */
     public function testExistingButUnusedIndexIsExplained(): void
@@ -185,7 +200,7 @@ class SqlExplainAdvisorTest extends TestCase
 
         $findings = (new SqlExplainAdvisor(
             new SqlQueryInspector('SELECT id FROM emprunts WHERE utilisateur_id > 0'),
-            SqlExplainer::mysqlAccesses([$this->row('emprunts', 'ALL', null, 60000, 'Using where')]),
+            MysqlPlanNormalizer::normalize([$this->row('emprunts', 'ALL', null, 60000, 'Using where')]),
             $tables
         ))->advise();
 
