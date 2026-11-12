@@ -21,7 +21,7 @@ APP_ENV=dev
 
 !!! warning "Mode production"
 
-    Les routes `/_debug/profiler`, `/edu-logs` et `/edu-sql-logs` ne sont enregistrées **qu'en mode dev**.
+    Les routes `/_debug/profiler`, `/edu-logs`, `/edu-sql-logs` et `/edu-sql-explain` ne sont enregistrées **qu'en mode dev**.
     Elles ne sont donc pas accessibles lorsque `APP_ENV=prod`.
 
 ## La barre de debug
@@ -77,6 +77,7 @@ La base des logs étant partagée (le conteneur Docker monte le dossier du proje
 - compteur du nombre de requêtes par **famille de statut** (2xx, 3xx, 4xx, 5xx) : onglets de filtrage en tête des vues **Logs** et **Recherche** (un clic filtre les résultats sur la famille, l'onglet **Tous** affiche toutes les requêtes ; dans la vue Recherche, le champ Statut du formulaire est synchronisé) ;
 - **descriptif d'une requête HTTP** : la page `/_debug/profiler#request/{token}` décrit la requête sélectionnée (statut, méthode, URL, IP, SAPI, durée, mémoire, ligne brute) — c'est la page ouverte par le bloc DevTool de la barre de debug ; l'URL d'une requête dans la liste est également cliquable ;
 - **vue SQL d'une requête HTTP** : la page `/_debug/profiler#sql/{token}` liste les requêtes SQL exécutées pendant la requête sélectionnée (voir [« Les requêtes SQL »](#les-requetes-sql)) — accessible depuis la ligne *Requêtes SQL* du descriptif et le bloc SQL de la barre de debug ;
+- **analyse EXPLAIN d'une requête SQL** : la page `/_debug/profiler#explain/{token}/{id}` affiche le plan d'exécution d'une requête et des axes d'amélioration (voir [« Analyser une requête SQL (EXPLAIN) »](#analyser-une-requete-sql-explain)) — accessible depuis le bouton *Analyser le plan (EXPLAIN)* de la vue SQL ;
 - filtres combinables :
 
 | Filtre      | Description                                                        | Exemple                    |
@@ -168,7 +169,53 @@ La collecte est assurée par trois classes du framework, **uniquement en mode de
 
 En **production** (`APP_ENV=prod`), la fabrique retourne une connexion `PDO` native : les classes de tracing ne sont **ni instanciées ni chargées**, aucune mesure ni collecte n'a lieu.
 
-Les requêtes exécutées hors d'une requête HTTP journalisée ne sont jamais collectées : commandes CLI, routes internes du profiler (`/_debug/...`, `/edu-logs`, `/edu-sql-logs`) et requêtes de la base des logs elle-même — le rattachement se fait par le token, absent dans ces contextes.
+Les requêtes exécutées hors d'une requête HTTP journalisée ne sont jamais collectées : commandes CLI, routes internes du profiler (`/_debug/...`, `/edu-logs`, `/edu-sql-logs`, `/edu-sql-explain`) et requêtes de la base des logs elle-même — le rattachement se fait par le token, absent dans ces contextes.
+
+## Analyser une requête SQL (EXPLAIN)
+
+Chaque requête de la vue SQL a un bouton **Analyser le plan (EXPLAIN)** qui ouvre la vue `/_debug/profiler#explain/{token}/{id}`. Elle affiche comment la base de données exécute la requête et propose des **axes d'amélioration** :
+
+- **Axes d'amélioration** : constats classés par niveau — *Critique*, *À améliorer*, *À savoir* et *Bon point* — avec une explication et, si possible, l'instruction `CREATE INDEX` à copier. Les index proposés sont regroupés dans un script en fin de liste ;
+- **Plan d'exécution** : le résultat brut de `EXPLAIN`, colonne `type` colorée (vert : accès par index, orange : parcours d'index, rouge : `ALL`, parcours complet de la table) et mots-clés de la colonne `Extra` mis en évidence. Le survol d'un en-tête de colonne explique son rôle ;
+- **Index des tables** : nombre de lignes et index existants de chaque table de la requête ;
+- **Comment lire le plan d'exécution ?** : aide-mémoire des valeurs de `type` et `Extra` (ou des étapes SQLite).
+
+Les constats repérés sont notamment :
+
+| Constat | Exemple | Proposition |
+|---------|---------|-------------|
+| Parcours complet d'une table recherchée par une **jointure** sans index | `LEFT JOIN emprunts e ON e.utilisateur_id = u.id` (« Using join buffer ») | `CREATE INDEX idx_emprunts_utilisateur_id ON emprunts (utilisateur_id);` |
+| Parcours complet d'une table **filtrée** sans index | `WHERE utilisateur_id = 5` | index sur la colonne filtrée |
+| **Tri sans index** (« Using filesort ») | `ORDER BY nom, prenom` | index composite dans l'ordre du tri, précédé des colonnes filtrées par égalité : `(auteur_id, annee_publication)` |
+| **Table temporaire** (« Using temporary ») | `GROUP BY` sur la table lue en premier | index sur les colonnes du regroupement |
+| **Sous-requête corrélée** | `WHERE EXISTS (SELECT … WHERE e.livre_id = l.id)` | réécriture en jointure, index sur la colonne de liaison |
+| **Fonction sur une colonne** dans le `WHERE` | `YEAR(date_emprunt) = 2024` | condition sur la colonne elle-même |
+| `LIKE '%…'` | `titre LIKE '%chat%'` | motif `LIKE 'abc%'` ou index `FULLTEXT` |
+| Requête exécutée **plusieurs fois** (N+1) | même requête dans une boucle | une seule requête (jointure ou `IN (…)`) |
+| `SELECT *`, grand résultat sans `LIMIT` | — | colonnes utiles, pagination |
+
+!!! info "Des suggestions à vérifier"
+
+    Les constats s'appuient sur le plan d'exécution et sur une lecture du texte de la requête : ce sont des pistes à valider. Après avoir créé un index, rechargez la page de l'application puis relancez l'analyse pour comparer les deux plans.
+
+### EXPLAIN et EXPLAIN ANALYZE
+
+- **EXPLAIN** (par défaut) affiche le plan **estimé** par l'optimiseur : la requête n'est pas exécutée ;
+- **EXPLAIN ANALYZE** exécute **réellement** la requête et ajoute les mesures réelles : `ANALYZE` sous MariaDB (colonnes `r_rows`, `r_filtered`), `EXPLAIN ANALYZE` sous MySQL 8 (arbre avec `actual time`, `rows` et `loops`), temps d'exécution et nombre de lignes sous SQLite. Ce mode est réservé aux requêtes de lecture (`SELECT`) et s'exécute dans une **transaction annulée**.
+
+| Base de données | EXPLAIN | EXPLAIN ANALYZE |
+|-----------------|---------|-----------------|
+| MySQL 8         | `EXPLAIN` (tableau) | `EXPLAIN ANALYZE` (arbre mesuré) |
+| MariaDB         | `EXPLAIN` (tableau) | `ANALYZE` (tableau avec les colonnes `r_*`) |
+| SQLite          | `EXPLAIN QUERY PLAN` (arbre `SCAN` / `SEARCH`) | exécution de la requête, temps et nombre de lignes |
+
+### Les paramètres de la requête
+
+Pour rejouer une requête préparée (`WHERE a.id = :auteur_id`), le profiler enregistre la **valeur de ses paramètres** au moment de l'exécution (`execute([...])`, `bindValue()`, `bindParam()`). Ces valeurs sont affichées dans la vue et **modifiables** : relancez l'analyse avec une autre valeur pour voir comment le plan change selon la valeur cherchée. Une requête enregistrée avant l'ajout de cette fonctionnalité n'a pas de valeurs : le profiler demande de les saisir.
+
+!!! warning "Sécurité"
+
+    L'analyse porte toujours sur une requête **enregistrée** par le profiler (désignée par son identifiant) : l'endpoint n'accepte pas de texte SQL. Seules les requêtes `SELECT`, `INSERT`, `UPDATE`, `DELETE` et `REPLACE` sont analysées, un texte contenant plusieurs requêtes est refusé, et la route n'existe qu'en mode dev.
 
 ## L'API des requêtes SQL
 
@@ -199,6 +246,7 @@ Exemple de réponse :
             "query": "SELECT 1",
             "duration_ms": 1.0,
             "rows_count": 1,
+            "has_params": false,
             "event_date": "2026-10-17 15:04:25"
         }
     ]
@@ -207,6 +255,20 @@ Exemple de réponse :
 
 - `queries` : liste chronologique des exécutions (`rows_count` à `null` si le pilote ne fournit pas l'information, Exemple : `-1` pour un `SELECT` sous PostgreSQL) ;
 - `groups` : requêtes identiques regroupées avec leur nombre d'exécutions et leur temps cumulé.
+
+## L'API d'analyse EXPLAIN
+
+```
+GET /edu-sql-explain?id=12&analyze=1&params={":auteur_id":"3"}
+```
+
+| Paramètre  | Description                                                      | Défaut    |
+|------------|------------------------------------------------------------------|-----------|
+| `id`       | Identifiant de la requête SQL enregistrée (champ `id` de `/edu-sql-logs`) | requis |
+| `analyze`  | `1` pour exécuter réellement la requête (EXPLAIN ANALYZE, `SELECT` uniquement) | — |
+| `params`   | Valeurs des paramètres (objet JSON) à la place des valeurs enregistrées | — |
+
+La réponse contient la requête (`query`, `duration_ms`, `rows_count`, `executions`), ses paramètres (`params`), le moteur (`driver`, `server_version`), le plan estimé (`plan`), le plan mesuré (`analysis`, `null` sans `analyze`), les accès aux tables normalisés (`accesses`), la structure des tables (`tables`), les axes d'amélioration (`findings` : `level`, `title`, `detail`, `suggestion`) et les index proposés (`suggestions`). Si l'analyse est impossible, `message` en donne la raison et `error` contient l'éventuelle erreur de la base de données.
 
 ## Le profiler de code
 
@@ -414,7 +476,7 @@ Les requêtes HTTP traitées par le framework sont enregistrées dans une base *
 
 - fichier : `var/logs/core_logs.sqlite`
 - table : `serv_logs` (colonnes `id`, `event_date`, `event_desc`)
-- table : `serv_sql_logs` (colonnes `id`, `request_id` (token de la requête HTTP), `query`, `duration_ms`, `rows_count`, `event_date`) — requêtes SQL collectées par `SqlQueryLogger`, indexée sur `request_id`
+- table : `serv_sql_logs` (colonnes `id`, `request_id` (token de la requête HTTP), `query`, `duration_ms`, `rows_count`, `params` (valeurs des paramètres en JSON, pour l'analyse EXPLAIN), `event_date`) — requêtes SQL collectées par `SqlQueryLogger`, indexée sur `request_id`
 
 La collecte est assurée par la classe `HttpRequestLogger`, en deux temps comme le profiler de Symfony : la ligne de log est **réservée en début de requête** — son identifiant (le *token*) est alors disponible pour le bloc DevTool de la barre de debug, qui fait le lien vers le descriptif de la requête — puis **complétée en fin de requête** avec le statut final, le temps d'exécution et la mémoire. C'est ce qui permet de mesurer par requête le **temps d'exécution** et la **mémoire utilisée** — deux indicateurs également affichés par la barre de debug — quel que soit le serveur qui la sert (serveur PHP intégré via `php bin/edu start`, ou FrankenPHP dans Docker). La commande `php bin/edu start` analyse la sortie du serveur uniquement pour l'**afficher dans la console** : elle n'écrit plus dans la base des logs.
 
@@ -452,7 +514,7 @@ flowchart LR
 
 !!! info
 
-    Les requêtes du profiler et de la barre de debug (`/_debug/...`, `/edu-logs` et `/edu-sql-logs`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
+    Les requêtes du profiler et de la barre de debug (`/_debug/...`, `/edu-logs`, `/edu-sql-logs` et `/edu-sql-explain`) ne sont pas journalisées, afin d'éviter le remplissage de la base à chaque affichage d'une page d'outils.
 
 !!! note "Limitations"
 

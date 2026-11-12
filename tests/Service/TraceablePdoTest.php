@@ -283,4 +283,100 @@ class TraceablePdoTest extends TestCase
         $this->assertSame(3, $groups[0]['count']);
         $this->assertGreaterThanOrEqual(0, $groups[0]['duration_ms']);
     }
+
+    /**
+     * Vérifie que les paramètres d'un statement préparé sont enregistrés avec la requête
+     * (execute() avec tableau, bindValue(), bindParam() lu au moment de execute(), position)
+     * pour que le profiler puisse rejouer la requête avec EXPLAIN
+     */
+    public function testBoundParametersAreRecordedWithTheQuery(): void
+    {
+        $_ENV['APP_ENV'] = 'dev';
+        $this->startHttpRequest(102);
+
+        $pdo = PdoFactory::create('sqlite::memory:');
+        $pdo->exec('CREATE TABLE ville (id INTEGER PRIMARY KEY, nom TEXT, cp INTEGER)');
+        SqlQueryLogger::reset();
+
+        $pdo->prepare('SELECT * FROM ville WHERE nom = :nom')->execute([':nom' => 'Nice']);
+
+        $byValue = $pdo->prepare('SELECT * FROM ville WHERE cp = :cp');
+        $byValue->bindValue(':cp', 6000, PDO::PARAM_INT);
+        $byValue->execute();
+
+        $byParam = $pdo->prepare('SELECT * FROM ville WHERE nom = :nom');
+        $nom = 'Avant';
+        $byParam->bindParam(':nom', $nom);
+        $nom = 'Cannes';
+        $byParam->execute();
+
+        $pdo->prepare('SELECT * FROM ville WHERE id = ? AND nom = ?')->execute([3, 'Antibes']);
+        $pdo->query('SELECT * FROM ville');
+
+        SqlQueryLogger::flush();
+        $queries = LogsService::getSqlQueries(102);
+        $params = array_map(
+            static fn (array $query): array => LogsService::getSqlQuery($query['id'])['params'],
+            $queries
+        );
+
+        $this->assertSame([['name' => ':nom', 'value' => 'Nice', 'type' => PDO::PARAM_STR]], $params[0]);
+        $this->assertSame([['name' => ':cp', 'value' => 6000, 'type' => PDO::PARAM_INT]], $params[1]);
+        // bindParam() : la valeur est celle de la variable au moment de execute()
+        $this->assertSame('Cannes', $params[2][0]['value']);
+        // Paramètres positionnels numérotés à partir de 1, comme bindValue()
+        $this->assertSame([1, 2], array_column($params[3], 'name'));
+        $this->assertSame([3, 'Antibes'], array_column($params[3], 'value'));
+        // Une requête sans paramètre n'en enregistre aucun
+        $this->assertSame([], $params[4]);
+        $this->assertTrue($queries[0]['has_params']);
+        $this->assertFalse($queries[4]['has_params']);
+    }
+
+    /**
+     * Vérifie que getSqlQuery() compte les exécutions identiques de la requête HTTP
+     * et tronque les valeurs de paramètres trop longues
+     */
+    public function testRecordedQueryCountsIdenticalExecutionsAndTruncatesLongValues(): void
+    {
+        $_ENV['APP_ENV'] = 'dev';
+        $this->startHttpRequest(103);
+
+        $pdo = PdoFactory::create('sqlite::memory:');
+        $pdo->exec('CREATE TABLE ville (id INTEGER PRIMARY KEY, nom TEXT)');
+        SqlQueryLogger::reset();
+
+        $statement = $pdo->prepare('SELECT * FROM ville WHERE nom = :nom');
+        $statement->execute([':nom' => str_repeat('a', SqlQueryLogger::PARAM_MAX_LENGTH + 50)]);
+        $statement->execute([':nom' => 'Nice']);
+        SqlQueryLogger::flush();
+
+        $queries = LogsService::getSqlQueries(103);
+        $first = LogsService::getSqlQuery($queries[0]['id']);
+
+        $this->assertSame(2, $first['executions']);
+        $this->assertSame(103, $first['request_id']);
+        $this->assertSame(SqlQueryLogger::PARAM_MAX_LENGTH, strlen($first['params'][0]['value']));
+        $this->assertNull(LogsService::getSqlQuery(999999));
+    }
+
+    /**
+     * Vérifie qu'une base des logs créée par une version précédente (sans la colonne
+     * params) est mise à jour à l'ouverture
+     */
+    public function testLogsDatabaseWithoutParamsColumnIsUpgraded(): void
+    {
+        $database = new PDO('sqlite:' . self::$logsPath . 'core_logs.sqlite');
+        $database->exec('DROP TABLE IF EXISTS serv_sql_logs');
+        $database->exec('CREATE TABLE serv_sql_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, request_id INTEGER NOT NULL, '
+            . 'query TEXT NOT NULL, duration_ms REAL NOT NULL, rows_count INTEGER, event_date TEXT)');
+        $database = null;
+
+        $columns = array_column(
+            LogsService::getConnect()->query('PRAGMA table_info(serv_sql_logs)')->fetchAll(PDO::FETCH_ASSOC),
+            'name'
+        );
+
+        $this->assertContains('params', $columns);
+    }
 }

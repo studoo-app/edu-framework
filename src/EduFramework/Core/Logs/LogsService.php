@@ -269,12 +269,12 @@ class LogsService
      *
      * @param int $tokenId Identifiant du log de la requête HTTP
      * @return array<int, array<string, mixed>> Liste des requêtes
-     *         (id, query, duration_ms, rows_count, event_date)
+     *         (id, query, duration_ms, rows_count, has_params, event_date)
      */
     public static function getSqlQueries(int $tokenId): array
     {
         $stmt = self::getConnect()->prepare(
-            'SELECT id, query, duration_ms, rows_count, event_date '
+            'SELECT id, query, duration_ms, rows_count, params IS NOT NULL AS has_params, event_date '
             . 'FROM serv_sql_logs WHERE request_id = :request_id ORDER BY id ASC'
         );
         $stmt->bindValue(':request_id', $tokenId, PDO::PARAM_INT);
@@ -287,11 +287,63 @@ class LogsService
                 'query' => (string) $row['query'],
                 'duration_ms' => (float) $row['duration_ms'],
                 'rows_count' => ($row['rows_count'] === null ? null : (int) $row['rows_count']),
+                'has_params' => ((int) $row['has_params'] === 1),
                 'event_date' => $row['event_date'],
             ];
         }
 
         return $queries;
+    }
+
+    /**
+     * Permets de récupérer une requête SQL enregistrée (par son identifiant),
+     * avec les valeurs de ses paramètres et son nombre d'exécutions pendant la
+     * même requête HTTP (requêtes identiques), utilisée par l'analyse EXPLAIN du profiler
+     *
+     * @param int $id Identifiant de la requête SQL (table serv_sql_logs)
+     * @return array{id: int, request_id: int, query: string, duration_ms: float, rows_count: int|null,
+     *         params: array<int, array{name: int|string, value: mixed, type: int}>, executions: int,
+     *         event_date: string|null}|null Requête SQL, null si elle n'existe pas
+     */
+    public static function getSqlQuery(int $id): ?array
+    {
+        $stmt = self::getConnect()->prepare(
+            'SELECT s.id, s.request_id, s.query, s.duration_ms, s.rows_count, s.params, s.event_date, '
+            . '(SELECT COUNT(*) FROM serv_sql_logs c WHERE c.request_id = s.request_id AND c.query = s.query) '
+            . 'AS executions FROM serv_sql_logs s WHERE s.id = :id'
+        );
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
+
+        $params = [];
+        $decoded = ($row['params'] === null ? null : json_decode((string) $row['params'], true));
+        if (is_array($decoded) === true) {
+            foreach ($decoded as $param) {
+                if (is_array($param) === true && isset($param['name']) === true
+                    && (is_int($param['name']) === true || is_string($param['name']) === true)) {
+                    $params[] = [
+                        'name' => $param['name'],
+                        'value' => $param['value'] ?? null,
+                        'type' => (int) ($param['type'] ?? PDO::PARAM_STR),
+                    ];
+                }
+            }
+        }
+
+        return [
+            'id' => (int) $row['id'],
+            'request_id' => (int) $row['request_id'],
+            'query' => (string) $row['query'],
+            'duration_ms' => (float) $row['duration_ms'],
+            'rows_count' => ($row['rows_count'] === null ? null : (int) $row['rows_count']),
+            'params' => $params,
+            'executions' => (int) $row['executions'],
+            'event_date' => ($row['event_date'] === null ? null : (string) $row['event_date']),
+        ];
     }
 
     /**
