@@ -228,6 +228,79 @@
         .sql-duration.medium { color: #a46a1f; }
         .sql-duration.slow { color: #b0413e; }
         #sidebarSqlCount:empty { display: none; }
+        .sql-actions { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .btn-small { padding: 3px 9px; font-size: 12px; }
+        .btn-explain { background-color: #4f805d; }
+        .btn-explain:hover { background-color: #5e9a6f; }
+
+        /* ===== Vue analyse EXPLAIN d'une requête SQL ===== */
+        #viewExplain h2 { font-size: 18px; font-weight: 600; margin: 28px 0 10px; }
+        #viewExplain h2 small { font-size: 13px; font-weight: normal; color: #777; margin-left: 6px; }
+        #viewExplain h3 { font-size: 14px; margin: 16px 0 6px; }
+        .explain-modes { margin: 18px 0 8px; }
+        .explain-modes button small { font-size: 12px; opacity: .75; }
+        .explain-modes button:disabled { cursor: not-allowed; color: #aaa; background-color: #f6f6f6; }
+        .explain-message { margin: 12px 0; padding: 10px 14px; background-color: #fff7e8; border-left: 4px solid #a46a1f; color: #5b3d10; }
+        .explain-message.loading { background-color: #f0f0f0; border-left-color: #999; color: #555; }
+        .explain-error { margin: 0 0 12px; padding: 8px 10px; background-color: #fbeceb; border: 1px solid #e6b5b3; color: #b0413e; font-size: 12px; white-space: pre-wrap; word-break: break-word; font-family: 'SFMono-Regular', Consolas, monospace; }
+        .explain-params input { width: 100%; box-sizing: border-box; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; padding: 5px 7px; border: 1px solid #ccc; border-radius: 2px; }
+        .explain-params input.missing { border-color: #b0413e; background-color: #fff7f6; }
+        .explain-params td.param-name { width: 180px; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 600; white-space: nowrap; }
+        .explain-params td.param-origin { width: 190px; color: #777; font-size: 12px; white-space: nowrap; }
+        .explain-params .actions { margin-top: 10px; }
+        .explain-counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+        .level-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; color: #fff; white-space: nowrap; }
+        .level-badge.critical { background-color: #b0413e; }
+        .level-badge.warning { background-color: #a46a1f; }
+        .level-badge.info { background-color: #3a7d8c; }
+        .level-badge.success { background-color: #4f805d; }
+        .finding { background-color: #fff; border: 1px solid #ddd; border-left: 5px solid #3a7d8c; padding: 10px 14px; margin: 0 0 10px; }
+        .finding.critical { border-left-color: #b0413e; }
+        .finding.warning { border-left-color: #a46a1f; }
+        .finding.success { border-left-color: #4f805d; }
+        .finding-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .finding-head b { font-size: 15px; }
+        .finding p { margin: 6px 0 0; color: #444; line-height: 1.5; }
+        .finding .sql-suggestion { margin-top: 8px; display: flex; gap: 8px; align-items: flex-start; }
+        .finding .sql-suggestion pre { flex: 1; }
+        .sql-suggestion pre.sql-query { word-break: normal; overflow-wrap: anywhere; }
+        .explain-script { margin: 14px 0 0; padding: 12px 14px; background-color: #fff; border: 1px solid #ddd; }
+        .explain-script h3 { margin-top: 0 !important; }
+        .explain-script .code-note { margin: 8px 0 0; }
+        .plan-table td, .plan-table th { font-size: 13px; white-space: nowrap; }
+        .plan-table th abbr { text-decoration: none; border-bottom: 1px dotted #888; cursor: help; }
+        .plan-table td.extra { white-space: normal; min-width: 180px; }
+        .plan-table td.null { color: #bbb; }
+        .plan-type { display: inline-block; padding: 1px 7px; border-radius: 3px; font-weight: bold; font-family: 'SFMono-Regular', Consolas, monospace; }
+        .plan-type.ok, .plan-flag.ok { background-color: #d7f0dd; color: #1f6b3a; }
+        .plan-type.mid, .plan-flag.mid { background-color: #fff1c2; color: #7a5b00; }
+        .plan-type.bad, .plan-flag.bad { background-color: #fbdcda; color: #9c2f2b; }
+        .plan-flag { display: inline-block; margin: 1px 4px 1px 0; padding: 0 5px; border-radius: 2px; font-size: 12px; background-color: #eee; color: #555; }
+        .plan-tree, .plan-text {
+            margin: 0; padding: 10px 12px; background-color: #fff; border: 1px solid #ddd; font-size: 12px; line-height: 1.7;
+            font-family: 'SFMono-Regular', Consolas, monospace; white-space: pre; overflow-x: auto; color: #333;
+        }
+        .plan-tree ul { list-style: none; margin: 0; padding-left: 22px; }
+        .plan-tree > ul { padding-left: 0; }
+        .plan-tree li::before { content: '\2514\2500 '; color: #aaa; }
+        .plan-tree > ul > li::before { content: ''; }
+        .plan-line.ok { color: #1f6b3a; }
+        .plan-line.mid { color: #7a5b00; }
+        .plan-line.bad { color: #9c2f2b; font-weight: bold; }
+        .plan-text .actual { color: #0b62a3; }
+        .explain-tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+        .explain-tables .profiler-table th { font-size: 14px; }
+        .explain-tables .profiler-table td { padding: 7px 10px; font-size: 13px; }
+        .explain-tables .idx-cols { font-family: 'SFMono-Regular', Consolas, monospace; }
+        .explain-tables .tag { display: inline-block; margin-left: 6px; padding: 0 5px; border-radius: 2px; font-size: 11px; font-weight: bold; background-color: #cfe2ff; color: #0b4f8a; }
+        .explain-tables .tag.pk { background-color: #fff1c2; color: #7a5b00; }
+        details.explain-help { margin-top: 28px; background-color: #fff; border: 1px solid #ddd; padding: 10px 14px; }
+        details.explain-help summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+        details.explain-help dl { display: grid; grid-template-columns: 160px 1fr; gap: 6px 14px; margin: 12px 0 0; font-size: 13px; }
+        details.explain-help dt { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: bold; }
+        details.explain-help dd { margin: 0; color: #444; }
+        details.explain-help h4 { margin: 16px 0 0; font-size: 14px; }
+        @media (max-width: 800px) { details.explain-help dl { grid-template-columns: 1fr; } }
 
         /* ===== Badges ===== */
         .m-GET, .m-POST, .m-PUT, .m-DELETE, .m-PATCH, .m-OTHER { font-weight: bold; font-size: 12px; padding: 1px 6px; border-radius: 3px; color: #000; background-color: #ddd; }
@@ -458,6 +531,55 @@
                     <tbody id="sqlBody"></tbody>
                 </table>
             </div>
+
+            <!-- Vue : analyse du plan d'exécution (EXPLAIN) d'une requête SQL -->
+            <div id="viewExplain" class="hidden">
+                <div class="back-link"><a href="#sql" id="explainBackLink">&#8592; Retour aux requ&ecirc;tes SQL</a></div>
+                <h1>Analyse du plan d'ex&eacute;cution</h1>
+                <div class="sql-meta" id="explainMeta"></div>
+                <pre class="sql-query" id="explainQuery"></pre>
+
+                <div class="explain-params hidden" id="explainParams">
+                    <h2>Param&egrave;tres de la requ&ecirc;te</h2>
+                    <p class="code-note">Valeurs relev&eacute;es pendant l'ex&eacute;cution. Modifiez-les pour observer comment le plan change selon la valeur cherch&eacute;e.</p>
+                    <form id="explainParamsForm" autocomplete="off">
+                        <table class="profiler-table"><tbody id="explainParamsBody"></tbody></table>
+                        <div class="actions"><button type="submit" class="btn btn-explain">Relancer l'analyse avec ces valeurs</button></div>
+                    </form>
+                </div>
+
+                <div class="tabs explain-modes" id="explainModes">
+                    <button type="button" data-mode="explain" class="active">EXPLAIN <small>plan estim&eacute;</small></button>
+                    <button type="button" data-mode="analyze">EXPLAIN ANALYZE <small>ex&eacute;cution r&eacute;elle</small></button>
+                </div>
+                <p class="code-note" id="explainModeNote"></p>
+                <div class="explain-message hidden" id="explainMessage"></div>
+                <pre class="explain-error hidden" id="explainError"></pre>
+
+                <div id="explainResult" class="hidden">
+                    <h2>Axes d'am&eacute;lioration</h2>
+                    <div class="explain-counts" id="explainCounts"></div>
+                    <div id="explainFindings"></div>
+                    <div class="explain-script hidden" id="explainScript">
+                        <h3>Index propos&eacute;s</h3>
+                        <div class="sql-suggestion"><pre class="sql-query" id="explainScriptSql"></pre></div>
+                        <div class="sql-actions"><button type="button" class="btn btn-small" data-copy="explainScriptSql">Copier le script</button></div>
+                        <p class="code-note">Ex&eacute;cutez ce script sur votre base (phpMyAdmin, DBeaver...), rechargez la page de l'application puis relancez l'analyse pour comparer. Chaque index acc&eacute;l&egrave;re les lectures mais ralentit un peu les &eacute;critures (INSERT, UPDATE, DELETE) et occupe de la place : n'indexez que les colonnes qui servent &agrave; chercher, joindre ou trier.</p>
+                    </div>
+
+                    <h2>Plan d'ex&eacute;cution <small id="explainStatement"></small></h2>
+                    <div id="explainPlan"></div>
+                    <div id="explainAnalysis"></div>
+
+                    <h2>Index des tables</h2>
+                    <div class="explain-tables" id="explainTables"></div>
+
+                    <details class="explain-help" id="explainHelp">
+                        <summary>Comment lire le plan d'ex&eacute;cution ?</summary>
+                        <div id="explainHelpBody"></div>
+                    </details>
+                </div>
+            </div>
             <!-- Vue : profil du code PHP exécuté pendant une requête HTTP -->
             <div id="viewCode" class="hidden">
                 <div class="back-link"><a href="#request" id="codeBackLink">&#8592; Retour au descriptif de la requ&ecirc;te</a></div>
@@ -530,6 +652,11 @@
             var token = '';
             var requestToken = '';
             var sqlToken = '';
+            var explainToken = '';
+            var explainId = '';
+            var explainMode = 'explain';
+            var explainOverrides = {};
+            var explainRequest = 0;
             var codeToken = '';
             var codeData = null;
             var codeSort = 'self';
@@ -598,6 +725,14 @@
                     if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
                 });
                 return fetch('/edu-sql-logs?' + url.toString()).then(function(response) { return response.json(); });
+            }
+
+            function explainQuery(params) {
+                var url = new URLSearchParams();
+                Object.keys(params).forEach(function(key) {
+                    if (params[key] !== '' && params[key] !== undefined && params[key] !== null) { url.set(key, params[key]); }
+                });
+                return fetch('/edu-sql-explain?' + url.toString()).then(function(response) { return response.json(); });
             }
 
             function codeQuery(params) {
@@ -1002,6 +1137,13 @@
                             '\u00d7' + group.count + ' requ\u00eates identiques \u2014 '
                             + prettyNumber(group.duration_ms, 1) + ' ms au total'));
                     }
+                    if (/^[\s(]*(select|with|insert|update|delete|replace)\b/i.test(entry.query)) {
+                        var actions = el('div', 'sql-actions');
+                        var explainLink = el('a', 'btn btn-small btn-explain', 'Analyser le plan (EXPLAIN)');
+                        explainLink.href = '#explain/' + sqlToken + '/' + entry.id;
+                        actions.appendChild(explainLink);
+                        tdQuery.appendChild(actions);
+                    }
                     tr.appendChild(tdQuery);
 
                     tr.appendChild(el('td', durationClass(entry.duration_ms), prettyNumber(entry.duration_ms, 1) + ' ms'));
@@ -1033,6 +1175,454 @@
                     renderSql(results[1], log);
                 }).catch(fail);
             }
+
+
+            // ----- Vue "analyse EXPLAIN d'une requête SQL" -----
+            var EXPLAIN_LEVELS = {
+                critical: { label: 'Critique', plural: 'critiques' },
+                warning: { label: 'À améliorer', plural: 'à améliorer' },
+                info: { label: 'À savoir', plural: 'à savoir' },
+                success: { label: 'Bon point', plural: 'bons points' }
+            };
+            var PLAN_TYPES = {
+                system: 'ok', 'const': 'ok', eq_ref: 'ok', ref: 'ok', ref_or_null: 'ok', fulltext: 'ok',
+                unique_subquery: 'ok', index_subquery: 'ok', range: 'ok', index_merge: 'mid', index: 'mid', ALL: 'bad'
+            };
+            var PLAN_COLUMNS = {
+                id: 'Numéro du SELECT : les sous-requêtes et UNION ont leur propre numéro',
+                select_type: 'SIMPLE, PRIMARY (requête principale), SUBQUERY, DEPENDENT SUBQUERY (corrélée, réexécutée pour chaque ligne), DERIVED (sous-requête du FROM), UNION',
+                table: 'Table (ou alias) lue à cette étape. Les lignes sont dans l\'ordre de lecture des tables',
+                partitions: 'Partitions lues (tables partitionnées)',
+                type: 'Méthode d\'accès, de la meilleure à la pire : system, const, eq_ref, ref, range, index, ALL',
+                possible_keys: 'Index que l\'optimiseur pourrait utiliser',
+                key: 'Index réellement utilisé (vide : aucun index)',
+                key_len: 'Longueur (octets) de la partie de l\'index utilisée',
+                ref: 'Colonne ou valeur comparée à l\'index',
+                rows: 'Estimation du nombre de lignes lues à cette étape',
+                r_rows: 'Nombre réel de lignes lues (ANALYZE)',
+                filtered: 'Pourcentage estimé des lignes conservées après le WHERE',
+                r_filtered: 'Pourcentage réel des lignes conservées (ANALYZE)',
+                r_loops: 'Nombre réel de passages sur la table (ANALYZE)',
+                r_total_time_ms: 'Temps réel passé sur la table (ANALYZE)',
+                extra: 'Informations complémentaires : Using index, Using where, Using filesort, Using temporary, Using join buffer...',
+                detail: 'Étape du plan SQLite : SCAN (parcours complet) ou SEARCH (recherche par index)'
+            };
+
+            function formatInt(value) {
+                return Number(value).toLocaleString('fr-FR');
+            }
+
+            function engineLabel(data) {
+                var names = { mysql: 'MySQL', mariadb: 'MariaDB', sqlite: 'SQLite' };
+                if (!data.driver) { return ''; }
+                var version = (data.server_version || '').replace(/-MariaDB.*$/i, '');
+                return (names[data.driver] || data.driver) + (version ? ' ' + version : '');
+            }
+
+            function copyButton(targetId, label) {
+                var button = el('button', 'btn btn-small', label || 'Copier');
+                button.type = 'button';
+                button.setAttribute('data-copy', targetId);
+                return button;
+            }
+
+            function renderExplainMeta(data) {
+                var meta = $('explainMeta');
+                meta.innerHTML = '';
+                var parts = [];
+                if (data.duration_ms !== null) { parts.push(['Durée mesurée', prettyNumber(data.duration_ms, 1) + ' ms']); }
+                if (data.rows_count !== null) { parts.push(['Lignes', formatInt(data.rows_count)]); }
+                if (data.executions > 1) { parts.push(['Exécutions', '×' + data.executions]); }
+                if (engineLabel(data) !== '') { parts.push(['Base', engineLabel(data)]); }
+                parts.forEach(function(part, index) {
+                    if (index > 0) { meta.appendChild(document.createTextNode(' — ')); }
+                    meta.appendChild(document.createTextNode(part[0] + ' : '));
+                    meta.appendChild(el('b', null, part[1]));
+                });
+            }
+
+            function renderExplainParams(data) {
+                var body = $('explainParamsBody');
+                body.innerHTML = '';
+                $('explainParams').classList.toggle('hidden', data.params.length === 0);
+                var overrides = explainOverrides[explainId] || {};
+                data.params.forEach(function(param) {
+                    var name = String(param.name);
+                    var tr = el('tr');
+                    tr.appendChild(el('td', 'param-name', typeof param.name === 'number' ? '? n°' + name : name));
+                    var tdInput = el('td');
+                    var input = el('input', param.provided ? null : 'missing');
+                    input.type = 'text';
+                    input.name = name;
+                    input.value = (param.value === null || param.value === undefined) ? '' : String(param.value);
+                    input.placeholder = param.provided ? 'NULL' : 'valeur à renseigner';
+                    input.setAttribute('aria-label', 'Valeur du paramètre ' + name);
+                    tdInput.appendChild(input);
+                    tr.appendChild(tdInput);
+                    tr.appendChild(el('td', 'param-origin', overrides[name] !== undefined
+                        ? 'valeur saisie' : (param.provided ? 'valeur enregistrée' : 'valeur inconnue')));
+                    body.appendChild(tr);
+                });
+            }
+
+            function renderExplainModes(data) {
+                var analyze = document.querySelector('#explainModes button[data-mode="analyze"]');
+                analyze.disabled = (data !== null && data.read_only === false);
+                analyze.title = analyze.disabled ? 'EXPLAIN ANALYZE exécute réellement la requête : réservé aux requêtes SELECT' : '';
+                document.querySelectorAll('#explainModes button').forEach(function(node) {
+                    node.classList.toggle('active', node.getAttribute('data-mode') === explainMode);
+                });
+                var notes = {
+                    explain: 'Le plan est estimé par l\'optimiseur à partir des statistiques des tables : la requête n\'est pas exécutée.',
+                    analyze: 'La requête est réellement exécutée (dans une transaction annulée) : le plan indique les temps et les nombres de lignes réels.'
+                };
+                $('explainModeNote').textContent = notes[explainMode];
+            }
+
+            function renderFindings(data) {
+                var counts = $('explainCounts');
+                var list = $('explainFindings');
+                counts.innerHTML = '';
+                list.innerHTML = '';
+                var total = {};
+                data.findings.forEach(function(finding) { total[finding.level] = (total[finding.level] || 0) + 1; });
+                Object.keys(EXPLAIN_LEVELS).forEach(function(level) {
+                    if (total[level]) {
+                        counts.appendChild(el('span', 'level-badge ' + level, total[level] + ' ' + (total[level] > 1 ? EXPLAIN_LEVELS[level].plural : EXPLAIN_LEVELS[level].label.toLowerCase())));
+                    }
+                });
+                if (!total.critical && !total.warning) {
+                    var ok = el('div', 'finding success');
+                    var head = el('div', 'finding-head');
+                    head.appendChild(el('span', 'level-badge success', 'Bon point'));
+                    head.appendChild(el('b', null, 'Aucun problème majeur détecté dans le plan'));
+                    ok.appendChild(head);
+                    ok.appendChild(el('p', null, 'Les tables sont lues efficacement pour le volume actuel. Relancez l\'analyse quand les tables auront grossi : un plan peut changer avec le volume.'));
+                    list.appendChild(ok);
+                }
+                data.findings.forEach(function(finding, index) {
+                    var card = el('div', 'finding ' + finding.level);
+                    var head = el('div', 'finding-head');
+                    head.appendChild(el('span', 'level-badge ' + finding.level, EXPLAIN_LEVELS[finding.level].label));
+                    head.appendChild(el('b', null, finding.title));
+                    card.appendChild(head);
+                    card.appendChild(el('p', null, finding.detail));
+                    if (finding.suggestion) {
+                        var wrap = el('div', 'sql-suggestion');
+                        var pre = el('pre', 'sql-query', finding.suggestion);
+                        pre.id = 'explainSuggestion' + index;
+                        wrap.appendChild(pre);
+                        wrap.appendChild(copyButton(pre.id));
+                        card.appendChild(wrap);
+                    }
+                    list.appendChild(card);
+                });
+
+                var script = data.suggestions || [];
+                $('explainScript').classList.toggle('hidden', script.length === 0);
+                $('explainScriptSql').textContent = script.join('\n');
+            }
+
+            function planCell(column, value) {
+                var key = column.toLowerCase();
+                var td = el('td');
+                if (value === null || value === undefined || value === '') {
+                    td.className = 'null';
+                    td.textContent = 'NULL';
+                    return td;
+                }
+                if (key === 'type') {
+                    td.appendChild(el('span', 'plan-type ' + (PLAN_TYPES[value] || ''), value));
+                } else if (key === 'extra') {
+                    td.className = 'extra';
+                    String(value).split(/;\s*/).forEach(function(item) {
+                        var level = '';
+                        if (/filesort|temporary|join buffer|hash join|BNL|BKA/i.test(item)) { level = 'mid'; }
+                        if (/^Using index$|Using index condition|Using index for group-by|Select tables optimized away/i.test(item)) { level = 'ok'; }
+                        if (/Impossible WHERE|full scan on NULL key/i.test(item)) { level = 'bad'; }
+                        td.appendChild(el('span', 'plan-flag ' + level, item));
+                    });
+                } else if (key === 'rows' || key === 'r_rows') {
+                    td.textContent = formatInt(value);
+                } else {
+                    td.textContent = String(value);
+                }
+                return td;
+            }
+
+            function renderPlanTable(target, columns, rows) {
+                var table = el('table', 'profiler-table plan-table');
+                var thead = el('thead');
+                var trHead = el('tr');
+                columns.forEach(function(column) {
+                    var th = el('th');
+                    var help = PLAN_COLUMNS[column.toLowerCase()];
+                    if (help) {
+                        var abbr = el('abbr', null, column);
+                        abbr.title = help;
+                        th.appendChild(abbr);
+                    } else {
+                        th.textContent = column;
+                    }
+                    trHead.appendChild(th);
+                });
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+                var tbody = el('tbody');
+                rows.forEach(function(row) {
+                    var tr = el('tr');
+                    columns.forEach(function(column) { tr.appendChild(planCell(column, row[column])); });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                var wrap = el('div');
+                wrap.style.overflowX = 'auto';
+                wrap.appendChild(table);
+                target.appendChild(wrap);
+            }
+
+            function planLineClass(text) {
+                if (/<temporary>/i.test(text)) { return 'mid'; }
+                if (/^SCAN\b(?!.*USING)|Table scan|full scan|^SCAN TABLE/i.test(text)) { return 'bad'; }
+                if (/TEMP B-TREE|AUTOMATIC|Sort|temporary|hash join|Hash$|CORRELATED|DEPENDENT|Materialize/i.test(text)) { return 'mid'; }
+                if (/^SEARCH|index lookup|Index range scan|Covering index|Index scan|Single-row|USING (COVERING )?INDEX|PRIMARY KEY/i.test(text)) { return 'ok'; }
+                return '';
+            }
+
+            function renderSqliteTree(target, rows) {
+                var children = {};
+                rows.forEach(function(row) {
+                    var parent = String(row.parent);
+                    (children[parent] = children[parent] || []).push(row);
+                });
+                function build(parentId) {
+                    var ul = el('ul');
+                    (children[parentId] || []).forEach(function(row) {
+                        var li = el('li');
+                        li.appendChild(el('span', 'plan-line ' + planLineClass(String(row.detail)), String(row.detail)));
+                        if (children[String(row.id)]) { li.appendChild(build(String(row.id))); }
+                        ul.appendChild(li);
+                    });
+                    return ul;
+                }
+                var tree = el('div', 'plan-tree');
+                tree.appendChild(build('0'));
+                target.appendChild(tree);
+            }
+
+            function renderMysqlTree(target, text) {
+                var pre = el('pre', 'plan-text');
+                String(text).split('\n').forEach(function(line, index) {
+                    if (index > 0) { pre.appendChild(document.createTextNode('\n')); }
+                    var match = /^(.*?)(\(actual time=.*\))?\s*$/.exec(line);
+                    pre.appendChild(el('span', 'plan-line ' + planLineClass(line.replace(/^\s*->\s*/, '')), match[1]));
+                    if (match[2]) { pre.appendChild(el('span', 'actual', match[2])); }
+                });
+                target.appendChild(pre);
+            }
+
+            function renderPlan(data) {
+                var plan = $('explainPlan');
+                var analysis = $('explainAnalysis');
+                plan.innerHTML = '';
+                analysis.innerHTML = '';
+                var mariaAnalyze = data.analysis && data.analysis.rows && data.analysis.rows.length > 0;
+                $('explainStatement').textContent = mariaAnalyze ? data.analysis.statement : (data.plan.statement || '');
+
+                if (data.driver === 'sqlite') {
+                    renderSqliteTree(plan, data.plan.rows);
+                } else if (mariaAnalyze) {
+                    renderPlanTable(plan, data.analysis.columns, data.analysis.rows);
+                    plan.appendChild(el('p', 'code-note', 'Les colonnes r_* sont mesurées pendant l\'exécution : comparez rows (estimé) et r_rows (réel), filtered et r_filtered.'));
+                } else {
+                    renderPlanTable(plan, data.plan.columns, data.plan.rows);
+                }
+
+                if (data.analysis) {
+                    analysis.appendChild(el('h3', null, 'Exécution réelle'));
+                    var summary = el('p', 'sql-meta');
+                    summary.appendChild(document.createTextNode('Temps mesuré pendant l\'analyse : '));
+                    summary.appendChild(el('b', null, prettyNumber(data.analysis.time_ms, 1) + ' ms'));
+                    if (data.analysis.rows_count !== null) {
+                        summary.appendChild(document.createTextNode(' — ' + formatInt(data.analysis.rows_count) + ' ligne(s) retournée(s)'));
+                    }
+                    analysis.appendChild(summary);
+                    if (data.analysis.tree) {
+                        renderMysqlTree(analysis, data.analysis.tree);
+                        analysis.appendChild(el('p', 'code-note', 'L\'arbre se lit de l\'intérieur vers l\'extérieur : les étapes les plus indentées sont exécutées en premier. actual time=première ligne..dernière ligne (ms), rows=lignes réelles, loops=nombre d\'exécutions de l\'étape.'));
+                    }
+                }
+            }
+
+            function renderTables(data) {
+                var target = $('explainTables');
+                target.innerHTML = '';
+                if (data.tables.length === 0) {
+                    target.appendChild(el('p', 'code-note', 'Structure des tables indisponible.'));
+                    return;
+                }
+                data.tables.forEach(function(table) {
+                    var wrap = el('div');
+                    var t = el('table', 'profiler-table');
+                    var thead = el('thead');
+                    var trHead = el('tr');
+                    var th = el('th');
+                    th.colSpan = 2;
+                    th.appendChild(document.createTextNode(table.name));
+                    if (table.rows !== null) {
+                        th.appendChild(el('span', 'code-file', (data.driver === 'sqlite' ? '' : '≈ ') + formatInt(table.rows) + ' lignes'));
+                    }
+                    trHead.appendChild(th);
+                    thead.appendChild(trHead);
+                    t.appendChild(thead);
+                    var tbody = el('tbody');
+                    if (table.indexes.length === 0) {
+                        var trEmpty = el('tr');
+                        var tdEmpty = el('td', 'empty-state', 'Aucun index');
+                        tdEmpty.colSpan = 2;
+                        trEmpty.appendChild(tdEmpty);
+                        tbody.appendChild(trEmpty);
+                    }
+                    table.indexes.forEach(function(index) {
+                        var tr = el('tr');
+                        var tdName = el('td', null, index.name);
+                        if (index.primary) { tdName.appendChild(el('span', 'tag pk', 'clé primaire')); }
+                        else if (index.unique) { tdName.appendChild(el('span', 'tag', 'unique')); }
+                        tr.appendChild(tdName);
+                        tr.appendChild(el('td', 'idx-cols', '(' + index.columns.join(', ') + ')'));
+                        tbody.appendChild(tr);
+                    });
+                    t.appendChild(tbody);
+                    wrap.appendChild(t);
+                    target.appendChild(wrap);
+                });
+            }
+
+            function renderExplainHelp(driver) {
+                var body = $('explainHelpBody');
+                if (body.getAttribute('data-driver') === driver) { return; }
+                body.setAttribute('data-driver', driver);
+                body.innerHTML = '';
+                function list(title, items) {
+                    body.appendChild(el('h4', null, title));
+                    var dl = el('dl');
+                    items.forEach(function(item) {
+                        var dt = el('dt');
+                        dt.appendChild(el('span', item[2] ? 'plan-type ' + item[2] : null, item[0]));
+                        dl.appendChild(dt);
+                        dl.appendChild(el('dd', null, item[1]));
+                    });
+                    body.appendChild(dl);
+                }
+                if (driver === 'sqlite') {
+                    list('Étapes du plan SQLite', [
+                        ['SCAN t', 'Parcours complet de la table : toutes les lignes sont lues.', 'bad'],
+                        ['SCAN t USING INDEX i', 'Parcours complet de l\'index i (dans l\'ordre de l\'index).', 'mid'],
+                        ['SEARCH t USING INDEX i (col=?)', 'Recherche par index : seules les lignes correspondantes sont lues.', 'ok'],
+                        ['USING COVERING INDEX', 'Index couvrant : la table n\'est pas lue, l\'index suffit.', 'ok'],
+                        ['AUTOMATIC INDEX', 'Index temporaire construit à chaque exécution : il manque un index.', 'mid'],
+                        ['USE TEMP B-TREE', 'Structure temporaire pour trier (ORDER BY) ou regrouper (GROUP BY, DISTINCT).', 'mid'],
+                        ['CORRELATED SUBQUERY', 'Sous-requête réexécutée pour chaque ligne de la requête principale.', 'mid']
+                    ]);
+                    return;
+                }
+                list('Colonne type : méthode d\'accès, de la meilleure à la pire', [
+                    ['system / const', 'Une seule ligne, trouvée par la clé primaire ou un index unique.', 'ok'],
+                    ['eq_ref', 'Jointure : une seule ligne lue pour chaque ligne de la table précédente (clé unique).', 'ok'],
+                    ['ref', 'Lignes trouvées par un index non unique (WHERE col = valeur, jointure sur une clé étrangère indexée).', 'ok'],
+                    ['range', 'Plage d\'un index : <, >, BETWEEN, IN, LIKE \'abc%\'.', 'ok'],
+                    ['index', 'Parcours complet de l\'index : toutes ses entrées sont lues.', 'mid'],
+                    ['ALL', 'Parcours complet de la table : toutes les lignes sont lues. À surveiller dès que la table grossit.', 'bad']
+                ]);
+                list('Colonne Extra', [
+                    ['Using index', 'Index couvrant : la requête est satisfaite par l\'index seul.', 'ok'],
+                    ['Using where', 'Les lignes lues sont filtrées par le WHERE après lecture.', ''],
+                    ['Using filesort', 'Tri supplémentaire du résultat (ORDER BY sans index adapté).', 'mid'],
+                    ['Using temporary', 'Table temporaire pour GROUP BY, DISTINCT ou UNION.', 'mid'],
+                    ['Using join buffer', 'Jointure sans index : les lignes sont comparées en mémoire (hash join, BNL).', 'mid']
+                ]);
+            }
+
+            function loadExplain() {
+                var request = ++explainRequest;
+                $('explainBackLink').setAttribute('href', '#sql/' + explainToken);
+                $('explainResult').classList.add('hidden');
+                $('explainError').classList.add('hidden');
+                $('explainMessage').className = 'explain-message loading';
+                $('explainMessage').textContent = explainMode === 'analyze' ? 'Exécution de la requête et analyse en cours…' : 'Analyse en cours…';
+                renderExplainModes(null);
+                if (explainId === '') {
+                    $('explainMessage').className = 'explain-message';
+                    $('explainMessage').textContent = 'Choisissez une requête dans la liste des requêtes SQL.';
+                    return;
+                }
+
+                var params = { id: explainId, analyze: explainMode === 'analyze' ? '1' : '' };
+                if (explainOverrides[explainId]) { params.params = JSON.stringify(explainOverrides[explainId]); }
+
+                Promise.all([
+                    explainToken !== '' ? query({ token: explainToken, limit: 1 }) : Promise.resolve({ logs: [] }),
+                    explainQuery(params)
+                ]).then(function(results) {
+                    if (request !== explainRequest) { return; }
+                    var log = (results[0].logs && results[0].logs.length > 0 ? results[0].logs[0] : null);
+                    if (log !== null) { renderSummary(log); } else { $('summary').classList.add('hidden'); }
+                    renderExplain(results[1]);
+                }).catch(function(error) {
+                    $('explainMessage').className = 'explain-message';
+                    $('explainMessage').textContent = 'L\'analyse a échoué : consultez la console du navigateur.';
+                    fail(error);
+                });
+            }
+
+            function renderExplain(data) {
+                $('explainQuery').textContent = data.query || '';
+                renderExplainMeta(data);
+                renderExplainParams(data);
+                renderExplainModes(data);
+
+                $('explainMessage').className = 'explain-message' + (data.message ? '' : ' hidden');
+                $('explainMessage').textContent = data.message || '';
+                $('explainError').classList.toggle('hidden', !data.error);
+                $('explainError').textContent = data.error || '';
+
+                if (!data.plan) { return; }
+                $('explainResult').classList.remove('hidden');
+                renderFindings(data);
+                renderPlan(data);
+                renderTables(data);
+                renderExplainHelp(data.driver);
+            }
+
+            $('explainModes').addEventListener('click', function(event) {
+                var button = event.target.closest('button');
+                if (button === null || button.disabled) { return; }
+                window.location.hash = '#explain/' + explainToken + '/' + explainId
+                    + (button.getAttribute('data-mode') === 'analyze' ? '/analyze' : '');
+            });
+
+            $('explainParamsForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var values = {};
+                $('explainParamsBody').querySelectorAll('input').forEach(function(input) { values[input.name] = input.value; });
+                explainOverrides[explainId] = values;
+                loadExplain();
+            });
+
+            // Boutons "Copier" : copie le texte de l'élément désigné par data-copy
+            document.addEventListener('click', function(event) {
+                var button = event.target.closest('button[data-copy]');
+                if (button === null) { return; }
+                var text = $(button.getAttribute('data-copy')).textContent;
+                var done = function() {
+                    var label = button.textContent;
+                    button.textContent = 'Copié !';
+                    setTimeout(function() { button.textContent = label; }, 1500);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done).catch(fail);
+                }
+            });
 
             // ----- Vue "profil du code d'une requête HTTP" -----
             function originBadge(origin) {
@@ -1617,6 +2207,7 @@
                 $('viewLogs').classList.toggle('hidden', name !== 'logs');
                 $('viewRequest').classList.toggle('hidden', name !== 'request');
                 $('viewSql').classList.toggle('hidden', name !== 'sql');
+                $('viewExplain').classList.toggle('hidden', name !== 'explain');
                 $('viewCode').classList.toggle('hidden', name !== 'code');
                 $('searchForm').classList.toggle('hidden', !isSearch);
                 $('logsNav').classList.toggle('hidden', isSearch);
@@ -1625,7 +2216,7 @@
                 // État actif des entrées de navigation (sidebar)
                 document.querySelectorAll('#logsNav a').forEach(function(node) {
                     node.classList.toggle('active', (name === 'request' && node.id === 'navRequest')
-                        || (name === 'sql' && node.id === 'navSql')
+                        || ((name === 'sql' || name === 'explain') && node.id === 'navSql')
                         || (name === 'code' && node.id === 'navCode')
                         || (name === 'logs' && node.getAttribute('href') === '#logs'));
                 });
@@ -1650,6 +2241,13 @@
                     if (sqlToken !== '') { $('sqlBackLink').setAttribute('href', '#request/' + sqlToken); }
                     show('sql');
                     loadSql();
+                } else if (hash[0] === 'explain') {
+                    explainToken = /^\d+$/.test(hash[1] || '') ? hash[1] : '';
+                    explainId = /^\d+$/.test(hash[2] || '') ? hash[2] : '';
+                    explainMode = hash[3] === 'analyze' ? 'analyze' : 'explain';
+                    if (explainToken !== '') { updateSqlNav(explainToken); }
+                    show('explain');
+                    loadExplain();
                 } else if (hash[0] === 'code') {
                     codeToken = hash[1] || '';
                     codeMode = { flame: 'heavy', time: 'time', diff: 'diff' }[hash[2]] || 'table';

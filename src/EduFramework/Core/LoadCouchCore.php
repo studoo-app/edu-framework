@@ -15,6 +15,7 @@ use PDO;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugCodeProfileController;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
+use Studoo\EduFramework\Core\Controller\Debug\DebugSqlExplainController;
 use Studoo\EduFramework\Core\Controller\Debug\DebugSqlLogsController;
 use Studoo\EduFramework\Core\Controller\Debug\ProfilerController;
 use Studoo\EduFramework\Core\Controller\Error\HttpError403Controller;
@@ -82,6 +83,7 @@ class LoadCouchCore
                 $route->addRoute('GET', '/_debug/profiler', ProfilerController::class);
                 $route->addRoute('GET', '/edu-logs', DebugLogsController::class);
                 $route->addRoute('GET', '/edu-sql-logs', DebugSqlLogsController::class);
+                $route->addRoute('GET', '/edu-sql-explain', DebugSqlExplainController::class);
                 $route->addRoute('GET', '/edu-code-profile', DebugCodeProfileController::class);
             }
 
