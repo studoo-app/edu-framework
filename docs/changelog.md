@@ -2,6 +2,24 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.15.0 - 12/11/2026
+
+**features**
+
+- [#201](https://github.com/studoo-app/edu-framework/pull/201) Analyse EXPLAIN des requêtes SQL dans le profiler : un bouton **Analyser le plan (EXPLAIN)** sur chaque requête de la vue SQL ouvre `/_debug/profiler#explain/{token}/{id}`. Elle affiche des axes d'amélioration (index manquant sur une jointure ou un filtre, tri ou table temporaire sans index, sous-requête corrélée, fonction sur une colonne, `LIKE '%…'`, requête N+1, `SELECT *`...) classés par niveau, avec les instructions `CREATE INDEX` à copier, le plan brut annoté, les index de chaque table et un aide-mémoire pour lire le plan
+- Modes EXPLAIN (plan estimé) et EXPLAIN ANALYZE (exécution réelle) : arbre `EXPLAIN ANALYZE` de MySQL 8, `ANALYZE` de MariaDB, exécution chronométrée avec SQLite. ANALYZE est réservé aux requêtes `SELECT` et s'exécute dans une transaction annulée
+- Les valeurs des paramètres liés (`execute([...])`, `bindValue()`, `bindParam()`) sont enregistrées avec chaque requête SQL, pour la rejouer ; elles sont modifiables dans la vue pour comparer les plans
+
+**maintenance**
+
+- Nouvel endpoint interne `/edu-sql-explain` (mode dev uniquement) : il n'analyse qu'une requête enregistrée par le profiler, désignée par son identifiant, jamais un texte SQL
+- Nouvelles classes `SqlQueryInspector`, `SqlExplainer` et `SqlExplainAdvisor` (`Core\Profiler\Sql`)
+- Nouvelle colonne `params` dans la table `serv_sql_logs`, ajoutée automatiquement à une base des logs existante ; nouvelle méthode `LogsService::getSqlQuery()` ; `/edu-sql-logs` retourne `has_params` pour chaque requête
+
+**documentation**
+
+- mise à jour de [La barre de debug et le profiler](build/debug-bar.md) (nouvelle section « Analyser une requête SQL (EXPLAIN) » et API d'analyse EXPLAIN)
+
 ## v2.14.0 - 11/11/2026
 
 **features**

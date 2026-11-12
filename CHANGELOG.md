@@ -2,6 +2,24 @@
 
 **Overview of the Edu Framework releases**
 
+## v2.15.0 - 12/11/2026
+
+**features**
+
+- [#201](https://github.com/studoo-app/edu-framework/pull/201) EXPLAIN analysis of SQL queries in the profiler: an **Analyser le plan (EXPLAIN)** button on each query of the SQL view opens `/_debug/profiler#explain/{token}/{id}`. It shows improvement suggestions (missing index on a join or a filter, sort or temporary table without an index, correlated subquery, function on a column, `LIKE '%…'`, N+1 query, `SELECT *`...) ranked by level, with the `CREATE INDEX` statements to copy, the annotated raw plan, the indexes of each table and a cheat sheet to read the plan
+- EXPLAIN (estimated plan) and EXPLAIN ANALYZE (actual execution) modes: MySQL 8 `EXPLAIN ANALYZE` tree, MariaDB `ANALYZE`, timed execution with SQLite. ANALYZE is limited to `SELECT` queries and runs inside a rolled back transaction
+- The values of the bound parameters (`execute([...])`, `bindValue()`, `bindParam()`) are recorded with each SQL query, to replay it; they can be edited in the view to compare plans
+
+**maintenance**
+
+- New internal endpoint `/edu-sql-explain` (dev mode only): it only analyses a query recorded by the profiler, by its id, never SQL text
+- New classes `SqlQueryInspector`, `SqlExplainer` and `SqlExplainAdvisor` (`Core\Profiler\Sql`)
+- New `params` column in the `serv_sql_logs` table, added automatically to an existing log database; new `LogsService::getSqlQuery()`; `/edu-sql-logs` returns `has_params` for each query
+
+**documentation**
+
+- update [The debug bar and the profiler](docs/build/debug-bar.md) (new "Analysing a SQL query (EXPLAIN)" section and EXPLAIN analysis API)
+
 ## v2.14.0 - 11/11/2026
 
 **features**
