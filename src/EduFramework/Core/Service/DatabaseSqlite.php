@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *
  * @author Benoit Foujols
  *

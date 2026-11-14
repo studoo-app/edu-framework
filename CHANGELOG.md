@@ -2,6 +2,70 @@
 
 **Overview of the Edu Framework releases**
 
+## v2.15.0 - 12/11/2026
+
+**features**
+
+- [#201](https://github.com/studoo-app/edu-framework/pull/201) EXPLAIN analysis of SQL queries in the profiler: an **Analyser le plan (EXPLAIN)** button on each query of the SQL view opens `/_debug/profiler#explain/{token}/{id}`. It shows improvement suggestions (missing index on a join or a filter, sort or temporary table without an index, correlated subquery, function on a column, `LIKE '%…'`, N+1 query, `SELECT *`...) ranked by level, with the `CREATE INDEX` statements to copy, the annotated raw plan, the indexes of each table and a cheat sheet to read the plan
+- EXPLAIN (estimated plan) and EXPLAIN ANALYZE (actual execution) modes: MySQL 8 `EXPLAIN ANALYZE` tree, MariaDB `ANALYZE`, timed execution with SQLite. ANALYZE is limited to `SELECT` queries and runs inside a rolled back transaction
+- The values of the bound parameters (`execute([...])`, `bindValue()`, `bindParam()`) are recorded with each SQL query, to replay it; they can be edited in the view to compare plans
+
+**maintenance**
+
+- New internal endpoint `/edu-sql-explain` (dev mode only): it only analyses a query recorded by the profiler, by its id, never SQL text
+- New classes `SqlQueryInspector`, `SqlExplainer` and `SqlExplainAdvisor` (`Core\Profiler\Sql`)
+- New `params` column in the `serv_sql_logs` table, added automatically to an existing log database; new `LogsService::getSqlQuery()`; `/edu-sql-logs` returns `has_params` for each query
+
+**documentation**
+
+- update [The debug bar and the profiler](docs/build/debug-bar.md) (new "Analysing a SQL query (EXPLAIN)" section and EXPLAIN analysis API)
+
+## v2.14.0 - 11/11/2026
+
+**features**
+
+- [#200](https://github.com/studoo-app/edu-framework/pull/200) `php bin/edu routes:list` shows a new **Source** column: `routes.yaml` or `#[Route]` depending on where the route is declared
+
+**maintenance**
+
+- New `FastRouteCore::declaredRouteSources()`: source of each declared route, in the order of `declaredRoutes()` (`FastRouteCore::SOURCE_YAML`, `SOURCE_ATTRIBUTE` or `SOURCE_CODE` for a route added with `addRoute()`)
+
+**documentation**
+
+- update [The bin/edu command](docs/installation/command-edu.md) (`routes:list` Source column)
+
+## v2.13.0 - 11/11/2026
+
+**features**
+
+- [#198](https://github.com/studoo-app/edu-framework/issues/198) Routes declared with PHP attributes: `#[Route('/hello/{name}', methods: ['GET', 'POST'], name: 'hello_name')]` on a controller method and `#[RouteGroup('/admin', namePrefix: 'admin_')]` on the class (`studoo/edu-route` attributes). The controllers of `app/Controller` (subfolders included) are read on each request, after `app/Config/routes.yaml`: both ways work together and `routes.yaml` becomes optional as soon as a controller declares a route
+- `getNameToPath()` (Twig and `Route` class) generates the URL of every named route, from `routes.yaml` or from attributes: it relies on the routes declared to the routing engine instead of reading `routes.yaml` again
+- `php bin/edu routes:list` also lists the routes declared with attributes
+
+**maintenance**
+
+- `FastRouteCore::loadRoutes()` loads `routes.yaml` then the attributes (used by `LoadCouchCore` and `routes:list`); `FastRouteCore::loadRouteAttributes()` and `FastRouteCore::findAttributeControllers()` are public
+- New optional configuration keys `controller_path` (default: `app/Controller/` under `base_path`) and `controller_namespace` (default: `Controller\`)
+- `Route::getRouteInfo()` only returns named routes (key, `uri`, `controller`, `httpMethod`, `uri_parse`); `Route::loadRoute()` still returns the raw content of `routes.yaml`
+
+**documentation**
+
+- new [Declaring a route with #[Route]](docs/build/route-attribute.md) page; update [Building a page](docs/build/controller-edu.md), [Route](docs/build/route.md) and [The bin/edu command](docs/installation/command-edu.md)
+
+## v2.12.0 - 07/11/2026
+
+**features**
+
+- [#197](https://github.com/studoo-app/edu-framework/pull/197) New `php bin/edu routes:list` command: lists the routes of `app/Config/routes.yaml` (method, URI, controller, name), one row per HTTP method; the `--method` option filters on one HTTP method
+
+**maintenance**
+
+- Routing: `studoo/edu-route` is upgraded to `^1.1` (list of declared routes). The route name (key of `routes.yaml`) is now passed to the routing engine; `FastRouteCore::addRoute()` takes an optional fourth `$name` parameter and `FastRouteCore::declaredRoutes()` returns the declared routes
+
+**documentation**
+
+- update [The bin/edu command](docs/installation/command-edu.md): `routes:list` command
+
 ## v2.11.0 - 06/11/2026
 
 **maintenance**

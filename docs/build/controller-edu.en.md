@@ -70,13 +70,13 @@ class HelloController implements ControllerInterface
 
 We can see that the HelloController controller implements the ControllerInterface interface. 
 
-The `execute()` method takes an object of type [Request](../boost/resquet.md) as a parameter and returns a character string (string) or null.
+The `execute()` method takes an object of type [Request](resquet.md) as a parameter and returns a character string (string) or null.
 The view layer is handled by the Twig template engine. We use the `render()` method of the TwigCore class to display the "hello/hello.html.twig" template.
 Two variables are passed to the template: "titre" and "request".
 
 !!! info
 
-    To go further, you can read the documentation of the [Request](../boost/resquet.md) class to understand how to handle HTTP requests.
+    To go further, you can read the documentation of the [Request](resquet.md) class to understand how to handle HTTP requests.
 
 
 ### The hello.html.twig file
@@ -93,6 +93,12 @@ It will also create a "hello.html.twig" file in the "app/Template/hello" folder.
 ```
 
 In the "hello.html.twig" view, the page title "HelloController" is displayed in an h1. A `{{ titre }}` variable is passed to the template by the controller.
+
+!!! tip "Declaring the route in the controller"
+
+    Since version v2.13.0, the route can also be declared directly on the controller method
+    with the `#[Route('/hello', name: 'hello')]` attribute, like in Symfony:
+    see [Declaring a route with #[Route]](route-attribute.md).
 
 You can access your controller by typing the following URL: [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
@@ -198,7 +204,7 @@ class MedecinController
 A method called by a route must:
 
 - be **public** and **non-static**,
-- have a parameter of type [Request](../boost/resquet.md),
+- have a parameter of type [Request](resquet.md),
 - return a character string (`string`) or `null`.
 
 If one of these rules is not followed, an `ErrorControllerException` exception is thrown with an explicit message.

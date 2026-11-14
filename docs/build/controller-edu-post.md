@@ -7,7 +7,7 @@ Pour créer un post dans un controller, il faut faire un formulaire HTML dans le
 - Créer un controller
 - Créer un formulaire dans le fichier twig
 - Créer un traitement dans le controller
-- Comprendre comment fonctionne la classe [Request](../boost/resquet.md) pour récupérer les données du formulaire
+- Comprendre comment fonctionne la classe [Request](resquet.md) pour récupérer les données du formulaire
 
 ### Création d'un controller
 
@@ -120,7 +120,7 @@ class VilleController implements ControllerInterface
 }
 ```
 
-Dans cet exemple, on récupère la ville du formulaire dans le controller avec la méthode `get($key)` de la classe [Request](../boost/resquet.md#getkey).
+Dans cet exemple, on récupère la ville du formulaire dans le controller avec la méthode `get($key)` de la classe [Request](resquet.md#getkey).
 
 <video controls>
 <source src="../assets/screen-form-simple.mp4" type="video/mp4">
@@ -197,9 +197,9 @@ Nous allons implémenter la fonction `getNameToPath('NOM_ROUTE')` dans le fichie
 !!! info "Pour aller plus loin"
 
     Pour aller plus loin sur la génération d'URL par le nom de la route (routes avec paramètres, redirections, ...),
-    vous pouvez lire la documentation de la classe [Route](../boost/route.md).
+    vous pouvez lire la documentation de la classe [Route](route.md).
 
-    Pour comprendre comment gérer les requêtes HTTP, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md).
+    Pour comprendre comment gérer les requêtes HTTP, vous pouvez lire la documentation de la classe [Request](resquet.md).
 
     Pour sécuriser votre formulaire contre les attaques CSRF, vous pouvez lire la documentation
     [Protéger un formulaire (CSRF)](csrf.md).

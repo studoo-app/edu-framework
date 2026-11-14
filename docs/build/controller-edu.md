@@ -70,13 +70,13 @@ class HelloController implements ControllerInterface
 
 On peut voir que le controller HelloController implémente l'interface ControllerInterface. 
 
-La méthode `execute()` prend en paramètre un objet de type [Request](../boost/resquet.md) et retourne une chaine de caractère (string) ou null.
+La méthode `execute()` prend en paramètre un objet de type [Request](resquet.md) et retourne une chaine de caractère (string) ou null.
 La couche vue est gérée par le moteur de template Twig. On utilise la méthode `render()` de la classe TwigCore pour afficher le template "hello/hello.html.twig".
 Deux variables sont passées au template : "titre" et "request".
 
 !!! info
 
-    Pour aller plus loin, vous pouvez lire la documentation de la classe [Request](../boost/resquet.md) pour comprendre comment gérer les requêtes HTTP.
+    Pour aller plus loin, vous pouvez lire la documentation de la classe [Request](resquet.md) pour comprendre comment gérer les requêtes HTTP.
 
 
 ### Le fichier hello.html.twig
@@ -93,6 +93,12 @@ Et va aussi créer un fichier "hello.html.twig" dans le dossier "app/Template/he
 ```
 
 Dans la vue "hello.html.twig", on affiche le titre de la page "HelloController" dans un h1. Une variable `{{ titre }}` est passée au template via le controller.
+
+!!! tip "Déclarer la route dans le controller"
+
+    À partir de la version v2.13.0, la route peut aussi être déclarée directement sur la méthode du controller
+    avec l'attribut `#[Route('/hello', name: 'hello')]`, comme dans Symfony :
+    voir [Déclarer une route avec #[Route]](route-attribute.md).
 
 Vous pouvez accéder à votre controller en tapant l'url suivante : [http://localhost:8042/hello](http://localhost:8042/hello){:target="_blank"}
 
@@ -198,7 +204,7 @@ class MedecinController
 Une méthode appelée par une route doit :
 
 - être **publique** et **non statique**,
-- avoir un paramètre de type [Request](../boost/resquet.md),
+- avoir un paramètre de type [Request](resquet.md),
 - retourner une chaine de caractères (`string`) ou `null`.
 
 Si une de ces règles n'est pas respectée, une exception `ErrorControllerException` est levée avec un message explicite.

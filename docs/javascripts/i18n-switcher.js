@@ -8,7 +8,7 @@
   var root = null;
 
   // Racine du site, déduite des liens FR et EN de la première page chargée :
-  // /edu-framework/boost/route/ et /edu-framework/en/boost/route/ → /edu-framework/
+  // /edu-framework/build/route/ et /edu-framework/en/build/route/ → /edu-framework/
   function detectRoot() {
     var fr = document.querySelector('a[hreflang="fr"]');
     var en = document.querySelector('a[hreflang="en"]');

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *
  * @author Benoit Foujols
  *
@@ -23,6 +23,7 @@ class AppCommand extends Application
         (new ConfigCore(
             [
                 'base_path' => "./",
+                'route_config_path' => "./app/Config/",
                 'sqlite_path' => "./var/sqlite/",
                 'sqlite_logs_path' => "./var/logs/"
             ]
@@ -46,6 +47,7 @@ class AppCommand extends Application
         $this->addCommand(new \Studoo\EduFramework\Commands\CreateEntityCommand());
         $this->addCommand(new \Studoo\EduFramework\Commands\ClearCacheCommand());
         $this->addCommand(new \Studoo\EduFramework\Commands\CreateDeployCommand());
+        $this->addCommand(new \Studoo\EduFramework\Commands\RoutesListCommand());
 
         if (file_exists(ConfigCore::getConfig('command_config_path') . 'commands.yaml') === true) {
             $commandList = Yaml::parseFile(ConfigCore::getConfig('command_config_path') . 'commands.yaml');

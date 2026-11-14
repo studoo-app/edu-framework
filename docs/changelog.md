@@ -2,6 +2,70 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.15.0 - 12/11/2026
+
+**features**
+
+- [#201](https://github.com/studoo-app/edu-framework/pull/201) Analyse EXPLAIN des requêtes SQL dans le profiler : un bouton **Analyser le plan (EXPLAIN)** sur chaque requête de la vue SQL ouvre `/_debug/profiler#explain/{token}/{id}`. Elle affiche des axes d'amélioration (index manquant sur une jointure ou un filtre, tri ou table temporaire sans index, sous-requête corrélée, fonction sur une colonne, `LIKE '%…'`, requête N+1, `SELECT *`...) classés par niveau, avec les instructions `CREATE INDEX` à copier, le plan brut annoté, les index de chaque table et un aide-mémoire pour lire le plan
+- Modes EXPLAIN (plan estimé) et EXPLAIN ANALYZE (exécution réelle) : arbre `EXPLAIN ANALYZE` de MySQL 8, `ANALYZE` de MariaDB, exécution chronométrée avec SQLite. ANALYZE est réservé aux requêtes `SELECT` et s'exécute dans une transaction annulée
+- Les valeurs des paramètres liés (`execute([...])`, `bindValue()`, `bindParam()`) sont enregistrées avec chaque requête SQL, pour la rejouer ; elles sont modifiables dans la vue pour comparer les plans
+
+**maintenance**
+
+- Nouvel endpoint interne `/edu-sql-explain` (mode dev uniquement) : il n'analyse qu'une requête enregistrée par le profiler, désignée par son identifiant, jamais un texte SQL
+- Nouvelles classes `SqlQueryInspector`, `SqlExplainer` et `SqlExplainAdvisor` (`Core\Profiler\Sql`)
+- Nouvelle colonne `params` dans la table `serv_sql_logs`, ajoutée automatiquement à une base des logs existante ; nouvelle méthode `LogsService::getSqlQuery()` ; `/edu-sql-logs` retourne `has_params` pour chaque requête
+
+**documentation**
+
+- mise à jour de [La barre de debug et le profiler](build/debug-bar.md) (nouvelle section « Analyser une requête SQL (EXPLAIN) » et API d'analyse EXPLAIN)
+
+## v2.14.0 - 11/11/2026
+
+**features**
+
+- [#200](https://github.com/studoo-app/edu-framework/pull/200) `php bin/edu routes:list` affiche une nouvelle colonne **Source** : `routes.yaml` ou `#[Route]` selon l'endroit où la route est déclarée
+
+**maintenance**
+
+- Nouvelle méthode `FastRouteCore::declaredRouteSources()` : source de chaque route déclarée, dans l'ordre de `declaredRoutes()` (`FastRouteCore::SOURCE_YAML`, `SOURCE_ATTRIBUTE` ou `SOURCE_CODE` pour une route ajoutée avec `addRoute()`)
+
+**documentation**
+
+- mise à jour de [La commande bin/edu](installation/command-edu.md) (colonne Source de `routes:list`)
+
+## v2.13.0 - 11/11/2026
+
+**features**
+
+- [#198](https://github.com/studoo-app/edu-framework/issues/198) Routes déclarées avec des attributs PHP : `#[Route('/hello/{name}', methods: ['GET', 'POST'], name: 'hello_name')]` sur une méthode de controller et `#[RouteGroup('/admin', namePrefix: 'admin_')]` sur la classe (attributs de `studoo/edu-route`). Les controllers de `app/Controller` (sous-dossiers compris) sont lus à chaque requête, après `app/Config/routes.yaml` : les deux modes fonctionnent ensemble et `routes.yaml` devient facultatif dès qu'un controller déclare une route
+- `getNameToPath()` (Twig et classe `Route`) génère l'URL de toutes les routes nommées, de `routes.yaml` comme des attributs : il s'appuie sur les routes déclarées au moteur de routage au lieu de relire `routes.yaml`
+- `php bin/edu routes:list` liste aussi les routes déclarées par attributs
+
+**maintenance**
+
+- `FastRouteCore::loadRoutes()` charge `routes.yaml` puis les attributs (utilisée par `LoadCouchCore` et `routes:list`) ; `FastRouteCore::loadRouteAttributes()` et `FastRouteCore::findAttributeControllers()` sont publiques
+- Nouvelles clés de configuration facultatives `controller_path` (défaut : `app/Controller/` sous `base_path`) et `controller_namespace` (défaut : `Controller\`)
+- `Route::getRouteInfo()` ne renvoie que les routes nommées (clé, `uri`, `controller`, `httpMethod`, `uri_parse`) ; `Route::loadRoute()` renvoie toujours le contenu brut de `routes.yaml`
+
+**documentation**
+
+- nouvelle page [Déclarer une route avec #[Route]](build/route-attribute.md) ; update [Construire une page](build/controller-edu.md), [Route](build/route.md) et [La commande bin/edu](installation/command-edu.md)
+
+## v2.12.0 - 07/11/2026
+
+**features**
+
+- [#197](https://github.com/studoo-app/edu-framework/pull/197) Nouvelle commande `php bin/edu routes:list` : liste les routes de `app/Config/routes.yaml` (méthode, URI, contrôleur, nom), une ligne par méthode HTTP ; l'option `--method` filtre sur une méthode HTTP
+
+**maintenance**
+
+- Routage : `studoo/edu-route` passe en `^1.1` (liste des routes déclarées). Le nom de la route (clé de `routes.yaml`) est désormais transmis au moteur de routage ; `FastRouteCore::addRoute()` accepte un quatrième paramètre optionnel `$name` et `FastRouteCore::declaredRoutes()` renvoie les routes déclarées
+
+**documentation**
+
+- update [La commande bin/edu](installation/command-edu.md) : commande `routes:list`
+
 ## v2.11.0 - 06/11/2026
 
 **maintenance**
@@ -56,7 +120,7 @@
 
 **documentation**
 
-- update [La barre de debug et le profiler](boost/debug-bar.md) : description des clés `get`, `post` et `session` du log d'une requête
+- update [La barre de debug et le profiler](build/debug-bar.md) : description des clés `get`, `post` et `session` du log d'une requête
 
 ## v2.9.1 - 05/11/2026
 
@@ -83,7 +147,7 @@
 
 **documentation**
 
-- update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelles sections « Le flamegraph intégré » et « Comparer deux requêtes » (avec captures d'écran), mini-flamegraph de la barre de debug, paramètres `format=flame`, `order`, `compare`, `min` et `depth` de l'API
+- update [La barre de debug et le profiler](build/debug-bar.md) : nouvelles sections « Le flamegraph intégré » et « Comparer deux requêtes » (avec captures d'écran), mini-flamegraph de la barre de debug, paramètres `format=flame`, `order`, `compare`, `min` et `depth` de l'API
 - new [Migrer de la version 2.8 à la version 2.9](migrate/migration-2_8-2_9.md) : mise à jour du framework, fichiers Docker (`Dockerfile` multi-stage, `docker-entrypoint.sh`, `.dockerignore`, `target` dans `compose.yaml`), `.gitignore` (`.env.local`, `composer.lock`), `.gitattributes` pour les scripts shell, changements du chargement des variables d'environnement
 - new [Déployer son application](deploy/index.md) : préparation du serveur, `make:deploy`, variables d'environnement, déploiement, import de la base, dossiers partagés, commandes du quotidien, image de production
 - update [La commande bin/edu](installation/command-edu.md) : commande `make:deploy`
@@ -100,7 +164,7 @@
 
 - new [Les fonctionnalités](features.md) : toutes les fonctionnalités du framework regroupées par thème d'apprentissage, avec la notion travaillée et son équivalent dans Symfony
 - new [Migrer de la version 2.3 à la version 2.8](migrate/migration-2_3-2_8.md) : étapes de migration (sauvegarde et passage de MySQL à MariaDB, templates d'erreur, cache Twig, variables du `.env`, fichiers Docker), changements et nouveautés des versions 2.4 à 2.8
-- update [La barre de debug et le profiler](boost/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil avec captures d'écran, lecture du flamegraph avec Speedscope, API)
+- update [La barre de debug et le profiler](build/debug-bar.md) : nouvelle section « Le profiler de code » (installation, modes, lecture du profil avec captures d'écran, lecture du flamegraph avec Speedscope, API)
 - update [Installation avec Docker](installation/docker.md) : variables d'environnement `EDU_PROFILER`, `EDU_PROFILER_KEEP` et `EDU_PROFILER_BUILD`
 - update [Prérequis](installation/prerequis.md) : installation de l'extension optionnelle `excimer` hors Docker
 
@@ -116,7 +180,7 @@
 
 **documentation**
 
-- update [La barre de debug et le profiler](boost/debug-bar.md) : onglets de filtrage par famille de statut documentés pour les vues **Logs** et **Recherche** (clic pour filtrer, onglet actif, synchronisation du champ Statut du formulaire)
+- update [La barre de debug et le profiler](build/debug-bar.md) : onglets de filtrage par famille de statut documentés pour les vues **Logs** et **Recherche** (clic pour filtrer, onglet actif, synchronisation du champ Statut du formulaire)
 
 ## v2.7.2 - 17/10/2026
 
@@ -145,7 +209,7 @@
 
 - new [L'application dans Docker](installation/docker.md) : architecture, démarrage/arrêt, variables d'environnement, ports et coexistence de plusieurs projets, mode HTTPS local (certificat auto-signé, limitation `https://127.0.0.1`), vérification des prérequis dans le conteneur, dépannage
 - update [Démarrer les services](installation/start-services.md) : MySQL devient MariaDB, service FrankenPHP dans le tableau des ports, commandes par version, corrections de liens
-- update [La barre de debug et le profiler](boost/debug-bar.md) : collecte de toutes les requêtes par `HttpRequestLogger` quel que soit le serveur (clé `sapi`, temps d'exécution et mémoire par requête), token de la requête dans le bloc DevTool, nouvelle page descriptif d'une requête (`#request/{token}`), profiler disponible sur les deux serveurs (`http://localhost:8042/_debug/profiler` et `https://localhost/_debug/profiler`), limitations (fichiers statiques non journalisés, IP du réseau Docker, mode worker FrankenPHP) ; liste des services de développement (URLs cliquables) dans le bloc DEV
+- update [La barre de debug et le profiler](build/debug-bar.md) : collecte de toutes les requêtes par `HttpRequestLogger` quel que soit le serveur (clé `sapi`, temps d'exécution et mémoire par requête), token de la requête dans le bloc DevTool, nouvelle page descriptif d'une requête (`#request/{token}`), profiler disponible sur les deux serveurs (`http://localhost:8042/_debug/profiler` et `https://localhost/_debug/profiler`), limitations (fichiers statiques non journalisés, IP du réseau Docker, mode worker FrankenPHP) ; liste des services de développement (URLs cliquables) dans le bloc DEV
 
 ## v2.6.3 - 15/10/2026
 
@@ -166,11 +230,11 @@
 - new [Le MVC, c'est quoi ?](build/concept-mvc.md) : flowchart du cycle d'une requête avec les classes réelles (FastRouteCore, Controller, Repository, TwigCore)
 - update [Comment faire un controller ?](build/controller-edu.md) : le schéma statique est remplacé par un flowchart du cycle de vie de HelloController
 - new [Construire le CRUD](build/dataservice-select.md) : diagramme de classes VilleController / VilleRepository / Ville / DatabaseService
-- new [Les erreurs HTTP](boost/http-error.md) : flowchart du pipeline d'erreurs avec les branches dev/production
+- new [Les erreurs HTTP](build/http-error.md) : flowchart du pipeline d'erreurs avec les branches dev/production
 - update [Comment faire un formulaire ?](build/controller-edu-post.md) : diagramme de séquence du pattern PRG (Post/Redirect/Get)
-- new [DatabaseService : La gestion des données](boost/dataservice.md) : diagramme de classes de la connexion (adaptateurs mysql, mariadb, sqlite)
-- new [La barre de debug et le profiler](boost/debug-bar.md) : flowchart du flux des logs vers le profiler
-- new [Route : générer une URL à partir du nom d'une route](boost/route.md) : flowchart de la génération d'URL et de la BadRouteException
+- new [DatabaseService : La gestion des données](build/dataservice.md) : diagramme de classes de la connexion (adaptateurs mysql, mariadb, sqlite)
+- new [La barre de debug et le profiler](build/debug-bar.md) : flowchart du flux des logs vers le profiler
+- new [Route : générer une URL à partir du nom d'une route](build/route.md) : flowchart de la génération d'URL et de la BadRouteException
 
 ## v2.6.1 - 15/10/2026
 
@@ -211,7 +275,7 @@
 - new [La commande make:entity](installation/command-edu.md) : génération d'une entité et de son repository
 - update [Construire le CRUD](build/dataservice-select.md) : note sur la génération des fichiers avec `make:entity`
 - update [Installation](installation/installation.md) : les paramètres du framework (eduframe.yml)
-- new [Les erreurs HTTP](boost/http-error.md) : pages 403/404/405/500, personnalisation, `ErrorHttpStatusException`
+- new [Les erreurs HTTP](build/http-error.md) : pages 403/404/405/500, personnalisation, `ErrorHttpStatusException`
 
 > Release notes for v2.5.0
 >
@@ -236,10 +300,10 @@
 **documentation**
 
 - new [Un controller, plusieurs routes](build/controller-edu.md) : la syntaxe `Controller\Class::method` dans le fichier des routes
-- new [Gestion des fichiers (upload)](boost/resquet.md) : téléversement de fichiers dans Request
+- new [Gestion des fichiers (upload)](build/resquet.md) : téléversement de fichiers dans Request
 - update [La commande bin/edu](installation/command-edu.md) : commande `cache:clear`
 - update [Installation](installation/installation.md) : erreur sur le fichier des routes et sensibilité à la casse sur Linux
-- update [Route](boost/route.md) : note sur la syntaxe `Controller\Class::method`
+- update [Route](build/route.md) : note sur la syntaxe `Controller\Class::method`
 
 > Release notes for v2.4.0
 >
@@ -311,7 +375,7 @@
 **documentation**
 
 - new [Migrer de la version 2.2 à la version 2.3](migrate/migration-2_2-2_3.md)
-- new [La barre de debug et le profiler](boost/debug-bar.md)
+- new [La barre de debug et le profiler](build/debug-bar.md)
 - update [Start/Stop l'application](installation/start-application.md) : options de la commande `start`
 - update [Comment installer les services](installation/start-services.md) : MailPit et dbgate
 - update [Avant de démarrer](installation/prerequis.md) : extension `pdo_sqlite` et PHP 8.4 minimum
@@ -423,7 +487,7 @@
 **documentation**
 
 - Nouvelle interface et organisation par chapitre
-- new [Request : La gestion des requêtes HTTP](https://studoo-app.github.io/edu-framework/boost/resquet.html)
+- new [Request : La gestion des requêtes HTTP](https://studoo-app.github.io/edu-framework/build/resquet/)
 - update [Comment installer EduFrame](https://studoo-app.github.io/edu-framework/build/index.html) : Nouvelle installation par version
 - update [Comment installer les services](https://studoo-app.github.io/edu-framework/installation/index.html) : Refactoring Docker
 - update [Arborescence](https://studoo-app.github.io/edu-framework/installation/index.html) : Nouvelle arbo v2.0

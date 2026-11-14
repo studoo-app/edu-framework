@@ -21,7 +21,7 @@ APP_ENV=dev
 
 !!! warning "Production mode"
 
-    The `/_debug/profiler`, `/edu-logs` and `/edu-sql-logs` routes are registered **only in dev mode**.
+    The `/_debug/profiler`, `/edu-logs`, `/edu-sql-logs` and `/edu-sql-explain` routes are registered **only in dev mode**.
     They are therefore not accessible when `APP_ENV=prod`.
 
 ## The debug bar
@@ -77,6 +77,7 @@ Since the log database is shared (the Docker container mounts the project folder
 - counter of the number of requests per **status family** (2xx, 3xx, 4xx, 5xx): filter tabs at the top of the **Logs** and **Search** views (a click filters the results by family, the **All** tab shows all requests; in the Search view, the form's Status field is kept in sync);
 - **HTTP request details**: the `/_debug/profiler#request/{token}` page describes the selected request (status, method, URL, IP, SAPI, duration, memory, raw line) — this is the page opened by the DevTool block of the debug bar; the URL of a request in the list is also clickable;
 - **SQL view of an HTTP request**: the `/_debug/profiler#sql/{token}` page lists the SQL queries executed during the selected request (see ["SQL queries"](#sql-queries)) — accessible from the *SQL queries* line of the details page and from the SQL block of the debug bar;
+- **EXPLAIN analysis of a SQL query**: the `/_debug/profiler#explain/{token}/{id}` page shows the execution plan of a query and improvement suggestions (see ["Analysing a SQL query (EXPLAIN)"](#analysing-a-sql-query-explain)) — accessible from the *Analyser le plan (EXPLAIN)* button of the SQL view;
 - combinable filters:
 
 | Filter      | Description                                                        | Example                    |
@@ -168,7 +169,53 @@ Collection is handled by three framework classes, **only in dev mode**:
 
 In **production** (`APP_ENV=prod`), the factory returns a native `PDO` connection: the tracing classes are **neither instantiated nor loaded**, and no measurement or collection takes place.
 
-Queries executed outside a logged HTTP request are never collected: CLI commands, internal profiler routes (`/_debug/...`, `/edu-logs`, `/edu-sql-logs`) and queries on the log database itself — the link is made through the token, which is absent in these contexts.
+Queries executed outside a logged HTTP request are never collected: CLI commands, internal profiler routes (`/_debug/...`, `/edu-logs`, `/edu-sql-logs`, `/edu-sql-explain`) and queries on the log database itself — the link is made through the token, which is absent in these contexts.
+
+## Analysing a SQL query (EXPLAIN)
+
+Each query of the SQL view has an **Analyser le plan (EXPLAIN)** button that opens the `/_debug/profiler#explain/{token}/{id}` view. It shows how the database runs the query and suggests **improvements**:
+
+- **Axes d'amélioration** (improvements): findings ranked by level — *Critical*, *To improve*, *Good to know* and *Good point* — with an explanation and, when possible, the `CREATE INDEX` statement to copy. The suggested indexes are gathered in a script at the end of the list;
+- **Plan d'exécution** (execution plan): the raw `EXPLAIN` result, with a coloured `type` column (green: index access, orange: index scan, red: `ALL`, full table scan) and highlighted `Extra` keywords. Hovering a column header explains it;
+- **Index des tables**: row count and existing indexes of each table of the query;
+- **Comment lire le plan d'exécution ?**: a cheat sheet of the `type` and `Extra` values (or of the SQLite steps).
+
+The detected findings include:
+
+| Finding | Example | Suggestion |
+|---------|---------|------------|
+| Full scan of a table looked up by a **join** without an index | `LEFT JOIN emprunts e ON e.utilisateur_id = u.id` ("Using join buffer") | `CREATE INDEX idx_emprunts_utilisateur_id ON emprunts (utilisateur_id);` |
+| Full scan of a **filtered** table without an index | `WHERE utilisateur_id = 5` | index on the filtered column |
+| **Sort without an index** ("Using filesort") | `ORDER BY nom, prenom` | composite index in the sort order, preceded by the columns filtered by equality: `(auteur_id, annee_publication)` |
+| **Temporary table** ("Using temporary") | `GROUP BY` on the first table read | index on the grouping columns |
+| **Correlated subquery** | `WHERE EXISTS (SELECT … WHERE e.livre_id = l.id)` | rewrite as a join, index on the linking column |
+| **Function on a column** in the `WHERE` | `YEAR(date_emprunt) = 2024` | condition on the column itself |
+| `LIKE '%…'` | `titre LIKE '%chat%'` | `LIKE 'abc%'` pattern or `FULLTEXT` index |
+| Query run **several times** (N+1) | same query in a loop | a single query (join or `IN (…)`) |
+| `SELECT *`, large result without `LIMIT` | — | useful columns only, pagination |
+
+!!! info "Suggestions to check"
+
+    The findings rely on the execution plan and on a reading of the query text: they are leads to validate. After creating an index, reload the application page then run the analysis again to compare both plans.
+
+### EXPLAIN and EXPLAIN ANALYZE
+
+- **EXPLAIN** (default) shows the plan **estimated** by the optimiser: the query is not executed;
+- **EXPLAIN ANALYZE** **actually runs** the query and adds the real measurements: `ANALYZE` with MariaDB (`r_rows`, `r_filtered` columns), `EXPLAIN ANALYZE` with MySQL 8 (tree with `actual time`, `rows` and `loops`), execution time and row count with SQLite. This mode is restricted to read queries (`SELECT`) and runs inside a **rolled back transaction**.
+
+| Database | EXPLAIN | EXPLAIN ANALYZE |
+|----------|---------|-----------------|
+| MySQL 8  | `EXPLAIN` (table) | `EXPLAIN ANALYZE` (measured tree) |
+| MariaDB  | `EXPLAIN` (table) | `ANALYZE` (table with the `r_*` columns) |
+| SQLite   | `EXPLAIN QUERY PLAN` (`SCAN` / `SEARCH` tree) | query execution, time and row count |
+
+### Query parameters
+
+To replay a prepared query (`WHERE a.id = :auteur_id`), the profiler records the **value of its parameters** at execution time (`execute([...])`, `bindValue()`, `bindParam()`). These values are shown in the view and **can be edited**: run the analysis again with another value to see how the plan changes depending on the searched value. A query recorded before this feature was added has no values: the profiler asks you to enter them.
+
+!!! warning "Security"
+
+    The analysis always targets a query **recorded** by the profiler (identified by its id): the endpoint does not accept SQL text. Only `SELECT`, `INSERT`, `UPDATE`, `DELETE` and `REPLACE` queries are analysed, a text containing several queries is refused, and the route only exists in dev mode.
 
 ## The SQL queries API
 
@@ -199,6 +246,7 @@ Example response:
             "query": "SELECT 1",
             "duration_ms": 1.0,
             "rows_count": 1,
+            "has_params": false,
             "event_date": "2026-10-17 15:04:25"
         }
     ]
@@ -207,6 +255,20 @@ Example response:
 
 - `queries`: chronological list of executions (`rows_count` is `null` if the driver does not provide the information, Example: `-1` for a `SELECT` on PostgreSQL);
 - `groups`: identical queries grouped together with their number of executions and their cumulative time.
+
+## The EXPLAIN analysis API
+
+```
+GET /edu-sql-explain?id=12&analyze=1&params={":auteur_id":"3"}
+```
+
+| Parameter  | Description                                                      | Default   |
+|------------|------------------------------------------------------------------|-----------|
+| `id`       | Id of the recorded SQL query (`id` field of `/edu-sql-logs`)     | required  |
+| `analyze`  | `1` to actually run the query (EXPLAIN ANALYZE, `SELECT` only)   | —         |
+| `params`   | Parameter values (JSON object) instead of the recorded values    | —         |
+
+The response contains the query (`query`, `duration_ms`, `rows_count`, `executions`), its parameters (`params`), the engine (`driver`, `server_version`), the estimated plan (`plan`), the measured plan (`analysis`, `null` without `analyze`), the normalised table accesses (`accesses`), the table structure (`tables`), the improvements (`findings`: `level`, `title`, `detail`, `suggestion`) and the suggested indexes (`suggestions`). When the analysis is not possible, `message` gives the reason and `error` holds the database error, if any.
 
 ## The code profiler
 
@@ -414,7 +476,7 @@ The HTTP requests handled by the framework are recorded in a dedicated **SQLite*
 
 - file: `var/logs/core_logs.sqlite`
 - table: `serv_logs` (columns `id`, `event_date`, `event_desc`)
-- table: `serv_sql_logs` (columns `id`, `request_id` (HTTP request token), `query`, `duration_ms`, `rows_count`, `event_date`) — SQL queries collected by `SqlQueryLogger`, indexed on `request_id`
+- table: `serv_sql_logs` (columns `id`, `request_id` (HTTP request token), `query`, `duration_ms`, `rows_count`, `params` (parameter values as JSON, for the EXPLAIN analysis), `event_date`) — SQL queries collected by `SqlQueryLogger`, indexed on `request_id`
 
 Collection is handled by the `HttpRequestLogger` class, in two steps like the Symfony profiler: the log line is **reserved at the start of the request** — its identifier (the *token*) is then available to the DevTool block of the debug bar, which links to the request details — then **completed at the end of the request** with the final status, the execution time and the memory. This is what makes it possible to measure, per request, the **execution time** and the **memory used** — two indicators also shown by the debug bar — whichever server serves it (built-in PHP server via `php bin/edu start`, or FrankenPHP in Docker). The `php bin/edu start` command parses the server output only to **display it in the console**: it no longer writes to the log database.
 
@@ -452,7 +514,7 @@ flowchart LR
 
 !!! info
 
-    Requests from the profiler and the debug bar (`/_debug/...`, `/edu-logs` and `/edu-sql-logs`) are not logged, to avoid filling the database every time a tools page is displayed.
+    Requests from the profiler and the debug bar (`/_debug/...`, `/edu-logs`, `/edu-sql-logs` and `/edu-sql-explain`) are not logged, to avoid filling the database every time a tools page is displayed.
 
 !!! note "Limitations"
 

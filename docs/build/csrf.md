@@ -82,7 +82,7 @@ La fonction génère le champ caché du jeton :
 ### Étape 2 : la validation dans le controller
 
 Dans le traitement du formulaire, validez le jeton avec la méthode `isCsrfTokenValid()`
-de la classe [Request](../boost/resquet.md) en utilisant **le même nom de route** :
+de la classe [Request](resquet.md) en utilisant **le même nom de route** :
 
 ```diff
  public function execute(Request $request): string|null
@@ -103,7 +103,7 @@ de la classe [Request](../boost/resquet.md) en utilisant **le même nom de route
     dans le controller doit être **identique**, sinon la soumission est toujours rejetée (403).
 
 Si le jeton est invalide, la classe `ErrorHttpStatusException` déclenche la page
-[d'erreur HTTP 403](../boost/http-error.md) via le pipeline d'erreurs du framework.
+[d'erreur HTTP 403](http-error.md) via le pipeline d'erreurs du framework.
 Si le jeton est valide, il est immédiatement **renouvelé** pour la prochaine soumission.
 
 !!! tip "Astuce"

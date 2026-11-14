@@ -40,6 +40,7 @@ Here are the available commands by version:
 | make:entity     | generates an entity and its repository        | v2.5.0                 |
 | cache:clear     | deletes the application cache                 | v2.4.0                 |
 | make:deploy     | generates the deployment configuration        | v2.9.0                 |
+| routes:list     | lists the application routes                  | v2.12.0                |
 
 !!! info "Going further"
 
@@ -83,6 +84,42 @@ If the `var/cache` folder does not exist, a message tells you that there is no c
 
     Modified templates are automatically recompiled (Twig `auto_reload` option).
     The `cache:clear` command is still useful to start again from a clean cache, for example after a deployment.
+
+### The routes:list command
+
+The `routes:list` command displays the routes declared in the `app/Config/routes.yaml` file, in file order, then those declared with the [`#[Route]`](../build/route-attribute.md) attribute (since version v2.13.0):
+
+```bash
+php bin/edu routes:list
+```
+
+```
+ --------- --------------- ------------------------------------- ------------ ------------- 
+  Méthode   URI             Contrôleur                            Nom          Source      
+ --------- --------------- ------------------------------------- ------------ ------------- 
+  GET       /               Controller\HomeController             index        routes.yaml 
+  GET       /user/{id}      Controller\UserController             user         routes.yaml 
+  POST      /user/{id}      Controller\UserController             user         routes.yaml 
+  GET       /medecin        Controller\MedecinController::index   medecin      routes.yaml 
+  GET       /hello/{name}   Controller\HelloController::show      hello_name   #[Route]    
+ --------- --------------- ------------------------------------- ------------ ------------- 
+```
+
+| Column               | Detail                                                                |
+|----------------------|-----------------------------------------------------------------------|
+| Méthode (method)     | one row per HTTP method: a `[GET, POST]` route takes two rows         |
+| URI                  | the URI as written in `routes.yaml` (Example: `/user/{id:\d+}[/{name}]`) |
+| Contrôleur (controller) | the called controller, with its method if any (`::index`)          |
+| Nom (name)           | the route name (key of the `routes.yaml` file), used by `getNameToPath()` |
+| Source               | where the route comes from: `routes.yaml` or `#[Route]` (controller attribute, since version v2.14.0) |
+
+The `--method` (or `-m`) option only displays the routes of one HTTP method: `php bin/edu routes:list --method=POST`.
+
+A badly described route in `routes.yaml` is reported with the same error message as when a page is loaded.
+
+!!! info "Internal routes"
+
+    The debug bar routes (`/_debug/profiler`, `/edu-logs`…), added only in `dev` mode, are not listed.
 
 ### The make:deploy command
 

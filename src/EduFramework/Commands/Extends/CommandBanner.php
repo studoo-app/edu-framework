@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *
  * @author Benoit Foujols
  *
@@ -58,7 +58,7 @@ class CommandBanner
             " |  __/ (_| | |_| | \n" .
             "  \___|\__,_|\__,_| \n" .
             "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</info>    \n";
 
         $banner[1] =   "<info>" .
             "           _          __ \n" .
@@ -67,7 +67,7 @@ class CommandBanner
             " |  __/ (_| | |_| | |  _|\n" .
             "  \___|\__,_|\__,_| |_| |\n" .
             "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</comment>    \n";
 
         $banner[2] =   "<comment>" .
             "           _          __      \n" .
@@ -76,7 +76,7 @@ class CommandBanner
             " |  __/ (_| | |_| | |  _| | | \n" .
             "  \___|\__,_|\__,_| |_| |_|   \n" .
             "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</info>    \n";
 
         $banner[3] =   "<info>" .
             "           _          __           \n" .
@@ -85,7 +85,7 @@ class CommandBanner
             " |  __/ (_| | |_| | |  _| | | (_| |\n" .
             "  \___|\__,_|\__,_| |_| |_|  \__,_|\n" .
             "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</comment>    \n";
 
         $banner[4] =   "<comment>" .
             "           _          __                      \n" .
@@ -94,7 +94,7 @@ class CommandBanner
             " |  __/ (_| | |_| | |  _| | | (_| | | | | | | \n" .
             "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_| \n" .
             "                        </comment><info>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</info>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</info>    \n";
 
         $banner[5] =   "<info>" .
             "           _          __                           \n" .
@@ -103,7 +103,7 @@ class CommandBanner
             " |  __/ (_| | |_| | |  _| | | (_| | | | | | |  __/ \n" .
             "  \___|\__,_|\__,_| |_| |_|  \__,_|_| |_| |_|\___| \n" .
             "                        </info><comment>" . ConfigCore::getConfig('version') . " " .
-            ConfigCore::getConfig('date_version') . " by studoo collectif</comment>    \n";
+            ConfigCore::getConfig('date_version') . " by studoo labs</comment>    \n";
 
         return $banner[$slash] ?? $banner[5];
     }

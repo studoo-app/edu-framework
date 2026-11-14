@@ -26,7 +26,7 @@ Vous devez activer le service DatabaseService pour utiliser une base de données
 
 !!! info "Lecture obligatoire"
 
-    Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](../boost/dataservice.md)
+    Vous devez avoir lu la documentation sur la [DatabaseService : La gestion des données](dataservice.md)
 
     L'activation du service DatabaseService s'opère dans le fichier .env de votre projet.
     ```diff
@@ -449,10 +449,10 @@ class VilleController implements ControllerInterface
 
 Explications :
 
-- La méthode `getHttpMethod()` de la classe [Request](../boost/resquet.md) permet de distinguer l'affichage de la page (`GET`) de l'envoi du formulaire (`POST`).
-- Les données du formulaire sont récupérées avec la méthode `get()` de la classe [Request](../boost/resquet.md).
+- La méthode `getHttpMethod()` de la classe [Request](resquet.md) permet de distinguer l'affichage de la page (`GET`) de l'envoi du formulaire (`POST`).
+- Les données du formulaire sont récupérées avec la méthode `get()` de la classe [Request](resquet.md).
 - L'identifiant est initialisé à `0` : c'est la base de données qui attribuera le vrai identifiant lors de l'`INSERT`.
-- La classe [Route](../boost/route.md) génère l'URL de la route `ville` par son nom : si vous changez l'URI de la route, la redirection suivra automatiquement.
+- La classe [Route](route.md) génère l'URL de la route `ville` par son nom : si vous changez l'URI de la route, la redirection suivra automatiquement.
 
 !!! info "Le pattern PRG (Post/Redirect/Get)"
 
@@ -647,7 +647,7 @@ Le formulaire de modification est pré-rempli avec les valeurs de la ville. Modi
 {% endblock %}
 ```
 
-La fonction Twig `getNameToPath()` accepte les paramètres de route en second argument : `getNameToPath('villeupdate', {'id': ville.getId()})` génère l'URL `/ville/42/update` pour la ville n°42. Vous pouvez consulter la documentation de la classe [Route](../boost/route.md) pour plus de détails.
+La fonction Twig `getNameToPath()` accepte les paramètres de route en second argument : `getNameToPath('villeupdate', {'id': ville.getId()})` génère l'URL `/ville/42/update` pour la ville n°42. Vous pouvez consulter la documentation de la classe [Route](route.md) pour plus de détails.
 
 ### Ajouter le lien "Modifier" dans la liste
 
@@ -866,6 +866,6 @@ Le CRUD de l'entité `ville` est terminé : vous pouvez créer, lire, modifier e
 ## Pour aller plus loin
 
 - [Construire une API](controller-edu-api.md) : exposer le CRUD de ville en API REST (JSON)
-- [DatabaseService - La gestion des données](../boost/dataservice.md)
-- [Route - Générer une URL par le nom](../boost/route.md)
-- [Request - La gestion des requêtes HTTP](../boost/resquet.md)
+- [DatabaseService - La gestion des données](dataservice.md)
+- [Route - Générer une URL par le nom](route.md)
+- [Request - La gestion des requêtes HTTP](resquet.md)

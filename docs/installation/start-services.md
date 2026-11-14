@@ -114,7 +114,7 @@ Les services sont prêts à être utilisés. Vous pouvez maintenant démarrer vo
     Il propose deux connexions pré-configurées :
 
     - **MySql** : serveur `database`, utilisateur `root`, mot de passe `studoo` (base `app_db`)
-    - **SQLite** : fichier `var/logs/core_logs.sqlite` (logs des requêtes, consultables également depuis le [profiler](../boost/debug-bar.md#le-profiler))
+    - **SQLite** : fichier `var/logs/core_logs.sqlite` (logs des requêtes, consultables également depuis le [profiler](../build/debug-bar.md#le-profiler))
 
 !!! info 
     

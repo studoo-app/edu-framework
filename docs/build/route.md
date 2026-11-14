@@ -23,9 +23,15 @@ Cette fonctionnalité est disponible à partir de la version **v2.1.0**.
 
 !!! info "Plusieurs méthodes dans un même controller"
 
-    Depuis la version **v2.4.0**, la clé `controller` du fichier `app/Config/routes.yaml` peut désigner une méthode précise du controller avec la syntaxe `Controller\MedecinController::index` (voir [Un controller, plusieurs routes](../build/controller-edu.md#un-controller-plusieurs-routes-plusieurs-methodes)).
+    Depuis la version **v2.4.0**, la clé `controller` du fichier `app/Config/routes.yaml` peut désigner une méthode précise du controller avec la syntaxe `Controller\MedecinController::index` (voir [Un controller, plusieurs routes](controller-edu.md#un-controller-plusieurs-routes-plusieurs-methodes)).
 
     Cela ne change rien pour `getNameToPath()` : la génération d'URL se base uniquement sur le **nom** et l'`uri` de la route.
+
+!!! info "Routes déclarées avec l'attribut #[Route]"
+
+    Depuis la version **v2.13.0**, `getNameToPath()` génère aussi l'URL des routes déclarées sur les controllers avec
+    l'attribut `#[Route('/ville', name: 'villeread')]` : le nom est alors le paramètre `name` de l'attribut
+    (voir [Déclarer une route avec #[Route]](route-attribute.md)).
 
 ## Comment l'URL est-elle construite ?
 

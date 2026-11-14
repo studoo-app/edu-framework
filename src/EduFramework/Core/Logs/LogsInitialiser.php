@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *
  * @author Benoit Foujols
  *
@@ -47,9 +47,12 @@ class LogsInitialiser
                                         query TEXT NOT NULL,
                                         duration_ms REAL NOT NULL,
                                         rows_count INTEGER,
+                                        params TEXT,
                                         event_date TEXT DEFAULT (datetime('now'))
                                     )");
             $pdo->exec("CREATE INDEX IF NOT EXISTS idx_serv_sql_logs_request_id ON serv_sql_logs (request_id)");
+            // Base des logs créée avant l'ajout des paramètres des requêtes (EXPLAIN du profiler)
+            $this->addColumnIfMissing($pdo, 'serv_sql_logs', 'params', 'TEXT');
 
             // Table des profils de code (profiler de la barre de debug), un profil
             // par requête HTTP, rattaché par l'identifiant du log de la requête (request_id)
@@ -68,6 +71,25 @@ class LogsInitialiser
                                     )");
         } catch (\PDOException $e) {
             error_log('[EduFramework Logs] ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Ajoute une colonne à une table existante si elle n'existe pas encore
+     * (mise à jour de la structure d'une base des logs créée par une version précédente)
+     *
+     * @param \PDO $pdo Connexion à la base des logs
+     * @param string $table Nom de la table
+     * @param string $column Nom de la colonne
+     * @param string $definition Type SQLite de la colonne (Exemple : TEXT)
+     * @return void
+     */
+    private function addColumnIfMissing(\PDO $pdo, string $table, string $column, string $definition): void
+    {
+        $info = $pdo->query('PRAGMA table_info(' . $table . ')');
+        $columns = ($info === false ? [] : array_column($info->fetchAll(\PDO::FETCH_ASSOC), 'name'));
+        if (in_array($column, $columns, true) === false) {
+            $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $definition);
         }
     }
 }

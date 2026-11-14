@@ -123,7 +123,7 @@ class HelloController implements ControllerInterface
 Several points are worth noting in this controller:
 
 - The **namespace** is `Controller\api`: API controllers are kept separate from "web" controllers (namespace `Controller`).
-- Like any controller, it **implements the `ControllerInterface` interface** and its `execute()` method takes a [Request](../boost/resquet.md) object as a parameter and returns a string or null.
+- Like any controller, it **implements the `ControllerInterface` interface** and its `execute()` method takes a [Request](resquet.md) object as a parameter and returns a string or null.
 - The native function `header('Content-Type: application/json')` tells the client that the response is in JSON format.
 - The native function `json_encode()` turns a PHP array into a JSON string.
 - There is **no Twig view**: the JSON string returned by `json_encode()` is the response itself.
@@ -248,7 +248,7 @@ The generated controller contains sample data (`$listTest`). The following secti
 !!! info "Goal"
 
     - Create the base file with the `make:api` command
-    - Replace the sample data with the cities from the database using [DatabaseService](../boost/dataservice.md)
+    - Replace the sample data with the cities from the database using [DatabaseService](dataservice.md)
     - Test the API with curl
 
 **Prerequisites:**
@@ -340,7 +340,7 @@ Content-Type: application/json
 !!! info "Goal"
 
     - Create an API that returns **a single city** from its identifier: `GET /api/ville/{id}`
-    - Retrieve a route parameter with the [Request](../boost/resquet.md) class
+    - Retrieve a route parameter with the [Request](resquet.md) class
     - Document the parameter with the OpenAPI `Parameter` attribute
 
 In REST, it is customary to expose a single resource in the form `/api/ville/{id}`.
@@ -411,7 +411,7 @@ class VilleDetailController implements ControllerInterface
 
 Explanations:
 
-- The route's dynamic `{id}` parameter is retrieved with the `get()` method of the [Request](../boost/resquet.md) class, as in the [city CRUD](dataservice-select.md).
+- The route's dynamic `{id}` parameter is retrieved with the `get()` method of the [Request](resquet.md) class, as in the [city CRUD](dataservice-select.md).
 - The query uses a prepared statement with the `:id` parameter to prevent SQL injection.
 - The native function `http_response_code(404)` makes it possible to return an HTTP error code with an explicit JSON body.
 - The `#[Attributes\Parameter(...)]` attribute documents the path parameter for OpenAPI.
@@ -517,8 +517,8 @@ class VilleController implements ControllerInterface
 
 Explanations:
 
-- The `getHttpMethod()` method of the [Request](../boost/resquet.md#gethttpmethod) class makes it possible to tell the handling of `GET` (list) apart from `POST` (creation).
-- The data sent by the client is retrieved with the `get()` method of the [Request](../boost/resquet.md#getkey) class.
+- The `getHttpMethod()` method of the [Request](resquet.md#gethttpmethod) class makes it possible to tell the handling of `GET` (list) apart from `POST` (creation).
+- The data sent by the client is retrieved with the `get()` method of the [Request](resquet.md#getkey) class.
 - The native function `http_response_code(201)` returns the HTTP code `201 Created`, the REST convention for a successful creation.
 - The `#[Attributes\Post(path: '...')]` attribute documents the new operation for OpenAPI.
 
@@ -542,7 +542,7 @@ Content-Type: application/json
 
 !!! info "Request body in JSON format"
 
-    The [Request](../boost/resquet.md) class reads form data (type `application/x-www-form-urlencoded`, like the data sent by curl or an HTML form).
+    The [Request](resquet.md) class reads form data (type `application/x-www-form-urlencoded`, like the data sent by curl or an HTML form).
     If your client sends a JSON body directly (type `application/json`, common with Postman or a JavaScript frontend), the data is read like this:
 
     ```php
@@ -623,9 +623,9 @@ This file can then be viewed in tools such as [Swagger Editor](https://editor-ne
 
 # Going further
 
-- [Request - Handling HTTP requests](../boost/resquet.md)
-- [Route - Generating a URL from its name](../boost/route.md)
-- [DatabaseService - Data management](../boost/dataservice.md)
+- [Request - Handling HTTP requests](resquet.md)
+- [Route - Generating a URL from its name](route.md)
+- [DatabaseService - Data management](dataservice.md)
 - [The complete "VILLE" (city) CRUD](dataservice-select.md)
 - [The swagger-php documentation](https://github.com/zircote/swagger-php){:target="_blank"}
 - [The OpenAPI specification](https://swagger.io/specification/){:target="_blank"}

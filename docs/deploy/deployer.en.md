@@ -266,7 +266,7 @@ nano ~/mon-app/shared/.env
 
 !!! danger "APP_ENV=prod in production"
 
-    **Never** leave `APP_ENV=dev` on the server: the [debug bar](../boost/debug-bar.md) and detailed error messages would be visible to everyone.
+    **Never** leave `APP_ENV=dev` on the server: the [debug bar](../build/debug-bar.md) and detailed error messages would be visible to everyone.
 
 Since the `.env` file is **shared**, your changes are kept across subsequent deployments. Your application is live at `https://mon-app.fr` :tada:
 

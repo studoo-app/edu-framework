@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *
  * @author Benoit Foujols
  *
@@ -227,6 +227,7 @@ class HttpRequestLogger
         return str_starts_with($path, '/_debug/') === false
             && str_starts_with($path, '/edu-logs') === false
             && str_starts_with($path, '/edu-sql-logs') === false
+            && str_starts_with($path, '/edu-sql-explain') === false
             && str_starts_with($path, '/edu-code-profile') === false;
     }
 

@@ -68,7 +68,7 @@ php bin/edu start --no-start
 !!! tip "Journalisation des requêtes"
 
     Lorsque le serveur est démarré via `php bin/edu start`, chaque requête HTTP reçue est journalisée dans une base SQLite (`var/logs/core_logs.sqlite`).
-    Ces logs sont consultables depuis le [profiler](../boost/debug-bar.md#le-profiler).
+    Ces logs sont consultables depuis le [profiler](../build/debug-bar.md#le-profiler).
 
 ## Arrêtez l'application
 

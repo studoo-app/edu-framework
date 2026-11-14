@@ -94,7 +94,7 @@ To go further: [The MVC architecture concept](build/concept-mvc.md) and [The pro
 | **The `Request` object** | Read parameters, the HTTP method, headers and uploaded files | `Symfony\Component\HttpFoundation\Request` |
 | **File uploads** (`hasFile()`, `getFile()`, `move()`) | Receive, validate and store a file sent by a form | `UploadedFile` |
 
-To go further: [Building a page](build/controller-edu.md), [Request](boost/resquet.md) and [Generating a URL from its name](boost/route.md).
+To go further: [Building a page](build/controller-edu.md), [Request](build/resquet.md) and [Generating a URL from its name](build/route.md).
 
 ## Views
 
@@ -115,7 +115,7 @@ To go further: [Building a page](build/controller-edu.md) and [Building a form](
 | **CRUD** | Create, read, update and delete data, from the database all the way to the form | `make:crud` |
 | **The PRG pattern** (*Post/Redirect/Get*) | Redirect after a form to avoid submitting it twice | Same pattern (`redirectToRoute()`) |
 
-To go further: [DatabaseService](boost/dataservice.md) and [Building the CRUD](build/dataservice-select.md).
+To go further: [DatabaseService](build/dataservice.md) and [Building the CRUD](build/dataservice-select.md).
 
 ## APIs
 
@@ -139,6 +139,7 @@ The `php bin/edu` command gathers the developer's tools, like `bin/console` in S
 | `make:api` | Generates a documented API controller | `make:controller` + API Platform |
 | `make:command` | Generates a CLI command | `make:command` |
 | `cache:clear` | Clears the application cache | `cache:clear` |
+| `routes:list` | Lists the application routes (`--method` to filter) | `debug:router` |
 
 Building your own commands is also a way to approach automation, and the use of a CLI tool by an AI agent.
 
@@ -156,7 +157,7 @@ Edu Framework is used in cybersecurity lab sessions: deliberately simple and tra
 | **Error messages hidden in production** | Leak of technical information | Production error pages |
 | **Debug routes only in `dev`** | Exposure of internal tools | Profiler disabled in production |
 
-To go further: [Protecting a form (CSRF)](build/csrf.md) and [HTTP errors](boost/http-error.md).
+To go further: [Protecting a form (CSRF)](build/csrf.md) and [HTTP errors](build/http-error.md).
 
 ## Error handling
 
@@ -166,7 +167,7 @@ To go further: [Protecting a form (CSRF)](build/csrf.md) and [HTTP errors](boost
 | **`ErrorHttpStatusException`** | Raise an HTTP error from a controller (Example: access forbidden) | `HttpException`, `createAccessDeniedException()` |
 | **Exception message in dev mode** | Read an error to fix it, without exposing it in production | Dev mode exception page |
 
-To go further: [HTTP errors](boost/http-error.md).
+To go further: [HTTP errors](build/http-error.md).
 
 ## Debugging and performance
 
@@ -179,7 +180,7 @@ In development mode (`APP_ENV=dev`), Edu Framework provides tools inspired by Sy
 | **SQL queries per HTTP request** | Spot a slow or repeated SQL query ("N+1" problem) | Profiler's Doctrine panel |
 | **Code profiler** (Excimer, built-in flamegraph) | Measure the time spent in each function, read and compare flamegraphs | Blackfire, *Performance* panel |
 
-To go further: [The debug bar and the profiler](boost/debug-bar.md).
+To go further: [The debug bar and the profiler](build/debug-bar.md).
 
 ## Mail
 
@@ -216,8 +217,7 @@ To go further: [Starting the services](installation/start-services.md), [The app
 The documentation is organized as a progressive path:
 
 1. **[Get started](installation/index.md)**: install the environment, create and run your project.
-2. **[Build](build/index.md)**: a page, a form, the CRUD, a CLI command, an API.
-3. **[Consolidate](boost/index.md)**: dig deeper into the request, data, routes, errors and debugging.
+2. **[Build](build/index.md)**: a page, a form, the CRUD, a CLI command, an API, then dig deeper into the request, data, routes, errors and debugging.
 
 The learning objectives of each stage are detailed on the [Learning objectives](about.md) page.
 

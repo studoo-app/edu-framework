@@ -68,7 +68,7 @@ php bin/edu start --no-start
 !!! tip "Request logging"
 
     When the server is started with `php bin/edu start`, every HTTP request received is logged in an SQLite database (`var/logs/core_logs.sqlite`).
-    These logs can be viewed from the [profiler](../boost/debug-bar.md#the-profiler).
+    These logs can be viewed from the [profiler](../build/debug-bar.md#the-profiler).
 
 ## Stop the application
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Edu Framework by studoo
+ * Edu Framework by studoo labs
  *    ____  _             _
  *   / ___|| |_ _   _  __| | ___   ___
  *   \___ \| __| | | |/ _` |/ _ \ / _ \
