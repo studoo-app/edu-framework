@@ -15,6 +15,7 @@ class LoadEnvTest extends TestCase
     private const KEYS = [
         'EDU_TEST_VAR', 'EDU_TEST_LOCAL', 'DATABASE_URL', 'DB_HOST_STATUS', 'DB_TYPE',
         'DB_HOST', 'DB_SOCKET', 'DB_USER', 'DB_PASSWORD', 'DB_NAME',
+        'REDIS_URL', 'REDIS_SCHEME', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_USERNAME', 'REDIS_PASSWORD', 'REDIS_DB',
     ];
 
     /**
@@ -219,5 +220,75 @@ class LoadEnvTest extends TestCase
 
         $this->assertEquals('Xy7#kP', ConfigCore::getEnv('DB_PASSWORD'));
         $this->assertEquals('db-host', ConfigCore::getEnv('DB_HOST'));
+    }
+
+    /**
+     * Les variables REDIS_* sont déduites de la REDIS_URL fournie par FrankenDeploy
+     * @return void
+     */
+    public function testRedisUrl(): void
+    {
+        putenv('REDIS_URL=redis://:s3cr%23t@mon-app-redis:6380/2');
+        ConfigCore::loadEnv($this->envPath);
+
+        $this->assertEquals('tcp', ConfigCore::getEnv('REDIS_SCHEME'));
+        $this->assertEquals('mon-app-redis', ConfigCore::getEnv('REDIS_HOST'));
+        $this->assertEquals('6380', ConfigCore::getEnv('REDIS_PORT'));
+        $this->assertEquals('s3cr#t', ConfigCore::getEnv('REDIS_PASSWORD'));
+        $this->assertEquals('2', ConfigCore::getEnv('REDIS_DB'));
+        $this->assertFalse(ConfigCore::existEnv('REDIS_USERNAME'));
+    }
+
+    /**
+     * Une REDIS_URL rediss:// donne une connexion TLS et un utilisateur (ACL Redis 6+)
+     * @return void
+     */
+    public function testRedisUrlTls(): void
+    {
+        putenv('REDIS_URL=rediss://app:pass@redis.example.com');
+        ConfigCore::loadEnv($this->envPath);
+
+        $this->assertEquals('tls', ConfigCore::getEnv('REDIS_SCHEME'));
+        $this->assertEquals('app', ConfigCore::getEnv('REDIS_USERNAME'));
+        $this->assertFalse(ConfigCore::existEnv('REDIS_PORT'));
+        $this->assertFalse(ConfigCore::existEnv('REDIS_DB'));
+    }
+
+    /**
+     * Une variable REDIS_* déjà définie n'est pas écrasée par la REDIS_URL
+     * @return void
+     */
+    public function testRedisUrlNEcrasePasLesVariablesRedis(): void
+    {
+        putenv('REDIS_URL=redis://redis-url:6379/0');
+        putenv('REDIS_HOST=redis-env');
+        ConfigCore::loadEnv($this->envPath);
+
+        $this->assertEquals('redis-env', ConfigCore::getEnv('REDIS_HOST'));
+    }
+
+    /**
+     * Une REDIS_URL d'un autre schéma lève une erreur de configuration explicite
+     * @return void
+     */
+    public function testRedisUrlInvalide(): void
+    {
+        file_put_contents($this->envPath . '.env', "REDIS_URL=http://redis:6379\n");
+
+        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
+        $this->expectExceptionMessage('REDIS_URL est invalide');
+        ConfigCore::loadEnv($this->envPath);
+    }
+
+    /**
+     * Un numéro de base Redis non numérique lève une erreur de configuration
+     * @return void
+     */
+    public function testRedisUrlBaseInvalide(): void
+    {
+        putenv('REDIS_URL=redis://redis:6379/cache');
+
+        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
+        ConfigCore::loadEnv($this->envPath);
     }
 }

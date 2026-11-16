@@ -171,6 +171,50 @@ class ConfigCore
             ->make();
         Dotenv::create($repository, $basePath, ['.env', '.env.local'], false)->safeLoad();
         self::loadDatabaseUrl();
+        self::loadRedisUrl();
+    }
+
+    /**
+     * Déduit les variables REDIS_* de la variable REDIS_URL
+     * Format : redis://utilisateur:motdepasse@hote:6379/0 (rediss:// pour une connexion TLS)
+     * (format utilisé par FrankenDeploy et Symfony pour un Redis géré)
+     * Une variable REDIS_* déjà définie n'est jamais écrasée
+     * @return void
+     * @throws ErrorConfigException Si la REDIS_URL est mal formée
+     */
+    private static function loadRedisUrl(): void
+    {
+        $redisUrl = self::readEnv('REDIS_URL') ?? '';
+        if ($redisUrl === '') {
+            return;
+        }
+
+        $url = parse_url($redisUrl) ?: [];
+        $scheme = $url['scheme'] ?? '';
+        $database = ltrim($url['path'] ?? '', '/');
+        if (in_array($scheme, ['redis', 'rediss'], true) === false
+            || isset($url['host']) === false || ($database !== '' && ctype_digit($database) === false)) {
+            throw new ErrorConfigException(
+                "La variable REDIS_URL est invalide. Format attendu : "
+                . "redis://:motdepasse@hote:6379/0 (rediss:// pour une connexion TLS). Les caractères spéciaux "
+                . "du mot de passe doivent être encodés (# => %23, @ => %40, / => %2F)"
+            );
+        }
+
+        $values = [
+            'REDIS_SCHEME' => $scheme === 'rediss' ? 'tls' : 'tcp',
+            'REDIS_HOST' => $url['host'],
+            'REDIS_PORT' => (string) ($url['port'] ?? ''),
+            'REDIS_USERNAME' => $url['user'] ?? '',
+            'REDIS_PASSWORD' => $url['pass'] ?? '',
+            'REDIS_DB' => $database,
+        ];
+
+        // Dépôt "immutable" : une variable déjà définie n'est pas écrasée
+        $repository = self::envRepository();
+        foreach (array_filter($values, 'strlen') as $key => $value) {
+            $repository->set($key, rawurldecode($value));
+        }
     }
 
     /**
