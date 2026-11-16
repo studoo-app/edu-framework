@@ -5,6 +5,10 @@ namespace Core\View;
 use Core\Profiler\FakeProfilerDriver;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use Studoo\EduFramework\Core\Cache\CacheCollector;
+use Studoo\EduFramework\Core\Cache\CacheService;
+use Studoo\EduFramework\Core\Cache\NullCache;
+use Studoo\EduFramework\Core\Cache\TraceableCache;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Request;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
@@ -42,6 +46,9 @@ class StudooBarreDebugTest extends TestCase
         // Réinitialisation du profiler de code (driver factice, cookie du bouton Code)
         CodeProfiler::reset();
         CodeProfiler::setDriver(null);
+        // Réinitialisation du cache applicatif et de ses opérations collectées
+        CacheCollector::reset();
+        CacheService::setCache(null);
         unset($_COOKIE[CodeProfiler::COOKIE]);
         // Restauration des variables d'environnement modifiées par les tests
         foreach ($this->envBackup as $key => $value) {
@@ -299,5 +306,82 @@ class StudooBarreDebugTest extends TestCase
         // En mode trigger, le panneau permet de désactiver le profilage
         $this->assertStringContainsString('<button type="button" class="edu-tb-action" onclick="eduProfileToggle(false)">', $html);
         $this->assertStringContainsString('eduLoadCodeProfile();', $html);
+    }
+
+    /**
+     * Le bloc Cache est masqué quand la requête n'a pas utilisé le cache
+     */
+    public function testCacheBlockIsHiddenWithoutCacheOperations(): void
+    {
+        CacheCollector::reset();
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $this->assertStringNotContainsString('Cache applicatif', (new studooBarreDebug())->generateBarDebug());
+    }
+
+    /**
+     * Le bloc Cache affiche les lectures trouvées (hit) et absentes (miss) et le détail des opérations
+     */
+    public function testCacheBlockShowsHitsAndMisses(): void
+    {
+        CacheService::setCache(new TraceableCache(new NullCache()));
+        CacheCollector::collect('get', 'ville:list', false, 0.4);
+        CacheCollector::collect('set', 'ville:list', null, 0.6);
+        CacheCollector::collect('get', 'ville:<1>', true, 0.25);
+        ConfigCore::setRequest(new Request('/ville', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('<b>1</b><small>hit</small> <b>1</b><small>miss</small>', $html);
+        $this->assertStringContainsString('edu-tb-cache miss', $html);
+        $this->assertStringContainsString('<span>Driver</span><em>none</em>', $html);
+        $this->assertStringContainsString('<span>1. get ville:list</span><em>miss — 0,40 ms</em>', $html);
+        $this->assertStringContainsString('<span>2. set ville:list</span><em>ok — 0,60 ms</em>', $html);
+        // Les clés sont échappées comme le reste du panneau
+        $this->assertStringContainsString('<span>3. get ville:&lt;1&gt;</span><em>hit — 0,25 ms</em>', $html);
+    }
+
+    /**
+     * Une page servie entièrement depuis le cache est signalée en vert (classe hit)
+     */
+    public function testCacheBlockIsGreenWhenEveryReadIsAHit(): void
+    {
+        CacheService::setCache(new TraceableCache(new NullCache()));
+        CacheCollector::collect('get', 'ville:list', true, 0.3);
+        ConfigCore::setRequest(new Request('/ville', 'GET'));
+
+        $this->assertStringContainsString('edu-tb-cache hit', (new studooBarreDebug())->generateBarDebug());
+    }
+
+    /**
+     * Le panneau Environnement affiche le driver du cache et, pour Redis, le serveur et Redis Insight
+     */
+    public function testEnvironmentPanelShowsTheRedisCacheAndRedisInsight(): void
+    {
+        $this->setEnv(['CACHE_DRIVER' => 'redis', 'REDIS_HOST' => 'redis', 'REDIS_PORT' => '6379', 'REDIS_UI_PORT' => '5541']);
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('<span>CACHE_DRIVER</span><em>redis</em>', $html);
+        $this->assertStringContainsString('<span>REDIS_HOST</span><em>redis:6379</em>', $html);
+        $this->assertStringContainsString(
+            '<span>Redis Insight</span><em><a href="http://localhost:5541" target="_blank" rel="noopener">localhost:5541</a></em>',
+            $html
+        );
+    }
+
+    /**
+     * Sans Redis, le panneau Environnement n'affiche que le driver du cache (fichier par défaut)
+     */
+    public function testEnvironmentPanelShowsTheFileCacheByDefault(): void
+    {
+        $this->setEnv(['CACHE_DRIVER' => null]);
+        ConfigCore::setRequest(new Request('/', 'GET'));
+
+        $html = (new studooBarreDebug())->generateBarDebug();
+
+        $this->assertStringContainsString('<span>CACHE_DRIVER</span><em>file</em>', $html);
+        $this->assertStringNotContainsString('Redis Insight', $html);
     }
 }
