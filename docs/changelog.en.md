@@ -6,7 +6,7 @@
 
 **features**
 
-- Application cache `CacheService`: `CacheService::getCache()` returns the cache selected by `CACHE_DRIVER` (`redis`, `file` or `none`) with `get()`, `set()`, `has()`, `delete()`, `clear()` and `remember()`. Values are stored as JSON (readable in Redis Insight or in the cache file), with a default lifetime `CACHE_TTL` and a key prefix `CACHE_PREFIX` (`edu:`). The cache is created on first use: a page that does not use it opens no connection
+- [#206](https://github.com/studoo-app/edu-framework/pull/206) Application cache `CacheService`: `CacheService::getCache()` returns the cache selected by `CACHE_DRIVER` (`redis`, `file` or `none`) with `get()`, `set()`, `has()`, `delete()`, `clear()` and `remember()`. Values are stored as JSON (readable in Redis Insight or in the cache file), with a default lifetime `CACHE_TTL` and a key prefix `CACHE_PREFIX` (`edu:`). The cache is created on first use: a page that does not use it opens no connection
 - Redis driver with the [Predis](https://github.com/predis/predis) client (pure PHP, no extension required): `CacheService::getRedis()` gives access to every Redis command (`RENAME`, hashes...) with the same prefix; `clear()` only deletes the keys of the prefix (`SCAN`, never `FLUSHDB`). An unreachable server raises an explicit error in dev mode and behaves as an empty cache in production
 - `REDIS_URL` support (`redis://` and `rediss://`, FrankenDeploy / Symfony format): the missing `REDIS_*` variables are deduced from it
 - Debug bar: new **Cache** block (hits and misses, writes, time and details of the operations; green when every read is found, orange otherwise) and cache driver, Redis server and Redis Insight link in the panel of the DEV block
