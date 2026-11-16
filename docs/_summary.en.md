@@ -18,6 +18,7 @@
     * [Build an API](build/controller-edu-api.md)
     * [Build the CRUD](build/dataservice-select.md)
     * [Build a CLI command](build/new-command-edu.md)
+    * [Cache data with Redis](build/cache-redis.md)
     * [Test your application (unit tests)](build/tests-unitaires.md)
     * [Request - Handling HTTP requests](build/resquet.md)
     * [DatabaseService - Handling data](build/dataservice.md)
