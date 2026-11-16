@@ -1,17 +1,16 @@
 <?php
-/*
- * Edu Framework by studoo labs
- *    ____  _             _
- *   / ___|| |_ _   _  __| | ___   ___
- *   \___ \| __| | | |/ _` |/ _ \ / _ \
- *    ___) | |_| |_| | (_| | (_) | (_) |
- *   |____/ \__|\__,_|\__,_|\___/ \___/
- *
- * Starting End Point Edu-Framework
+/*     ______    __            ______                                             __  
+ *    / ____/___/ /_  __      / ____/________ _____ ___  ___ _      ______  _____/ /__
+ *   / __/ / __  / / / /_____/ /_  / ___/ __ `/ __ `__ \/ _ \ | /| / / __ \/ ___/ //_/
+ *  / /___/ /_/ / /_/ /_____/ __/ / /  / /_/ / / / / / /  __/ |/ |/ / /_/ / /  / ,<   
+ * /_____/\__,_/\__,_/     /_/   /_/   \__,_/_/ /_/ /_/\___/|__/|__/\____/_/  /_/|_|   
+ * by studoo labs
  * @author Benoit Foujols
  *
  * Pour les informations complètes sur les droits d'auteur et la licence,
  * veuillez consulter le fichier LICENSE qui a été distribué avec ce code source.
+ * 
+ * Starting End Point
  */
 
 use Studoo\EduFramework\Core\ConfigCore;
