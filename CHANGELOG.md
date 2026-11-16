@@ -16,11 +16,13 @@
 
 **maintenance**
 
-- New `Core\Cache` classes: `CacheInterface`, `AbstractCache`, `RedisCache`, `FileCache`, `NullCache`, `TraceableCache`, `CacheCollector`, `CacheFactory` and `CacheService`; new `ErrorCacheException`
+- New `Core\Cache` classes: `CacheInterface`, `AbstractCache`, `RedisCache`, `FileCache`, `NullCache`, `TraceableCache`, `CacheCollector`, `CacheFactory`, `CacheService` and `JsonPayload` (JSON conversion of the values); new `ErrorCacheException`
 - New dependency `predis/predis` ^3.7
 - CI: Redis service to run the `RedisCache` tests (`EDU_TEST_REDIS_HOST` / `EDU_TEST_REDIS_PORT`, skipped without a server)
 - `make:deploy`: the generated `frankendeploy.yaml` explains the cache options in production (FrankenDeploy does not provide a Redis server)
 - Backward compatible with v2.15: without configuration the cache uses files, a `REDIS_URL` in another format is ignored and a malformed one is only reported when the `redis` driver is used
+- Header comments of `bin/edu` and `public/index.php` harmonized (Edu-Framework banner)
+- `composer.json`: Benoit Foujols's author email updated
 
 **documentation**
 
