@@ -9,10 +9,21 @@ use Studoo\EduFramework\Core\ConfigCore;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * Tests de la commande check:config (prérequis PHP et cache)
+ */
 class CheckStackCommandTest extends TestCase
 {
-    private $commandeTester;
+    /**
+     * Testeur de la commande check:config
+     * @var CommandTester|null
+     */
+    private ?CommandTester $commandeTester;
 
+    /**
+     * Prépare la commande check:config avec la configuration par défaut du cache
+     * @return void
+     */
     protected function setUp(): void
     {
         unset($_ENV['CACHE_DRIVER'], $_ENV['REDIS_HOST'], $_ENV['REDIS_PORT']);
@@ -24,6 +35,10 @@ class CheckStackCommandTest extends TestCase
         $this->commandeTester = new CommandTester($command);
     }
 
+    /**
+     * Remet à zéro les variables du cache et le cache partagé
+     * @return void
+     */
     protected function tearDown(): void
     {
         unset($_ENV['CACHE_DRIVER'], $_ENV['REDIS_HOST'], $_ENV['REDIS_PORT']);
@@ -31,6 +46,10 @@ class CheckStackCommandTest extends TestCase
         $this->commandeTester = null;
     }
 
+    /**
+     * La section des prérequis est affichée
+     * @return void
+     */
     public function testCommandPrerequis(): void
     {
         $this->commandeTester->execute([]);
@@ -39,6 +58,10 @@ class CheckStackCommandTest extends TestCase
         $this->assertStringContainsString('Check des prérequis', $output);
     }
 
+    /**
+     * L'extension PDO_MYSQL est contrôlée
+     * @return void
+     */
     public function testCommandPdo(): void
     {
         $this->commandeTester->execute([]);
@@ -47,6 +70,10 @@ class CheckStackCommandTest extends TestCase
         $this->assertStringContainsString('PDO_MYSQL', $output);
     }
 
+    /**
+     * L'extension OPENSSL est contrôlée
+     * @return void
+     */
     public function testCommandOpenSsl(): void
     {
         $this->commandeTester->execute([]);
@@ -55,6 +82,10 @@ class CheckStackCommandTest extends TestCase
         $this->assertStringContainsString('OPENSSL', $output);
     }
 
+    /**
+     * L'extension JSON est contrôlée
+     * @return void
+     */
     public function testCommandJson(): void
     {
         $this->commandeTester->execute([]);
@@ -63,6 +94,10 @@ class CheckStackCommandTest extends TestCase
         $this->assertStringContainsString('JSON', $output);
     }
 
+    /**
+     * L'extension MBSTRING est contrôlée
+     * @return void
+     */
     public function testCommandMbString(): void
     {
         $this->commandeTester->execute([]);

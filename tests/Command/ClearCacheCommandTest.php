@@ -13,6 +13,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Tests de la commande cache:clear (dossier var/cache et cache applicatif)
+ */
 class ClearCacheCommandTest extends TestCase
 {
     /**
@@ -21,13 +24,21 @@ class ClearCacheCommandTest extends TestCase
      */
     private string $cachePath;
 
-    private $commandeTester;
+    /**
+     * Testeur de la commande cache:clear
+     * @var CommandTester|null
+     */
+    private ?CommandTester $commandeTester;
 
     /**
      * Variables d'environnement du cache modifiées par les tests
      */
     private const CACHE_KEYS = ['APP_ENV', 'CACHE_DRIVER', 'CACHE_PREFIX', 'REDIS_HOST', 'REDIS_PORT'];
 
+    /**
+     * Crée un dossier de cache temporaire rempli et prépare la commande cache:clear
+     * @return void
+     */
     protected function setUp(): void
     {
         foreach (self::CACHE_KEYS as $key) {
@@ -38,7 +49,7 @@ class ClearCacheCommandTest extends TestCase
         $this->cachePath = sys_get_temp_dir() . '/edu-framework-test-cache-' . uniqid() . '/';
 
         // Simulation du contenu d'un dossier de cache (Exemple: le cache TWIG)
-        mkdir($this->cachePath . 'twig', 0777, true);
+        mkdir($this->cachePath . 'twig', 0700, true);
         file_put_contents($this->cachePath . 'twig/template.html.php', 'cache compile');
         file_put_contents($this->cachePath . 'fichier-test.txt', 'cache');
 
@@ -49,6 +60,10 @@ class ClearCacheCommandTest extends TestCase
         $this->commandeTester = new CommandTester($command);
     }
 
+    /**
+     * Supprime le dossier de cache temporaire et remet à zéro les variables du cache
+     * @return void
+     */
     protected function tearDown(): void
     {
         // Nettoyage du dossier de cache temporaire
@@ -60,6 +75,10 @@ class ClearCacheCommandTest extends TestCase
         CacheService::setCache(null);
     }
 
+    /**
+     * Le contenu du dossier de cache est supprimé, le dossier lui-même est conservé
+     * @return void
+     */
     public function testCommandClearCache(): void
     {
         $this->commandeTester->execute([]);
@@ -76,6 +95,10 @@ class ClearCacheCommandTest extends TestCase
         $this->assertDirectoryExists($this->cachePath);
     }
 
+    /**
+     * Un dossier de cache absent est signalé sans erreur
+     * @return void
+     */
     public function testCommandClearCacheWithDirNotExist(): void
     {
         // Le dossier de cache n'existe pas
