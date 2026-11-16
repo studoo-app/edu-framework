@@ -248,6 +248,13 @@ class CreateDeployCommand extends Command
                 - intl
                 - opcache
             {$databaseBlock}
+            # Cache applicatif (CacheService) : FrankenDeploy ne fournit pas de serveur Redis.
+            #   - par défaut, CACHE_DRIVER=file : cache dans var/cache/data, vidé à chaque déploiement
+            #   - avec un Redis externe (service géré, autre serveur), une commande par variable :
+            #       frankendeploy env set prod CACHE_DRIVER=redis
+            #       frankendeploy env set prod REDIS_URL --from-stdin   (redis://:motdepasse@hote:6379/0)
+            #     Si Redis devient injoignable, le site reste en ligne sans cache (erreur dans les logs)
+
             deploy:
             {$domainLine}
               # Page testée avant de basculer le trafic : doit répondre 200 sans connexion.

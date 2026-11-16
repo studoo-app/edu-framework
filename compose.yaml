@@ -40,6 +40,15 @@ services:
       # Mailer : Mailpit est joignable par le nom du service Docker
       # (le .env local pointe lui vers localhost:1025)
       MAILER_DSN: smtp://mailer:1025
+      # Cache applicatif (CacheService) : mêmes valeurs que le .env, sauf l'hôte
+      # et le port qui, dans le réseau Docker, sont ceux du service (redis:6379)
+      CACHE_DRIVER: ${CACHE_DRIVER:-redis}
+      CACHE_PREFIX: ${CACHE_PREFIX:-edu:}
+      CACHE_TTL: ${CACHE_TTL:-3600}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: ${REDIS_DB:-0}
       # Caddy (voir Caddyfile) :
       #   ":80" => HTTP simple (dev) | "localhost" => HTTPS auto | "exemple.fr" => Let's Encrypt
       SERVER_NAME: ${SERVER_NAME:-:80}
@@ -53,6 +62,7 @@ services:
       DBGATE_PORT: ${DBGATE_PORT:-8082}
       MAILER_UI_PORT: ${MAILER_UI_PORT:-8025}
       MAILER_SMTP_PORT: ${MAILER_SMTP_PORT:-1025}
+      REDIS_UI_PORT: ${REDIS_UI_PORT:-5540}
     ports:
       - "${HTTP_PORT:-80}:80"        # HTTP
       - "${HTTPS_PORT:-443}:443"     # HTTPS
@@ -64,6 +74,8 @@ services:
       - caddy_config:/config
     depends_on:
       database:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -144,7 +156,53 @@ services:
     links:
       - database
 
-# Volumes persistants pour Caddy (certificats et configuration)
+  redis:
+    container_name: ${APP_NAME}-redis
+    # Serveur Redis : cache applicatif (CacheService) - https://redis.io
+    image: redis:8-alpine
+    ports:
+      # Port publié sur l'hôte : piloté par REDIS_PORT du .env (même valeur que
+      # pour le dev hors Docker) ; le conteneur écoute toujours sur 6379
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    # appendonly : les données sont conservées dans var/redis au redémarrage du conteneur
+    # requirepass vide (défaut) => pas de mot de passe ; renseigner REDIS_PASSWORD dans le .env pour en activer un
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-}"]
+    volumes:
+      - ./var/redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning $${REDIS_PASSWORD:+-a \"$$REDIS_PASSWORD\"} ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: always
+
+  redisinsight:
+    container_name: ${APP_NAME}-redisinsight
+    # Interface web pour explorer les clés Redis (voir REDIS_UI_PORT, http://localhost:5540)
+    image: redis/redisinsight:latest
+    ports:
+      - "${REDIS_UI_PORT:-5540}:5540"
+    environment:
+      # Connexion préconfigurée vers le service redis : elle apparaît dans la liste
+      # une fois les conditions d'utilisation acceptées au premier lancement
+      RI_REDIS_HOST: redis
+      RI_REDIS_PORT: 6379
+      RI_REDIS_ALIAS: ${APP_NAME}
+      RI_REDIS_DB: ${REDIS_DB:-0}
+      RI_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    volumes:
+      # Volume nommé : Redis Insight s'exécute avec l'utilisateur 1000, un dossier
+      # monté depuis l'hôte n'est pas toujours accessible en écriture sous Linux
+      - redisinsight_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: always
+
+# Volumes persistants pour Caddy (certificats et configuration) et Redis Insight (connexions)
 volumes:
   caddy_data:
   caddy_config:
+  redisinsight_data:
