@@ -114,8 +114,9 @@ Pour aller plus loin : [Construire une page](build/controller-edu.md) et [Constr
 | **Entités et repositories** | Représenter une table par une classe, isoler les requêtes SQL dans un repository | Doctrine ORM : `Entity` et `Repository` |
 | **Le CRUD** | Créer, lire, modifier et supprimer des données, de la base jusqu'au formulaire | `make:crud` |
 | **Le pattern PRG** (*Post/Redirect/Get*) | Rediriger après un formulaire pour éviter le double envoi | Même pattern (`redirectToRoute()`) |
+| **`CacheService`** (Redis, fichiers) | Mettre en cache des données issues de la base, gérer leur fraîcheur | Composant Cache (`RedisAdapter`) |
 
-Pour aller plus loin : [DatabaseService](build/dataservice.md) et [Construire le CRUD](build/dataservice-select.md).
+Pour aller plus loin : [DatabaseService](build/dataservice.md), [Construire le CRUD](build/dataservice-select.md) et [Mettre des données en cache avec Redis](build/cache-redis.md).
 
 ## Les API
 

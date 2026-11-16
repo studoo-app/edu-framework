@@ -12,6 +12,7 @@
 namespace Studoo\EduFramework\Core;
 
 use PDO;
+use Studoo\EduFramework\Core\Cache\CacheCollector;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Controller\Debug\DebugCodeProfileController;
 use Studoo\EduFramework\Core\Controller\Debug\DebugLogsController;
@@ -54,6 +55,12 @@ class LoadCouchCore
         if (ConfigCore::getEnv('DB_HOST_STATUS') === 'true') {
             (new DatabaseService());
         }
+
+        // Gestion du cache applicatif (CacheService) : le cache est créé à sa première
+        // utilisation, selon CACHE_DRIVER. On vide ici les opérations collectées pour la
+        // barre de debug, l'application pouvant rester en mémoire entre deux requêtes
+        // (mode worker de FrankenPHP)
+        CacheCollector::reset();
 
         // Gestion des logs (le service de logs nécessite le driver PDO SQLite)
         if (in_array('sqlite', PDO::getAvailableDrivers(), true)) {

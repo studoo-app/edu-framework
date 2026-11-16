@@ -11,6 +11,8 @@
 
 namespace Studoo\EduFramework\Core\View;
 
+use Studoo\EduFramework\Core\Cache\CacheCollector;
+use Studoo\EduFramework\Core\Cache\CacheService;
 use Studoo\EduFramework\Core\ConfigCore;
 use Studoo\EduFramework\Core\Logs\HttpRequestLogger;
 use Studoo\EduFramework\Core\Logs\SqlQueryLogger;
@@ -19,7 +21,7 @@ use Studoo\EduFramework\Core\Profiler\CodeProfiler;
 /**
  * Class studooBarreDebug
  * Barre de debug affichée en bas des pages en mode dev (style Web Debug Toolbar de Symfony) :
- * un bloc par information (statut HTTP, route, temps, mémoire, DEV),
+ * un bloc par information (statut HTTP, route, temps, mémoire, SQL, cache, DEV),
  * le détail s'affiche au survol et la barre peut être réduite.
  *
  * @package Studoo\EduFramework\Core\View
@@ -59,6 +61,8 @@ class studooBarreDebug
 #edu-tb .edu-tb-status.s4 { background: #a46a1f; }
 #edu-tb .edu-tb-status.s5 { background: #b0413e; }
 #edu-tb .edu-tb-status:hover { filter: brightness(1.15); background: inherit; }
+#edu-tb .edu-tb-cache.hit b { color: #7ccf8f; }
+#edu-tb .edu-tb-cache.miss b { color: #f0b158; }
 #edu-tb .edu-tb-env { background: #4f805d; color: #fff; padding: 1px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; font-size: 11px; }
 #edu-tb .edu-tb-env.prod { background: #b0413e; }
 #edu-tb .edu-tb-ico { font-size: 18px; vertical-align: -1px; margin-right: 5px; }
@@ -272,6 +276,7 @@ HTML;
                 ['Pic d\'utilisation' => number_format($peak, 2, ',', ' ') . ' Mo', 'Limite PHP' => (string) ini_get('memory_limit')]
             ),
             $this->sqlBlock(),
+            $this->cacheBlock(),
             $this->codeBlock(),
             $this->devToolBlock(),
         ];
@@ -284,6 +289,7 @@ HTML;
                     ['APP_ENV' => $envName],
                     ['PHP' => PHP_VERSION, 'SAPI' => PHP_SAPI],
                     $this->databaseDetails(),
+                    $this->cacheDetails(),
                     $this->devServicesDetails()
                 )
             ),
@@ -388,6 +394,60 @@ HTML;
     }
 
     /**
+     * Bloc Cache de la barre : opérations du cache applicatif (CacheService) pendant la requête,
+     * collectées par TraceableCache. Une lecture trouvée est un "hit", une lecture absente un "miss".
+     * Comparé au bloc SQL, il montre l'effet du cache : une page servie depuis le cache affiche
+     * des hits et aucune requête SQL.
+     * Le bloc est masqué si la requête n'a pas utilisé le cache.
+     *
+     * @return string
+     */
+    private function cacheBlock(): string
+    {
+        $operations = CacheCollector::all();
+        if ($operations === []) {
+            return '';
+        }
+
+        $stats = CacheCollector::stats();
+        $formatMs = static fn (float $value): string => number_format($value, 2, ',', ' ') . ' ms';
+
+        $details = [
+            'Driver' => CacheService::getCache()->getDriverName(),
+            'Lectures trouvées (hit)' => (string) $stats['hits'],
+            'Lectures absentes (miss)' => (string) $stats['misses'],
+            'Écritures' => (string) $stats['writes'],
+            'Suppressions' => (string) $stats['deletes'],
+            'Temps cache cumulé' => $formatMs($stats['duration_ms']),
+        ];
+
+        // Détail des premières opérations (Exemple : "1. get ville:list" => "hit — 0,35 ms")
+        $max = 8;
+        foreach (array_slice($operations, 0, $max) as $index => $operation) {
+            $result = match (true) {
+                $operation['hit'] === true => 'hit',
+                $operation['hit'] === false => 'miss',
+                default => 'ok',
+            };
+            $label = ($index + 1) . '. ' . $operation['operation'] . ' ' . mb_strimwidth($operation['key'], 0, 40, '…');
+            $details[$label] = $result . ' — ' . $formatMs($operation['duration_ms']);
+        }
+        if (count($operations) > $max) {
+            $details['…'] = (count($operations) - $max) . ' autre(s) opération(s)';
+        }
+
+        // Toutes les lectures trouvées : vert ; au moins une lecture absente : orange
+        $class = ($stats['misses'] > 0 ? 'edu-tb-cache miss' : ($stats['hits'] > 0 ? 'edu-tb-cache hit' : ''));
+
+        return $this->block(
+            '<b>' . $stats['hits'] . '</b><small>hit</small> <b>' . $stats['misses'] . '</b><small>miss</small>',
+            'Cache applicatif',
+            $details,
+            $class
+        );
+    }
+
+    /**
      * Bloc Code de la barre : profiler du code PHP exécuté (extension Excimer).
      * - extension absente : bloc grisé avec le lien vers la documentation ;
      * - profilage inactif (EDU_PROFILER=trigger) : un clic pose le cookie edu_profile
@@ -480,6 +540,31 @@ HTML;
             'DbGate' => $link('localhost:' . $env('DBGATE_PORT', '8082') ,'http://localhost:' . $env('DBGATE_PORT', '8082')),
             'phpMyAdmin' => $link('localhost:' . $env('PMA_PORT', '8081'), 'http://localhost:' . $env('PMA_PORT', '8081')),
         ];
+    }
+
+    /**
+     * Configuration du cache applicatif (affichée dans le panneau du bloc Environnement) :
+     * driver (CACHE_DRIVER) et, pour Redis, serveur et lien vers l'interface Redis Insight
+     *
+     * @return array<string, string|array{text: string, href: string}> Lignes du panneau (libellé => valeur ou lien)
+     */
+    private function cacheDetails(): array
+    {
+        $env = static fn (string $key, string $default): string
+            => (ConfigCore::existEnv($key) === true && ConfigCore::getEnv($key) !== '' ? (string) ConfigCore::getEnv($key) : $default);
+        $driver = $env('CACHE_DRIVER', 'file');
+
+        $details = [
+            '---- cache ----' => "--------",
+            'CACHE_DRIVER' => $driver,
+        ];
+        if ($driver === 'redis') {
+            $uiPort = $env('REDIS_UI_PORT', '5540');
+            $details['REDIS_HOST'] = $env('REDIS_HOST', '127.0.0.1') . ':' . $env('REDIS_PORT', '6379');
+            $details['Redis Insight'] = ['text' => 'localhost:' . $uiPort, 'href' => 'http://localhost:' . $uiPort];
+        }
+
+        return $details;
     }
 
     /**

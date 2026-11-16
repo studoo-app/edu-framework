@@ -31,6 +31,16 @@ jobs:
           #MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
           - 8006:3306
+      redis:
+        # https://hub.docker.com/_/redis (tests du cache applicatif RedisCache)
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
     strategy:
         fail-fast: true
         matrix:
@@ -73,6 +83,10 @@ jobs:
         run: composer self-update && composer install && composer dump-autoload
 
       - name: Run tests and collect coverage
+        # EDU_TEST_REDIS_* : serveur Redis des tests RedisCacheTest (ignorés s'il est injoignable)
+        env:
+          EDU_TEST_REDIS_HOST: 127.0.0.1
+          EDU_TEST_REDIS_PORT: 6379
         run: vendor/bin/phpunit --coverage-clover clover.xml
 
       - name: Upload coverage to Codacy

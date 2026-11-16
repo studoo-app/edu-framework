@@ -114,8 +114,9 @@ To go further: [Building a page](build/controller-edu.md) and [Building a form](
 | **Entities and repositories** | Represent a table with a class, isolate SQL queries in a repository | Doctrine ORM: `Entity` and `Repository` |
 | **CRUD** | Create, read, update and delete data, from the database all the way to the form | `make:crud` |
 | **The PRG pattern** (*Post/Redirect/Get*) | Redirect after a form to avoid submitting it twice | Same pattern (`redirectToRoute()`) |
+| **`CacheService`** (Redis, files) | Cache data coming from the database, manage its freshness | Cache component (`RedisAdapter`) |
 
-To go further: [DatabaseService](build/dataservice.md) and [Building the CRUD](build/dataservice-select.md).
+To go further: [DatabaseService](build/dataservice.md), [Building the CRUD](build/dataservice-select.md) and [Caching data with Redis](build/cache-redis.md).
 
 ## APIs
 

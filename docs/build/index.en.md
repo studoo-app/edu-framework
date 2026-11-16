@@ -61,6 +61,7 @@ Follow the steps in order: each one builds on the previous one.
 | 4. [Build the CRUD](dataservice-select.md) | Listing, adding, updating and deleting a city | Entities, repositories and prepared SQL queries |
 | 5. [Build an API](controller-edu-api.md) | A JSON API documented in the OpenAPI format | HTTP status codes, JSON format, API documentation |
 | 6. [Build a CLI command](new-command-edu.md) | A new `bin/edu` command | Automate a task from the command line |
+| 7. [Cache data with Redis](cache-redis.md) | A `ville:sync` sync batch and a page served from Redis | The role of a cache, data freshness |
 
 ## Test your application
 
