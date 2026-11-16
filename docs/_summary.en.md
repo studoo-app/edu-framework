@@ -30,6 +30,7 @@
     * [Deploy with FrankenDeploy (Docker)](deploy/index.md)
     * [Deploy with Deployer (without Docker)](deploy/deployer.md)
 * [Migrate](migrate/major.md)
+    * [Migrate from version 2.15 to version 2.16](migrate/migration-2_15-2_16.md)
     * [Migrate from version 2.8 to version 2.9](migrate/migration-2_8-2_9.md)
     * [Migrate from version 2.3 to version 2.8](migrate/migration-2_3-2_8.md)
     * [Migrate from version 2.2 to version 2.3](migrate/migration-2_2-2_3.md)

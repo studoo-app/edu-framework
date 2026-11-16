@@ -37,6 +37,14 @@ class ConfigCore
     private static Request $resquest;
 
     /**
+     * Erreur de la variable REDIS_URL (null si elle est valide ou absente)
+     * Elle n'est signalée qu'à l'utilisation du driver redis (CacheFactory) : une REDIS_URL
+     * mal formée ne doit pas empêcher une application qui n'utilise pas Redis de démarrer
+     * @var string|null
+     */
+    private static ?string $redisUrlError = null;
+
+    /**
      * Schémas de DATABASE_URL reconnus => valeur de DB_TYPE
      */
     private const DATABASE_URL_TYPES = [
@@ -179,26 +187,28 @@ class ConfigCore
      * Format : redis://utilisateur:motdepasse@hote:6379/0 (rediss:// pour une connexion TLS)
      * (format utilisé par FrankenDeploy et Symfony pour un Redis géré)
      * Une variable REDIS_* déjà définie n'est jamais écrasée
+     * Une REDIS_URL d'un autre format (Exemple : tcp://hote:6379 ou hote:6379, utilisée par
+     * l'application elle-même) est ignorée, comme une DATABASE_URL d'un autre type.
+     * Une REDIS_URL redis:// mal formée ne lève pas d'erreur ici : l'erreur est mémorisée
+     * et signalée uniquement si le cache utilise le driver redis (voir getRedisUrlError())
      * @return void
-     * @throws ErrorConfigException Si la REDIS_URL est mal formée
      */
     private static function loadRedisUrl(): void
     {
+        self::$redisUrlError = null;
         $redisUrl = self::readEnv('REDIS_URL') ?? '';
-        if ($redisUrl === '') {
+        $scheme = strtolower((string) strstr($redisUrl, '://', true));
+        if (in_array($scheme, ['redis', 'rediss'], true) === false) {
             return;
         }
 
         $url = parse_url($redisUrl) ?: [];
-        $scheme = $url['scheme'] ?? '';
         $database = ltrim($url['path'] ?? '', '/');
-        if (in_array($scheme, ['redis', 'rediss'], true) === false
-            || isset($url['host']) === false || ($database !== '' && ctype_digit($database) === false)) {
-            throw new ErrorConfigException(
-                "La variable REDIS_URL est invalide. Format attendu : "
+        if (isset($url['host']) === false || ($database !== '' && ctype_digit($database) === false)) {
+            self::$redisUrlError = "La variable REDIS_URL est invalide. Format attendu : "
                 . "redis://:motdepasse@hote:6379/0 (rediss:// pour une connexion TLS). Les caractères spéciaux "
-                . "du mot de passe doivent être encodés (# => %23, @ => %40, / => %2F)"
-            );
+                . "du mot de passe doivent être encodés (# => %23, @ => %40, / => %2F)";
+            return;
         }
 
         $values = [
@@ -259,6 +269,16 @@ class ConfigCore
         foreach (array_filter($values, 'strlen') as $key => $value) {
             $repository->set($key, rawurldecode($value));
         }
+    }
+
+    /**
+     * Retourne l'erreur de la variable REDIS_URL, null si elle est valide ou absente
+     * (utilisée par CacheFactory lorsque CACHE_DRIVER=redis)
+     * @return string|null
+     */
+    public static function getRedisUrlError(): ?string
+    {
+        return self::$redisUrlError;
     }
 
     /**

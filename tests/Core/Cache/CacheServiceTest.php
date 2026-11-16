@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class CacheServiceTest extends TestCase
 {
     private const KEYS = [
-        'APP_ENV', 'CACHE_DRIVER', 'CACHE_PREFIX', 'CACHE_TTL', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB',
+        'APP_ENV', 'CACHE_DRIVER', 'CACHE_PREFIX', 'CACHE_TTL', 'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB', 'REDIS_URL',
     ];
 
     /**
@@ -61,6 +61,8 @@ class CacheServiceTest extends TestCase
         foreach ($this->backupEnv as $key => $value) {
             $_ENV[$key] = $value;
         }
+        // Recharge l'environnement sans REDIS_URL : efface une éventuelle erreur REDIS_URL mémorisée
+        ConfigCore::loadEnv($this->cachePath);
         CacheService::setCache(null);
         (new Filesystem())->remove($this->cachePath);
     }
@@ -162,6 +164,25 @@ class CacheServiceTest extends TestCase
 
         $this->expectException(ErrorConfigException::class);
         $this->expectExceptionMessage('CACHE_TTL=1h');
+        CacheService::getCache();
+    }
+
+    /**
+     * Une REDIS_URL mal formée est signalée uniquement avec le driver redis
+     * @return void
+     */
+    public function testRedisUrlInvalideSignaleeAvecLeDriverRedis(): void
+    {
+        $_ENV['REDIS_URL'] = 'redis://redis:6379/cache';
+        ConfigCore::loadEnv($this->cachePath);
+
+        // Driver fichier : la REDIS_URL n'est pas utilisée, aucune erreur
+        $this->assertInstanceOf(FileCache::class, CacheService::getCache());
+
+        CacheService::setCache(null);
+        $_ENV['CACHE_DRIVER'] = 'redis';
+        $this->expectException(ErrorConfigException::class);
+        $this->expectExceptionMessage('REDIS_URL est invalide');
         CacheService::getCache();
     }
 }

@@ -46,6 +46,10 @@ Avec Docker, le fichier `compose.yaml` fournit deux services : `redis` (le serve
 docker compose up -d redis redisinsight
 ```
 
+!!! warning "Projet créé avant la v2.16"
+
+    Si la commande répond `no such service: redis`, votre fichier `compose.yaml` ne contient pas encore ces services : ajoutez-les en suivant l'étape 3.3 de la page [Migrer de la version 2.15 à la version 2.16](../migrate/migration-2_15-2_16.md).
+
 Dans le fichier `.env`, choisissez le driver `redis` :
 
 ```diff

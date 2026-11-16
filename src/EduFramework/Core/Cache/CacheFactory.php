@@ -66,6 +66,12 @@ class CacheFactory
      */
     private static function createRedisCache(string $prefix, int $ttl): RedisCache
     {
+        // Une REDIS_URL mal formée n'est signalée qu'ici, quand le driver redis est réellement utilisé
+        $redisUrlError = ConfigCore::getRedisUrlError();
+        if ($redisUrlError !== null) {
+            throw new ErrorConfigException($redisUrlError);
+        }
+
         $parameters = [
             'scheme' => self::env('REDIS_SCHEME', 'tcp'),
             'host' => self::env('REDIS_HOST', '127.0.0.1'),

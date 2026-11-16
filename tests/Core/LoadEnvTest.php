@@ -268,27 +268,37 @@ class LoadEnvTest extends TestCase
     }
 
     /**
-     * Une REDIS_URL d'un autre schéma lève une erreur de configuration explicite
+     * Une REDIS_URL d'un autre format appartient à l'application : elle est ignorée,
+     * sans erreur (un projet existant qui définit sa propre REDIS_URL continue de démarrer)
      * @return void
      */
-    public function testRedisUrlInvalide(): void
+    public function testRedisUrlAutreFormatIgnoree(): void
     {
-        file_put_contents($this->envPath . '.env', "REDIS_URL=http://redis:6379\n");
+        foreach (['tcp://redis:6379', 'localhost:6379', 'http://redis:6379'] as $redisUrl) {
+            putenv('REDIS_URL=' . $redisUrl);
+            ConfigCore::loadEnv($this->envPath);
 
-        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
-        $this->expectExceptionMessage('REDIS_URL est invalide');
-        ConfigCore::loadEnv($this->envPath);
+            $this->assertFalse(ConfigCore::existEnv('REDIS_HOST'), $redisUrl);
+            $this->assertNull(ConfigCore::getRedisUrlError(), $redisUrl);
+        }
     }
 
     /**
-     * Un numéro de base Redis non numérique lève une erreur de configuration
+     * Une REDIS_URL redis:// mal formée n'empêche pas le chargement : l'erreur est mémorisée
+     * et ne sera signalée que si le cache utilise le driver redis
      * @return void
      */
-    public function testRedisUrlBaseInvalide(): void
+    public function testRedisUrlMalFormeeNonBloquante(): void
     {
         putenv('REDIS_URL=redis://redis:6379/cache');
-
-        $this->expectException(\Studoo\EduFramework\Core\Exception\ErrorConfigException::class);
         ConfigCore::loadEnv($this->envPath);
+
+        $this->assertFalse(ConfigCore::existEnv('REDIS_HOST'));
+        $this->assertStringContainsString('REDIS_URL est invalide', (string) ConfigCore::getRedisUrlError());
+
+        // L'erreur disparaît au chargement suivant si la variable est corrigée
+        putenv('REDIS_URL=redis://redis:6379/1');
+        ConfigCore::loadEnv($this->envPath);
+        $this->assertNull(ConfigCore::getRedisUrlError());
     }
 }

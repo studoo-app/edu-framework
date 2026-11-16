@@ -42,7 +42,8 @@ services:
       MAILER_DSN: smtp://mailer:1025
       # Cache applicatif (CacheService) : mêmes valeurs que le .env, sauf l'hôte
       # et le port qui, dans le réseau Docker, sont ceux du service (redis:6379)
-      CACHE_DRIVER: ${CACHE_DRIVER:-redis}
+      # CACHE_DRIVER=redis dans le .env pour utiliser le service redis (fichiers par défaut)
+      CACHE_DRIVER: ${CACHE_DRIVER:-file}
       CACHE_PREFIX: ${CACHE_PREFIX:-edu:}
       CACHE_TTL: ${CACHE_TTL:-3600}
       REDIS_HOST: redis
@@ -72,10 +73,10 @@ services:
       - ./Caddyfile:/etc/frankenphp/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+    # Pas de dépendance au service redis : l'application démarre même si Redis est arrêté
+    # ou si son port est déjà utilisé (le cache n'ouvre une connexion qu'à sa première utilisation)
     depends_on:
       database:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     restart: unless-stopped
 
