@@ -30,7 +30,8 @@
     "nette/php-generator": "^4.1@dev",
     "zircote/swagger-php": "5.8.*",
     "symfony/filesystem": "^7.4",
-    "symfony/process": "^7.4"
+    "symfony/process": "^7.4",
+    "predis/predis": "^3.7"
   }
   ,
   "require-dev": {

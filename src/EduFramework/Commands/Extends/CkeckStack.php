@@ -11,7 +11,11 @@
 
 namespace Studoo\EduFramework\Commands\Extends;
 
+use Predis\PredisException;
+use Studoo\EduFramework\Core\Cache\CacheService;
 use Studoo\EduFramework\Core\ConfigCore;
+use Studoo\EduFramework\Core\Exception\ErrorCacheException;
+use Studoo\EduFramework\Core\Exception\ErrorConfigException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -77,6 +81,51 @@ class CkeckStack
         $this->checkExtension('json');
         // Extension optionnelle : profiler de code de la barre de debug
         $this->checkExtension('excimer');
+
+        $this->symfonyStyle->writeln([
+            '',
+            '<info>Cache check : </info>',
+        ]);
+        $this->checkCache();
+    }
+
+    /**
+     * Vérification du cache applicatif (CacheService) :
+     * driver utilisé et, pour le driver redis, connexion au serveur
+     *
+     * @return void
+     */
+    private function checkCache(): void
+    {
+        try {
+            $driver = CacheService::getCache()->getDriverName();
+        } catch (ErrorConfigException $exception) {
+            $this->symfonyStyle->writeln(['  [X] ' . $exception->getMessage()]);
+            return;
+        }
+
+        $this->symfonyStyle->writeln(['  [*] Driver du cache : ' . $driver . ' (variable CACHE_DRIVER)']);
+        if ($driver !== 'redis') {
+            return;
+        }
+
+        $host = ConfigCore::getEnv('REDIS_HOST');
+        $port = ConfigCore::getEnv('REDIS_PORT');
+        $server = ($host === '' ? '127.0.0.1' : $host) . ':' . ($port === '' ? '6379' : $port);
+        try {
+            $redis = CacheService::getRedis();
+            $redis->ping();
+            $info = $redis->info('server');
+            $version = $info['Server']['redis_version'] ?? $info['redis_version'] ?? '?';
+            $this->symfonyStyle->writeln([
+                '  [*] Serveur Redis ' . $server . ' joignable (version ' . $version . ')',
+            ]);
+        } catch (PredisException | ErrorCacheException $exception) {
+            $this->symfonyStyle->writeln([
+                '  [X] Serveur Redis ' . $server . ' injoignable : ' . $exception->getMessage(),
+                '      Démarrez-le (docker compose up -d redis) ou utilisez CACHE_DRIVER=file dans le .env',
+            ]);
+        }
     }
 
     /**
