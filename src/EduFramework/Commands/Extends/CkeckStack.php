@@ -109,8 +109,9 @@ class CkeckStack
             return;
         }
 
-        $server = ConfigCore::getEnv('REDIS_HOST') ?: '127.0.0.1';
-        $server .= ':' . (ConfigCore::getEnv('REDIS_PORT') ?: '6379');
+        $host = ConfigCore::getEnv('REDIS_HOST');
+        $port = ConfigCore::getEnv('REDIS_PORT');
+        $server = ($host === '' ? '127.0.0.1' : $host) . ':' . ($port === '' ? '6379' : $port);
         try {
             $redis = CacheService::getRedis();
             $redis->ping();

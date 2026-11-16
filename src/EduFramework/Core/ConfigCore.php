@@ -202,7 +202,8 @@ class ConfigCore
             return;
         }
 
-        $url = parse_url($redisUrl) ?: [];
+        $url = parse_url($redisUrl);
+        $url = $url === false ? [] : $url;
         $database = ltrim($url['path'] ?? '', '/');
         if (isset($url['host']) === false || ($database !== '' && ctype_digit($database) === false)) {
             self::$redisUrlError = "La variable REDIS_URL est invalide. Format attendu : "

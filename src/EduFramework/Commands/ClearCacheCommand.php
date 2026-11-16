@@ -141,7 +141,7 @@ class ClearCacheCommand extends CommandManage
             return false;
         }
 
-        $prefix = ConfigCore::existEnv('CACHE_PREFIX') ? ConfigCore::getEnv('CACHE_PREFIX') : 'edu:';
+        $prefix = ConfigCore::existEnv('CACHE_PREFIX') === true ? ConfigCore::getEnv('CACHE_PREFIX') : 'edu:';
         self::$stdOutput->success($driver === 'redis'
             ? "Le cache applicatif Redis a été vidé (clés $prefix*)"
             : "Le cache applicatif a été vidé (driver $driver)");

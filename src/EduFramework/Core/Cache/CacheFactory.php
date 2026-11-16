@@ -41,7 +41,7 @@ class CacheFactory
     public static function create(): CacheInterface
     {
         $driver = self::env('CACHE_DRIVER', 'file');
-        $prefix = ConfigCore::existEnv('CACHE_PREFIX') ? ConfigCore::getEnv('CACHE_PREFIX') : 'edu:';
+        $prefix = ConfigCore::existEnv('CACHE_PREFIX') === true ? ConfigCore::getEnv('CACHE_PREFIX') : 'edu:';
         $ttl = self::intEnv('CACHE_TTL', 3600);
 
         $cache = match ($driver) {
@@ -54,7 +54,7 @@ class CacheFactory
             ),
         };
 
-        return self::isDev() ? new TraceableCache($cache) : $cache;
+        return self::isDev() === true ? new TraceableCache($cache) : $cache;
     }
 
     /**

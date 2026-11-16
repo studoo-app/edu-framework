@@ -173,7 +173,9 @@ class RedisCacheTest extends CacheContractTestCase
             $this->assertSame(1, substr_count((string) file_get_contents($logFile), 'injoignable'));
         } finally {
             ini_set('error_log', (string) $previousLog);
-            @unlink($logFile);
+            if (is_file($logFile) === true) {
+                unlink($logFile);
+            }
         }
     }
 

@@ -11,13 +11,12 @@
 
 namespace Studoo\EduFramework\Core\Cache;
 
-use JsonException;
 use Studoo\EduFramework\Core\Exception\ErrorCacheException;
 
 /**
  * Class AbstractCache
  * Socle commun des drivers qui stockent réellement les valeurs (redis, file) :
- *     - conversion des valeurs en JSON (lisible dans Redis Insight ou dans le fichier)
+ *     - conversion des valeurs en JSON (JsonPayload, lisible dans Redis Insight ou dans le fichier)
  *     - contrôle du nom des clés et de la durée de vie
  *     - méthode remember()
  * Chaque driver n'a plus qu'à lire, écrire et supprimer un texte JSON (méthodes fetch, store, remove).
@@ -68,7 +67,7 @@ abstract class AbstractCache implements CacheInterface
             return $default;
         }
 
-        return $this->decode($key, $payload);
+        return JsonPayload::decode($key, $payload);
     }
 
     /**
@@ -76,7 +75,7 @@ abstract class AbstractCache implements CacheInterface
      */
     public function set(string $key, mixed $value, ?int $ttl = null): bool
     {
-        return $this->store($this->checkKey($key), $this->encode($key, $value), $this->resolveTtl($ttl));
+        return $this->store($this->checkKey($key), JsonPayload::encode($key, $value), $this->resolveTtl($ttl));
     }
 
     /**
@@ -160,44 +159,5 @@ abstract class AbstractCache implements CacheInterface
         }
 
         return $ttl;
-    }
-
-    /**
-     * Convertit une valeur en JSON
-     * @param string $key Nom de la clé (pour le message d'erreur)
-     * @param mixed $value Valeur à convertir
-     * @return string
-     * @throws ErrorCacheException
-     */
-    private function encode(string $key, mixed $value): string
-    {
-        try {
-            return json_encode(
-                $value,
-                JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION
-            );
-        } catch (JsonException $exception) {
-            throw new ErrorCacheException(
-                "La valeur de la clé <" . $key . "> ne peut pas être convertie en JSON : " . $exception->getMessage()
-            );
-        }
-    }
-
-    /**
-     * Convertit un texte JSON en valeur PHP (les objets JSON deviennent des tableaux associatifs)
-     * @param string $key Nom de la clé (pour le message d'erreur)
-     * @param string $payload Texte JSON
-     * @return mixed
-     * @throws ErrorCacheException
-     */
-    private function decode(string $key, string $payload): mixed
-    {
-        try {
-            return json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            throw new ErrorCacheException(
-                "La valeur de la clé <" . $key . "> n'est pas un JSON valide : " . $exception->getMessage()
-            );
-        }
     }
 }

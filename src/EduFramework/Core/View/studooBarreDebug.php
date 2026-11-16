@@ -410,7 +410,7 @@ HTML;
         }
 
         $stats = CacheCollector::stats();
-        $ms = static fn (float $value): string => number_format($value, 2, ',', ' ') . ' ms';
+        $formatMs = static fn (float $value): string => number_format($value, 2, ',', ' ') . ' ms';
 
         $details = [
             'Driver' => CacheService::getCache()->getDriverName(),
@@ -418,7 +418,7 @@ HTML;
             'Lectures absentes (miss)' => (string) $stats['misses'],
             'Écritures' => (string) $stats['writes'],
             'Suppressions' => (string) $stats['deletes'],
-            'Temps cache cumulé' => $ms($stats['duration_ms']),
+            'Temps cache cumulé' => $formatMs($stats['duration_ms']),
         ];
 
         // Détail des premières opérations (Exemple : "1. get ville:list" => "hit — 0,35 ms")
@@ -430,7 +430,7 @@ HTML;
                 default => 'ok',
             };
             $label = ($index + 1) . '. ' . $operation['operation'] . ' ' . mb_strimwidth($operation['key'], 0, 40, '…');
-            $details[$label] = $result . ' — ' . $ms($operation['duration_ms']);
+            $details[$label] = $result . ' — ' . $formatMs($operation['duration_ms']);
         }
         if (count($operations) > $max) {
             $details['…'] = (count($operations) - $max) . ' autre(s) opération(s)';
