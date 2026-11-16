@@ -2,6 +2,32 @@
 
 **Présentation des versions du framework Edu Framework**
 
+## v2.16.0 - 16/11/2026
+
+**features**
+
+- Cache applicatif `CacheService` : `CacheService::getCache()` retourne le cache choisi par `CACHE_DRIVER` (`redis`, `file` ou `none`) avec `get()`, `set()`, `has()`, `delete()`, `clear()` et `remember()`. Les valeurs sont stockées en JSON (lisible dans Redis Insight ou dans le fichier du cache), avec une durée de vie par défaut `CACHE_TTL` et un préfixe de clés `CACHE_PREFIX` (`edu:`). Le cache est créé à sa première utilisation : une page qui ne l'utilise pas n'ouvre aucune connexion
+- Driver Redis avec le client [Predis](https://github.com/predis/predis) (en PHP, aucune extension requise) : `CacheService::getRedis()` donne accès à toutes les commandes Redis (`RENAME`, hash...) avec le même préfixe ; `clear()` ne supprime que les clés du préfixe (`SCAN`, jamais `FLUSHDB`). Un serveur injoignable lève une erreur explicite en mode dev et se comporte comme un cache vide en production
+- Prise en charge de `REDIS_URL` (`redis://` et `rediss://`, format FrankenDeploy / Symfony) : les variables `REDIS_*` manquantes en sont déduites
+- Barre de debug : nouveau bloc **Cache** (lectures trouvées et absentes, écritures, temps et détail des opérations ; vert si toutes les lectures sont trouvées, orange sinon) et driver du cache, serveur Redis et lien vers Redis Insight dans le panneau du bloc DEV
+- `cache:clear` vide aussi le cache applicatif ; nouvelles options `--app-only` et `--files-only`
+- `check:config` affiche le driver du cache et vérifie la connexion au serveur Redis
+- Docker : nouveaux services `redis` (Redis 8) et `redisinsight` dans `compose.yaml` (optionnels : l'application n'en dépend pas)
+
+**maintenance**
+
+- Nouvelles classes `Core\Cache` : `CacheInterface`, `AbstractCache`, `RedisCache`, `FileCache`, `NullCache`, `TraceableCache`, `CacheCollector`, `CacheFactory` et `CacheService` ; nouvelle exception `ErrorCacheException`
+- Nouvelle dépendance `predis/predis` ^3.7
+- CI : service Redis pour exécuter les tests de `RedisCache` (`EDU_TEST_REDIS_HOST` / `EDU_TEST_REDIS_PORT`, ignorés sans serveur)
+- `make:deploy` : le fichier `frankendeploy.yaml` généré explique les options du cache en production (FrankenDeploy ne fournit pas de serveur Redis)
+- Rétro-compatible avec la v2.15 : sans configuration, le cache utilise des fichiers ; une `REDIS_URL` d'un autre format est ignorée et une `REDIS_URL` mal formée n'est signalée qu'avec le driver `redis`
+
+**documentation**
+
+- nouveau tutoriel [Mettre des données en cache avec Redis](build/cache-redis.md) : un batch de synchro `ville:sync` écrit par les étudiants, une page servie depuis le cache sans requête SQL, Redis Insight et `redis-cli`, la fraîcheur des données (cron, write-through, `remember()`), `RENAME` atomique et hash
+- nouvelle page [Migrer de la version 2.15 à la version 2.16](migrate/migration-2_15-2_16.md)
+- mise à jour de [La barre de debug et le profiler](build/debug-bar.md), [Construire](build/index.md) et [Les fonctionnalités](features.md)
+
 ## v2.15.0 - 12/11/2026
 
 **features**

@@ -5,7 +5,7 @@ La version 2.16 du framework apporte le **cache applicatif** (`CacheService`) : 
 
 Elle est **rétro-compatible** : votre application fonctionne après la mise à jour du framework, **sans modifier votre code ni vos fichiers Docker**. Sans configuration, le cache utilise des fichiers (`CACHE_DRIVER=file`) et aucune connexion à Redis n'est ouverte. L'étape 3.3 est **optionnelle** : elle ajoute Redis à votre environnement Docker, pour suivre le tutoriel [Mettre des données en cache avec Redis](../build/cache-redis.md).
 
-Lien sur les release notes : [Changelog](../changelog.md)
+Lien sur les release notes : [v2.16](../changelog.md#v2160-16112026)
 
 !!! info "La version de PHP ne change pas"
 
